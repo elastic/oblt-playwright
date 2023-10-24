@@ -7,3 +7,9 @@ To run tests, specify test name (test_name.spec.ts) and project (ess or serverle
 ```
 npx playwright test apm.spec.ts --project ess --headed
 ```
+
+## Report
+
+```
+npx playwright show-report
+```
