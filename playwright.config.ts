@@ -54,7 +54,7 @@ export default defineConfig({
     },
     {
       name: 'ess',
-      testMatch: 'apm.spec.ts',
+      testMatch: '**\/*.ess.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE,
@@ -63,6 +63,7 @@ export default defineConfig({
     },
     {
       name: 'serverless',
+      testMatch: '**\/*.serverless.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE,
