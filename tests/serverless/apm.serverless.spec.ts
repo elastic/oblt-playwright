@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('APM user journey', async ({ page }) => {
+test('User journey: APM', async ({ page }) => {
   // Navigates to Observability > APM > Services.
   await page.getByRole('link', { name: 'Services' }).click();
   await page.waitForLoadState('networkidle');

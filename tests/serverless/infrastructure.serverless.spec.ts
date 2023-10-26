@@ -4,7 +4,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('Infrastructure monitoring user journey', async ({ page }) => {
+test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.locator('xpath=//button[@aria-controls="project_settings_project_nav"]').click();
   // Opens Fleet.
