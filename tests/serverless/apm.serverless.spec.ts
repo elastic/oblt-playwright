@@ -7,6 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 test('User journey: APM', async ({ page }) => {
   // Navigates to Observability > APM > Services.
+  await page.locator('xpath=//button[@aria-controls="observability_project_nav.apm"]').click();
   await page.getByRole('link', { name: 'Services' }).click();
   await page.waitForLoadState('networkidle');
   

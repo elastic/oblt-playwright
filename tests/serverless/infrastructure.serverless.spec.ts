@@ -5,11 +5,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('User journey: Infrastructure Monitoring', async ({ page }) => {
-  await page.waitForLoadState('networkidle');
+  // Navigates to Observability > Infrastructure > Inventory.
+  await page.locator('xpath=//button[@aria-controls="observability_project_nav.metrics"]').click();
   await page.locator('xpath=//button[@aria-controls="project_settings_project_nav"]').click();
-  // Opens Fleet.
-  await page.locator('xpath=//a[@href="/app/fleet"]').click();
-  await page.waitForLoadState('networkidle');
-  await page.getByTestId('addAgentButton').isVisible();
-  await page.locator('xpath=//div[contains(@class, "euiTableCellContent__text") and contains(., "Loading agents...")]').isHidden();
+  await page.locator('xpath=//*[contains(text(),"Inventory")]').click();
 });
