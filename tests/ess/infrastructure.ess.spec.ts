@@ -32,7 +32,8 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await expect(page.getByTestId('infraWaffleTimeControlsStopRefreshingButton')).toBeVisible();
 
   // Ensures "Hosts" is selected as "Show" option. Clicks on any displayed host to open the detailed view.
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]//button').click({ force: true });
+  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
+  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//div[contains(@class, "euiFlyoutBody__overflowContent")]//*[@data-test-subj="superDatePickerToggleQuickMenuButton"]').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
   await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]')).toBeVisible();
@@ -47,7 +48,7 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
 
   // Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"]').click({ force: true });
+  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
 
   // Filters data by last 24 hours.
