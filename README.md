@@ -1,5 +1,11 @@
 ## Setup 
-Edit .env with ELASTIC_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD.
+Create .env file in the root directory with the following environmental variables:
+
+```
+ELASTIC_URL = 
+ELASTIC_USERNAME = 
+ELASTIC_PASSWORD = 
+```
 
 ## Preconditions
 Elastic deployment/project has APM and Kubernetes datasets.
