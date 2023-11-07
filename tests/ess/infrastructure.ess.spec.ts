@@ -19,9 +19,11 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.getByRole('link', { name: '[Metrics Kubernetes] Cluster Overview' }).click();
   await page.waitForLoadState('networkidle');
 
-  // Filters data by last 24 hours.
+  // Filters data by last 1 hour.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
+  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
+  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
   await expect(page.locator('xpath=//div[@data-title="Cores used vs total cores"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
 
   // Navigates to Observability > Infrastructure > Inventory.
@@ -32,10 +34,13 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await expect(page.getByTestId('infraWaffleTimeControlsStopRefreshingButton')).toBeVisible();
 
   // Ensures "Hosts" is selected as "Show" option. Clicks on any displayed host to open the detailed view.
+  await page.locator('xpath=//span[contains(text(),"Dismiss")]').click();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//div[contains(@class, "euiFlyoutBody__overflowContent")]//*[@data-test-subj="superDatePickerToggleQuickMenuButton"]').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
+  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
+  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
   await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]')).toBeVisible();
   await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]')).toBeVisible();
 
@@ -51,11 +56,12 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
 
-  // Filters data by last 24 hours.
+  // Filters data by last 1 hour.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.getByTestId('globalLoadingIndicator')).toBeVisible();
-  await expect(page.getByTestId('globalLoadingIndicator-hidden')).toBeVisible();
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
+  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
+  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
 
   // Navigates to Observability > Infrastructure > Hosts.
   await page.getByRole('link', { name: 'Hosts' }).click();
