@@ -37,11 +37,13 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//div[contains(@class, "euiFlyoutBody__overflowContent")]//*[@data-test-subj="superDatePickerToggleQuickMenuButton"]').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
   await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
   await page.locator('xpath=//span[contains(text(), "Apply")]').click();
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]')).toBeVisible();
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]')).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await page.waitForLoadState('networkidle');
 
   // Returns back to Observability > Infrastructure > Inventory.
   await page.getByTestId('euiFlyoutCloseButton').click();
@@ -55,23 +57,32 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
 
-  // Filters data by last 1 hour.
+  // Filters data by last 24 hours.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
   await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
   await page.locator('xpath=//span[contains(text(), "Apply")]').click();
   await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
 
   // Navigates to Observability > Infrastructure > Hosts.
   await page.getByRole('link', { name: 'Hosts' }).click();
-  await page.waitForLoadState('networkidle');
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
+  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
+  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
 
   // Clicks on the "Logs" tab, filters logs by searching "error".
   await page.getByTestId('hostsView-tabs-logs').click();
-  await page.getByPlaceholder('Search for log entries...').fill('error');
-  await page.waitForLoadState('networkidle');
+  await page.locator('xpath=//input[@placeholder="Search for log entries..."]').fill('error');
 
   // Clicks on the "Open in Logs"
   await page.locator('xpath=//*[contains(text(),"Open in Logs")]').click();
+  await page.waitForLoadState('networkidle');
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
+  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
+  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
 });
