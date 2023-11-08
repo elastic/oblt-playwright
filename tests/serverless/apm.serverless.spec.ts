@@ -22,8 +22,10 @@ test('User journey: APM', async ({ page }) => {
   
   // Opens the "Transactions" tab. Clicks on the most impactful transaction.
   await page.getByTestId('transactionsTab').click();
+  await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
   await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[@class="euiTableRowCell euiTableRowCell--middle"][1]//a').click();
+  await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
   
   // Clicks on the "Failed transaction correlations" tab.
@@ -62,17 +64,16 @@ test('User journey: APM', async ({ page }) => {
   // Opens the "Explorer" tab, filters data by http.response.status_code : 502.
   await page.getByRole('tab', { name: 'Explorer' }).click();
   await page.waitForLoadState('networkidle');
-  await page.getByPlaceholder('Filter your data using KQL syntax').click();
-  await page.getByPlaceholder('Filter your data using KQL syntax').fill('http.response.status_code : 502');
-  await page.waitForLoadState('networkidle');
-  
-  // Filters data by last 24 hours.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
   await page.waitForLoadState('networkidle');
+  await page.getByPlaceholder('Filter your data using KQL syntax').click();
+  await page.getByPlaceholder('Filter your data using KQL syntax').fill('http.response.status_code : 502');
+  await page.getByTestId('apmTraceSearchBoxSearchButton').click();
+  await page.waitForLoadState('networkidle');
   
   // Clicks on the "View related error" in the timeline.
-  await page.locator('xpath=//a[@title="View related error"][1]').click();
+  await page.locator('xpath=(//a[@title="View related error"])[1]').click();
   await page.waitForLoadState('networkidle');
   
   // Navigates to Observability > APM > Dependencies.
