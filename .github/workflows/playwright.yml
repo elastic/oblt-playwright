@@ -6,6 +6,9 @@ on:
     branches: [ main, master ]
 jobs:
   test:
+    strategy:
+        matrix:
+          shard: [1, 2, 3]
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -18,7 +21,7 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npx playwright test
+      run: npx playwright test apm.ess.spec.ts --project ess --headed --shard=${{ matrix.shard }}/${{ strategy.job-total }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
