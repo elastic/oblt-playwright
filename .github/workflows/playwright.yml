@@ -5,7 +5,40 @@ on:
   pull_request:
     branches: [ main, master ]
 jobs:
+  install:
+    timeout-minutes: 60
+    name: 🔍 Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+ 
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: |
+            node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+ 
+      - name: Cache Playwright binaries
+        uses: actions/cache@v3
+        id: cache-playwright
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+ 
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+ 
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
   test:
+    needs: install
     strategy:
         matrix:
           shard: [1, 2, 3]
@@ -16,12 +49,22 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: 18
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
     - name: Run Playwright tests
-      run: npx playwright test apm.ess.spec.ts --project ess --headed --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+      run: npx playwright test apm.ess.spec.ts --project ess --shard=${{ matrix.shard }}/${{ strategy.job-total }}
     - uses: actions/upload-artifact@v3
       if: always()
       with:
