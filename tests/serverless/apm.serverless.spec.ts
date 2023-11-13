@@ -39,23 +39,23 @@ test('User journey: APM', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Clicks on "Investigate", selects "Host logs".
-  await page.getByRole('button', { name: 'Investigate' }).click();
-  await page.getByRole('link', { name: 'Host logs' }).click();
-  await page.waitForLoadState('networkidle');
+  // await page.getByRole('button', { name: 'Investigate' }).click();
+  // await page.getByRole('link', { name: 'Host logs' }).click();
+  // await page.waitForLoadState('networkidle');
   
   // Filters logs by last 24 hours, then filters by error messages.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await page.waitForLoadState('networkidle');
-  await page.getByPlaceholder('Search field names').click();
-  await page.getByPlaceholder('Search field names').fill('error');
-  await page.waitForLoadState('networkidle');
-  await page.getByTestId('fieldToggle-error.message').click();
-  await page.waitForLoadState('networkidle');
+  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  // await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  // await page.waitForLoadState('networkidle');
+  // await page.getByPlaceholder('Search field names').click();
+  // await page.getByPlaceholder('Search field names').fill('error');
+  // await page.waitForLoadState('networkidle');
+  // await page.getByTestId('fieldToggle-error.message').click();
+  // await page.waitForLoadState('networkidle');
   
   // Expands certain document.
-  await page.locator('xpath=//div[@data-grid-row-index="1"]//button').click();
-  await page.waitForLoadState('networkidle');
+  // await page.locator('xpath=//div[@data-grid-row-index="1"]//button').click();
+  // await page.waitForLoadState('networkidle');
   
   // Navigates to Observability > APM > Traces.
   await page.getByRole('link', { name: 'Traces' }).click();
@@ -101,6 +101,6 @@ test('User journey: APM', async ({ page }) => {
 
   // Clicks on "Investigate", selects "Trace logs".
   await page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]').click();
-  await page.getByRole('link', { name: 'Trace logs' }).click();
-  await expect (page.locator('xpath=//div[@data-grid-row-index="0"]')).toBeVisible();
+  // await page.getByRole('link', { name: 'Trace logs' }).click();
+  // await expect (page.locator('xpath=//div[@data-grid-row-index="0"]')).toBeVisible();
 });

@@ -56,7 +56,6 @@ export default defineConfig({
     {
       name: 'ess',
       testMatch: '**\/*.ess.spec.ts',
-      fullyParallel: true,
       use: {
         ...devices['Desktop Chrome'],
         storageState: STORAGE_STATE,

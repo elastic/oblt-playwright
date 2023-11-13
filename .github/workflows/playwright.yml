@@ -61,6 +61,11 @@ jobs:
     
     - name: Run Playwright tests
       run: npx playwright test apm.ess.spec.ts --project ess --shard=${{ matrix.shard }}/${{ strategy.job-total }}
+      env:
+        ELASTIC_URL: ${{ vars.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ vars.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ vars.ELASTIC_PASSWORD }}
+
     - uses: actions/upload-artifact@v3
       if: always()
       with:

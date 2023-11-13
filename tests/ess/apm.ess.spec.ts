@@ -92,7 +92,8 @@ test('User journey: APM', async ({ page }) => {
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]')).toBeVisible();
 
   // Clicks on the most impactful operation.
-  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a').click();
+  //await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a').click();
+  await page.locator('xpath=//a[contains(text(), "SET")]').click();
   await expect (page.locator('xpath=//*[@type="transaction"]//*[@color]')).toBeVisible();
 
   // Clicks on the transaction in the timeline to open the detailed view.

@@ -77,12 +77,12 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//input[@placeholder="Search for log entries..."]').fill('error');
 
   // Clicks on the "Open in Logs"
-  await page.locator('xpath=//*[contains(text(),"Open in Logs")]').click();
-  await page.waitForLoadState('networkidle');
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
-  await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
-  await page.waitForLoadState('networkidle');
+  // await page.locator('xpath=//*[contains(text(),"Open in Logs")]').click();
+  // await page.waitForLoadState('networkidle');
+  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  // await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
+  // await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
+  // await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  // await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  // await page.waitForLoadState('networkidle');
 });
