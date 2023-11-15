@@ -11,17 +11,27 @@ test('User journey: APM', async ({ page }) => {
   await page.getByRole('link', { name: 'Services' }).click();
   await page.waitForLoadState('networkidle');
   
-  // Clicks on the service name from the Inventory.
+  // Clicks on the service name with the highest error rate from the Inventory.
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await page.waitForLoadState('networkidle');
+  await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
+  await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
+  await expect(page.locator('xpath=//*[@data-icon-type="sortUp"]')).toBeVisible();
   await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a').click();
   await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('networkidle');
   
-  // Filters data by last 24 hours.
+  // Filters data by selected date picker option.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
   
   // Opens the "Transactions" tab. Clicks on the most impactful transaction.
   await page.getByTestId('transactionsTab').click();
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await page.waitForLoadState('networkidle');
   await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
   await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[@class="euiTableRowCell euiTableRowCell--middle"][1]//a').click();
@@ -43,9 +53,9 @@ test('User journey: APM', async ({ page }) => {
   // await page.getByRole('link', { name: 'Host logs' }).click();
   // await page.waitForLoadState('networkidle');
   
-  // Filters logs by last 24 hours, then filters by error messages.
+  // Filters logs by selected date picker option, then filters by error messages.
   // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  // await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   // await page.waitForLoadState('networkidle');
   // await page.getByPlaceholder('Search field names').click();
   // await page.getByPlaceholder('Search field names').fill('error');
@@ -65,7 +75,7 @@ test('User journey: APM', async ({ page }) => {
   await page.getByRole('tab', { name: 'Explorer' }).click();
   await page.waitForLoadState('networkidle');
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
   await page.getByPlaceholder('Filter your data using KQL syntax').click();
   await page.getByPlaceholder('Filter your data using KQL syntax').fill('http.response.status_code : 502');
@@ -80,9 +90,9 @@ test('User journey: APM', async ({ page }) => {
   await page.getByRole('link', { name: 'Dependencies' }).click();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
 
-  // Filters data by last 24 hours.
+  // Filters data by selected date picker option.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
 
   // Selects the dependency, then navigates to the "Operations" tab.

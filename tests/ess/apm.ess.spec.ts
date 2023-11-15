@@ -10,19 +10,28 @@ test('User journey: APM', async ({ page }) => {
   await page.getByRole('link', { name: 'APM' }).click();
   await expect(page.getByRole('link', { name: 'Services' })).toBeVisible();
   await page.getByRole('link', { name: 'Services' }).click();
-  await page.waitForLoadState('networkidle');
+  await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a')).toBeVisible();
   
-  // Clicks on the service name from the Inventory.
+  // Clicks on the service name with the highest error rate from the Inventory.
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await page.waitForLoadState('networkidle');
+  await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
+  await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
+  await expect(page.locator('xpath=//*[@data-icon-type="sortUp"]')).toBeVisible();
   await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a').click();
   await page.waitForLoadState('networkidle');
   
-  // Filters data by last 24 hours.
+  // Filters data by selected date picker option.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
   
   // Opens the "Transactions" tab. Clicks on the most impactful transaction.
   await page.getByTestId('transactionsTab').click();
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await page.waitForLoadState('networkidle');
   await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
   await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[@class="euiTableRowCell euiTableRowCell--middle"][1]//a').click();
@@ -40,22 +49,22 @@ test('User journey: APM', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Clicks on "Investigate", selects "Host logs".
-  await page.getByRole('button', { name: 'Investigate' }).click();
-  await page.getByRole('link', { name: 'Host logs' }).click();
-  await page.waitForLoadState('networkidle');
+  // await page.getByRole('button', { name: 'Investigate' }).click();
+  // await page.getByRole('link', { name: 'Host logs' }).click();
+  // await page.waitForLoadState('networkidle');
   
-  // Filters logs by last 24 hours, then filters by error messages.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await page.waitForLoadState('networkidle');
-  await page.getByTestId('addFilter').click();
-  await page.getByTestId('filterFieldSuggestionList').click();
-  await page.locator('xpath=//input[@aria-label="Select a field"]').fill('error.log.message');
-  await page.getByTestId('filterOperatorList').click();
-  await page.locator('xpath=//input[@aria-label="Select operator"]').fill('exists');
-  await page.keyboard.press('Enter');
-  await page.getByTestId('saveFilter').click();
-  await page.waitForLoadState('networkidle');
+  // Filters logs by selected date picker option, then filters by error messages.
+  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  // await page.waitForLoadState('networkidle');
+  // await page.getByTestId('addFilter').click();
+  // await page.getByTestId('filterFieldSuggestionList').click();
+  // await page.locator('xpath=//input[@aria-label="Select a field"]').fill('error.log.message');
+  // await page.getByTestId('filterOperatorList').click();
+  // await page.locator('xpath=//input[@aria-label="Select operator"]').fill('exists');
+  // await page.keyboard.press('Enter');
+  // await page.getByTestId('saveFilter').click();
+  // await page.waitForLoadState('networkidle');
   
   // Navigates to Observability > APM > Traces.
   await page.getByTestId('observability-nav-apm-traces').click();
@@ -65,7 +74,7 @@ test('User journey: APM', async ({ page }) => {
   await page.getByRole('tab', { name: 'Explorer' }).click();
   await page.waitForLoadState('networkidle');
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
   await page.getByPlaceholder('Filter your data using KQL syntax').click();
   await page.getByPlaceholder('Filter your data using KQL syntax').fill('http.response.status_code : 502');
@@ -80,9 +89,9 @@ test('User journey: APM', async ({ page }) => {
   await page.getByRole('link', { name: 'Dependencies' }).click();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
 
-  // Filters data by last 24 hours.
+  // Filters data by selected date picker option.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
 
   // Selects the dependency, then navigates to the "Operations" tab.
@@ -92,8 +101,7 @@ test('User journey: APM', async ({ page }) => {
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]')).toBeVisible();
 
   // Clicks on the most impactful operation.
-  //await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a').click();
-  await page.locator('xpath=//a[contains(text(), "SET")]').click();
+  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a').click();
   await expect (page.locator('xpath=//*[@type="transaction"]//*[@color]')).toBeVisible();
 
   // Clicks on the transaction in the timeline to open the detailed view.

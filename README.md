@@ -5,7 +5,19 @@ Create .env file in the root directory with the following environmental variable
 ELASTIC_URL = 
 ELASTIC_USERNAME = 
 ELASTIC_PASSWORD = 
+DATE_PICKER = 'Last 24 hours'
 ```
+
+Commonly used date picker options:
+
+- Last 15 minutes
+- Last 30 minutes
+- Last 1 hour
+- Last 24 hours
+- Last 7 days
+- Last 30 days
+- Last 90 days
+- Last 1 year
 
 ## Preconditions
 Install Playwright https://playwright.dev/docs/intro

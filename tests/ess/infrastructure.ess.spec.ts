@@ -37,10 +37,8 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//span[contains(text(),"Dismiss")]').click();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
-  await page.locator('xpath=//div[contains(@class, "euiFlyoutBody__overflowContent")]//*[@data-test-subj="superDatePickerToggleQuickMenuButton"]').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
   await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
@@ -58,19 +56,15 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
 
-  // Filters data by last 24 hours.
+  // Filters data by selected date picker option.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
 
   // Navigates to Observability > Infrastructure > Hosts.
   await page.getByRole('link', { name: 'Hosts' }).click();
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
 
   // Clicks on the "Logs" tab, filters logs by searching "error".
@@ -81,9 +75,7 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//*[contains(text(),"Open in Logs")]').click();
   await page.waitForLoadState('networkidle');
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('24');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
 
@@ -95,9 +87,9 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.getByTestId('infraMetricsExplorerAggregationPickerSelect').click();
   await page.waitForLoadState('networkidle');
 
-  // Filters data by last 24 hours.
+  // Filters data by selected date picker option.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
+  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await expect(page.getByTestId('globalLoadingIndicator')).toBeVisible();
   await expect(page.getByTestId('globalLoadingIndicator-hidden')).toBeVisible();
 

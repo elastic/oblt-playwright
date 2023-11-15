@@ -38,6 +38,9 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     testIdAttribute: 'data-test-subj',
+    video: {
+      mode: 'off',
+      size: {width: 1920, height: 1080}},
   },
 
   /* Configure projects for major browsers */
@@ -58,6 +61,7 @@ export default defineConfig({
       testMatch: '**\/*.ess.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
       },
       dependencies: ['ess_setup'],
@@ -67,6 +71,7 @@ export default defineConfig({
       testMatch: '**\/*.serverless.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
       },
       dependencies: ['serverless_setup'],
