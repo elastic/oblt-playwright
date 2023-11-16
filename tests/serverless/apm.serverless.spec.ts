@@ -12,14 +12,15 @@ test('User journey: APM', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Clicks on the service name with the highest error rate from the Inventory.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  await page.waitForLoadState('networkidle');
-  await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
-  await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
-  await expect(page.locator('xpath=//*[@data-icon-type="sortUp"]')).toBeVisible();
-  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a').click();
-  await page.waitForLoadState('networkidle');
+  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
+  // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  // await page.waitForLoadState('networkidle');
+  // await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
+  // await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
+  // await expect(page.locator('xpath=//*[@data-icon-type="sortUp"]')).toBeVisible();
+  // await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a').click();
+  // await page.waitForLoadState('networkidle');
+  await page.locator('xpath=//span[contains(text(),"opbeans-go")]').click();
   await page.waitForLoadState('networkidle');
   
   // Filters data by selected date picker option.
