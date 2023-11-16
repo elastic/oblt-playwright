@@ -1,0 +1,404 @@
+name: Test at a scale (10 Kibana sessions)
+on: workflow_dispatch
+jobs:
+  install:
+    timeout-minutes: 60
+    name: 🔍 Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+ 
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: |
+            node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+ 
+      - name: Cache Playwright binaries
+        uses: actions/cache@v3
+        id: cache-playwright
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+ 
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+ 
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+  instance01:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance02:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance03:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance04:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance05:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance06:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test apm.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance07:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test apm.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance08:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test apm.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance09:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test apm.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+
+  instance10:
+    needs: install
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test apm.serverless.spec.ts --project serverless
+      env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
