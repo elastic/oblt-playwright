@@ -27,8 +27,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Timeouts */
-  timeout: 500000,
-  expect: {timeout: 500000},
+  timeout: 50000,
+  expect: {timeout: 50000},
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -41,6 +41,8 @@ export default defineConfig({
     video: {
       mode: 'off',
       size: {width: 1920, height: 1080}},
+    
+    permissions: ["clipboard-read", "clipboard-write"],
   },
 
   /* Configure projects for major browsers */
