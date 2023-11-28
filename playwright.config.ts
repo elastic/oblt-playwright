@@ -60,6 +60,15 @@ export default defineConfig({
       }
     },
     {
+      name: 'ess_teardown',
+      testMatch: 'ess.teardown.setup.ts',
+      use: {
+        viewport: {width: 1920, height: 1080},
+        storageState: STORAGE_STATE,
+        testIdAttribute: 'data-test-subj',
+      },
+    },
+    {
       name: 'serverless_teardown',
       testMatch: 'serverless.teardown.setup.ts',
       use: {
@@ -77,6 +86,7 @@ export default defineConfig({
         storageState: STORAGE_STATE,
       },
       dependencies: ['ess_setup'],
+      teardown: 'ess_teardown',
     },
     {
       name: 'serverless',

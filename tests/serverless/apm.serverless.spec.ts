@@ -94,9 +94,8 @@ test('APM - Traces', async ({ page }) => {
   } else {
     await relatedErrors.click();
   }
-  // await page.locator('xpath=(//a[@title="View related error"])[1]').click();
-  await page.waitForLoadState('networkidle');
 
+  await page.waitForLoadState('networkidle');
 });
   
 test('APM - Dependencies', async ({ page }) => {

@@ -12,7 +12,7 @@ test('Average container CPU core usage', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container CPU core usage in ns"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container CPU core usage in ns"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -32,7 +32,7 @@ test('Average container CPU core usage', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container CPU core usage in ns"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container CPU core usage in ns"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -48,7 +48,7 @@ test('Average container CPU core usage', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container CPU core usage in ns"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container CPU core usage in ns"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -70,7 +70,7 @@ test('Average container memory usage in bytes', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container memory usage in bytes"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container memory usage in bytes"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -89,7 +89,7 @@ test('Average container memory usage in bytes', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container memory usage in bytes"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container memory usage in bytes"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -104,7 +104,7 @@ test('Average container memory usage in bytes', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container memory usage in bytes"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Average container memory usage in bytes"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -126,7 +126,7 @@ test('CPU usage per container of the total node cpu', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per container of the total node cpu"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per container of the total node cpu"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -145,7 +145,7 @@ test('CPU usage per container of the total node cpu', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per container of the total node cpu"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per container of the total node cpu"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -160,7 +160,7 @@ test('CPU usage per container of the total node cpu', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per container of the total node cpu"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per container of the total node cpu"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -181,7 +181,7 @@ test('CPU usage per pod of the total node cpu', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per pod of the total node cpu"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per pod of the total node cpu"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -200,7 +200,7 @@ test('CPU usage per pod of the total node cpu', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per pod of the total node cpu"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per pod of the total node cpu"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -215,7 +215,7 @@ test('CPU usage per pod of the total node cpu', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per pod of the total node cpu"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] CPU usage per pod of the total node cpu"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -236,7 +236,7 @@ test('Memory usage per container of the total node memory', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per container of the total node memory"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per container of the total node memory"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -255,7 +255,7 @@ test('Memory usage per container of the total node memory', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per container of the total node memory"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per container of the total node memory"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -270,7 +270,7 @@ test('Memory usage per container of the total node memory', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per container of the total node memory"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per container of the total node memory"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -291,7 +291,7 @@ test('Memory usage per pod of the total node memory', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per pod of the total node memory"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per pod of the total node memory"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -310,7 +310,7 @@ test('Memory usage per pod of the total node memory', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per pod of the total node memory"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per pod of the total node memory"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -325,7 +325,7 @@ test('Memory usage per pod of the total node memory', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per pod of the total node memory"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Memory usage per pod of the total node memory"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -347,7 +347,7 @@ test('Percentile CPU Usage per container', async ({page}) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 15 minutes, gets visualization load time.
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Percentile CPU Usage per container"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Percentile CPU Usage per container"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -366,7 +366,7 @@ test('Percentile CPU Usage per container', async ({page}) => {
   // Filters data by last 1 hour, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 1 hour' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Percentile CPU Usage per container"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Percentile CPU Usage per container"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -381,7 +381,7 @@ test('Percentile CPU Usage per container', async ({page}) => {
   // Filters data by last 24 hours, gets visualization load time.
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: 'Last 24 hours' }).click();
-  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Percentile CPU Usage per container"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="[Playwright Test] Percentile CPU Usage per container"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.getByTestId('embeddablePanelToggleMenuIcon').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();

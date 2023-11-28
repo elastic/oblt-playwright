@@ -93,7 +93,7 @@ test('APM - Traces', async ({ page }) => {
   } else {
     await relatedErrors.click();
   }
-  
+
   await page.waitForLoadState('networkidle');
 });
 
