@@ -2,12 +2,12 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-});
-
-test('User journey: APM', async ({ page }) => {
-  // Navigates to Observability > APM > Services.
   await page.getByTestId('toggleNavButton').click();
   await page.getByRole('link', { name: 'APM' }).click();
+});
+
+test('APM - Services', async ({ page }) => {
+  // Navigates to Observability > APM > Services.
   await expect(page.getByRole('link', { name: 'Services' })).toBeVisible();
   await page.getByRole('link', { name: 'Services' }).click();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a')).toBeVisible();
@@ -66,7 +66,9 @@ test('User journey: APM', async ({ page }) => {
   // await page.keyboard.press('Enter');
   // await page.getByTestId('saveFilter').click();
   // await page.waitForLoadState('networkidle');
-  
+});
+
+test('APM - Traces', async ({ page }) => {
   // Navigates to Observability > APM > Traces.
   await page.getByTestId('observability-nav-apm-traces').click();
   await page.waitForLoadState('networkidle');
@@ -83,9 +85,19 @@ test('User journey: APM', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Clicks on the "View related error" in the timeline.
-  await page.locator('xpath=(//a[@title="View related error"])[1]').click();
-  await page.waitForLoadState('networkidle');
+  const relatedError = page.locator('xpath=(//a[@title="View related error"])[1]');
+  const relatedErrors = page.locator('xpath=(//a[@title="View 2 related errors"])[1]');
+
+  if (await relatedError.isVisible()){
+    await relatedError.click();
+  } else {
+    await relatedErrors.click();
+  }
   
+  await page.waitForLoadState('networkidle');
+});
+
+test('APM - Dependencies', async ({ page }) => {  
   // Navigates to Observability > APM > Dependencies.
   await page.getByRole('link', { name: 'Dependencies' }).click();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
