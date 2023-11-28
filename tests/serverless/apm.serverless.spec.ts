@@ -3,11 +3,11 @@ import { assert } from 'console';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
+  await page.locator('xpath=//button[@aria-controls="observability_project_nav.apm"]').click();
 });
 
-test('User journey: APM', async ({ page }) => {
+test('APM - Services', async ({ page }) => {
   // Navigates to Observability > APM > Services.
-  await page.locator('xpath=//button[@aria-controls="observability_project_nav.apm"]').click();
   await page.getByRole('link', { name: 'Services' }).click();
   await page.waitForLoadState('networkidle');
   
@@ -67,7 +67,9 @@ test('User journey: APM', async ({ page }) => {
   // Expands certain document.
   // await page.locator('xpath=//div[@data-grid-row-index="1"]//button').click();
   // await page.waitForLoadState('networkidle');
-  
+});
+
+test('APM - Traces', async ({ page }) => {
   // Navigates to Observability > APM > Traces.
   await page.getByRole('link', { name: 'Traces' }).click();
   await page.waitForLoadState('networkidle');
@@ -84,9 +86,20 @@ test('User journey: APM', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Clicks on the "View related error" in the timeline.
-  await page.locator('xpath=(//a[@title="View related error"])[1]').click();
+  const relatedError = page.locator('xpath=(//a[@title="View related error"])[1]');
+  const relatedErrors = page.locator('xpath=(//a[@title="View 2 related errors"])[1]');
+
+  if (await relatedError.isVisible()){
+    await relatedError.click();
+  } else {
+    await relatedErrors.click();
+  }
+  // await page.locator('xpath=(//a[@title="View related error"])[1]').click();
   await page.waitForLoadState('networkidle');
+
+});
   
+test('APM - Dependencies', async ({ page }) => {
   // Navigates to Observability > APM > Dependencies.
   await page.getByRole('link', { name: 'Dependencies' }).click();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
