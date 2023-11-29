@@ -2,9 +2,10 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
+  await page.locator('xpath=//button[@aria-controls="metrics"]').click();
 });
 
-test('User journey: Infrastructure Monitoring', async ({ page }) => {
+test('Infrastructure Monitoring - Cluster Overview dashboard', async ({ page }) => {
   // Navigates to Dashboards, filters dashboards by Kubernetes tag.
   await page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]').click();
   await expect(page.locator('xpath=//*[@id="dashboardListingHeading"]')).toBeVisible();
@@ -23,7 +24,7 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
   await page.locator('xpath=//span[contains(text(), "Apply")]').click();
   
-  await expect(page.locator('xpath=//div[@data-title="Cores used vs total cores"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="Cores used vs total cores"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.locator('xpath=//button[@aria-label="Panel options for Cores used vs total cores"]').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -38,7 +39,7 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
   
-  await expect(page.locator('xpath=//div[@data-title="Top memory intensive pods"]//canvas[@class="echCanvasRenderer"]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-title="Top memory intensive pods"]//canvas[@class="echCanvasRenderer"]'), 'visualization should be visible').toBeVisible();
   await page.locator('xpath=//button[@aria-label="Panel options for Top memory intensive pods"]').click();
   await page.getByTestId('embeddablePanelAction-openInspector').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -48,10 +49,10 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   console.log('[Metrics Kubernetes] Top memory intensive pods.');
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
+});
   
+test('Infrastructure - Inventory', async ({ page }) => {
   // Navigates to Observability > Infrastructure > Inventory.
-  await page.locator('xpath=//button[@aria-controls="observability_project_nav.metrics"]').click();
-  await page.locator('xpath=//button[@aria-controls="project_settings_project_nav"]').click();
   await page.locator('xpath=//*[contains(text(),"Inventory")]').click();
 
   // Ensures "Hosts" is selected as "Show" option. Clicks on any displayed host to open the detailed view.
@@ -62,7 +63,7 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
 
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
   await page.waitForLoadState('networkidle');
   await page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
   await page.locator('xpath=//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
@@ -71,10 +72,14 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.getByTestId('inspectorRequestDetailRequest').click();
   await page.getByTestId('inspectorRequestCopyClipboardButton').click();
   console.log('Host: Percentage of CPU time spent in states other than Idle and IOWait, normalized by the number of CPU cores.');
+  async function logQuery() {
+    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
+    }
   logQuery();
   await page.locator('xpath=//div[@data-test-subj="inspectorPanel"]//button[@data-test-subj="euiFlyoutCloseButton"]').click();
 
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
   await page.waitForLoadState('networkidle');
   await page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
   await page.locator('xpath=//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
@@ -103,15 +108,17 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await expect(page.getByTestId('superDatePickerToggleQuickMenuButton')).toBeVisible();
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
-  await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podMemoryUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podMemoryUsage"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
+});
 
+test('Infrastructure - Hosts', async ({ page }) => {
   // Navigates to Observability > Infrastructure > Hosts.
   await page.getByRole('link', { name: 'Hosts' }).click();
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
   await page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
   await page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -119,10 +126,14 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   await page.getByTestId('inspectorRequestDetailRequest').click();
   await page.getByTestId('inspectorRequestCopyClipboardButton').click();
   console.log('All hosts: Percentage of CPU time spent in states other than Idle and IOWait, normalized by the number of CPU cores.');
+  async function logQuery() {
+    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
+    }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsView-metricChart-normalizedLoad1m"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsView-metricChart-normalizedLoad1m"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
   await page.locator('xpath=//div[@data-test-embeddable-id="hostsView-metricChart-normalizedLoad1m"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
   await page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
   await page.getByTestId('inspectorViewChooser').click();
@@ -143,6 +154,6 @@ test('User journey: Infrastructure Monitoring', async ({ page }) => {
   // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
   // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  // await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]')).toBeVisible();
+  // await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]'), 'visualization should be visible').toBeVisible();
   // await page.waitForLoadState('networkidle');
 });

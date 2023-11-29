@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  //await page.getByTestId('toggleNavButton').click();
   await page.locator('xpath=//a[contains(text(),"Analytics")]').click();
   await page.locator('xpath=//a[contains(text(),"Dashboard")]').click();
 });
