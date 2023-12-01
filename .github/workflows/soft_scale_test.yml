@@ -62,7 +62,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -100,7 +100,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -138,7 +138,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -176,7 +176,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -214,7 +214,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -252,7 +252,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -290,7 +290,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -328,7 +328,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -366,7 +366,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
@@ -404,7 +404,7 @@ jobs:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-        DATE_PICKER: ${{ env.DATE_PICKER }}
+        DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v3
       if: always()
