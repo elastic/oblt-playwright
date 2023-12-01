@@ -86,7 +86,7 @@ export default defineConfig({
         storageState: STORAGE_STATE,
       },
       dependencies: ['ess_setup'],
-      teardown: 'ess_teardown',
+      //teardown: 'ess_teardown',
     },
     {
       name: 'serverless',
@@ -97,7 +97,7 @@ export default defineConfig({
         storageState: STORAGE_STATE,
       },
       dependencies: ['serverless_setup'],
-      teardown: 'serverless_teardown',
+      //teardown: 'serverless_teardown',
     },
   ],
 });
