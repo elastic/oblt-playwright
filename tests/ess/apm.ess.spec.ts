@@ -85,10 +85,16 @@ test('APM - Traces', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   
   // Clicks on the "View related error" in the timeline.
-  const relatedError = page.locator('xpath=(//a[@title="View related error"])[1]');
-  const relatedErrors = page.locator('xpath=(//a[@title="View 2 related errors"])[1]');
+  const relatedError = page.locator('xpath=//a[@title="View related error"][1]');
+  const relatedErrors = page.locator('xpath=//a[@title="View 2 related errors"][1]');
 
-  if (await relatedError.isVisible()){
+  if (await relatedError.isHidden()){
+    await page.keyboard.press('ArrowDown');
+  } 
+  
+  await expect.soft(relatedError || relatedErrors).toBeVisible();
+
+  if (await relatedError.isVisible()) {
     await relatedError.click();
   } else {
     await relatedErrors.click();
