@@ -66,7 +66,13 @@ test('Infrastructure - Inventory', async ({ page }) => {
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
   await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  if (await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).isVisible()) {
+    await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  } else {
+    await page.locator('xpath=//input[@aria-label="Time value"]').fill('30');
+    await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Days');
+    await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  }
   await page.waitForLoadState('networkidle');
 
   // Asserts "Host CPU Usage" visualization visibility.
@@ -110,8 +116,13 @@ test('Infrastructure - Inventory', async ({ page }) => {
   await page.waitForLoadState('networkidle');
 
   // Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
+  await page.getByTestId('waffleSortByDropdown').click();
+  await page.getByTestId('waffleSortByValue').click();
+  await page.locator('xpath=//label[@title="Table view"]').click();
+  await page.waitForLoadState('networkidle');
+  //await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').hover();
+  //await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
+  await page.locator('xpath=(//tbody//td)[1]').click();
   await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
 
   // Filters data by selected date picker option.
