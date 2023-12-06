@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  await page.locator('xpath=//button[@aria-controls="metrics"]').click();
+  await page.getByTestId('accordionArrow accordionArrow-observability_project_nav.metrics').click();
 });
 
 test('Infrastructure - Cluster Overview dashboard', async ({ page }) => {
@@ -94,10 +94,10 @@ test('Infrastructure - Inventory', async ({ page }) => {
   await page.locator('xpath=//div[@data-test-subj="inspectorPanel"]//button[@data-test-subj="euiFlyoutCloseButton"]').click();
 
   // Asserts "Host Memory Usage" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]'), '"Host Memory Usage" visualization should be visible').toBeVisible();
+  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsHostMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]'), '"Host Memory Usage" visualization should be visible').toBeVisible();
   await page.waitForLoadState('networkidle');
   // Logs Elasticsearch query.
-  await page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
+  await page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsHostMetricsChartmemoryUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
   await page.locator('xpath=//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
   await page.getByTestId('inspectorViewChooser').click();
   await page.getByTestId('inspectorViewChooserRequests').click();

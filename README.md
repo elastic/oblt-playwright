@@ -16,8 +16,6 @@ Commonly used date picker options:
 - Last 24 hours
 - Last 7 days
 - Last 30 days
-- Last 90 days
-- Last 1 year
 
 ## Preconditions
 Install Playwright https://playwright.dev/docs/intro
@@ -26,16 +24,16 @@ Elastic deployment/project has APM and Kubernetes datasets.
 Tests should be run during ongoing data collection.
 
 ## Running tests
-To run all tests, specify project name (ess or serverless) in the following command:
+To run all tests, specify project name (stateful or serverless) in the following command:
 
 ```
-npx playwright test --project ess --headed
+npx playwright test --project stateful --headed
 ```
 
 To run a specific test, specify its name in the command. Example:
 
 ```
-npx playwright test k8s_aggregations.ess.spec.ts --project ess --headed
+npx playwright test k8s_aggs.ess.spec.ts --project stateful --headed
 ```
 
 ## Test report

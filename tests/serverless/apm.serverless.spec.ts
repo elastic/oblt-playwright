@@ -3,7 +3,7 @@ import { assert } from 'console';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
-  await page.locator('xpath=//button[@aria-controls="apm"]').click();
+  await page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm').click();
 });
 
 test('APM - Services', async ({ page }) => {

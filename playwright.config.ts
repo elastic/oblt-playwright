@@ -27,8 +27,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Timeouts */
-  timeout: 500000,
-  expect: {timeout: 500000},
+  timeout: 300000,
+  expect: {timeout: 300000},
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -48,8 +48,8 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'ess_setup',
-      testMatch: 'ess.setup.ts',
+      name: 'stateful_setup',
+      testMatch: 'stateful.setup.ts',
     },
     {
       name: 'serverless_setup',
@@ -60,8 +60,8 @@ export default defineConfig({
       }
     },
     {
-      name: 'ess_teardown',
-      testMatch: 'ess.teardown.setup.ts',
+      name: 'stateful_teardown',
+      testMatch: 'stateful.teardown.setup.ts',
       use: {
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
@@ -78,15 +78,15 @@ export default defineConfig({
       },
     },
     {
-      name: 'ess',
-      testMatch: '**\/*.ess.spec.ts',
+      name: 'stateful',
+      testMatch: '**\/*.stateful.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
       },
-      dependencies: ['ess_setup'],
-      //teardown: 'ess_teardown',
+      dependencies: ['stateful_setup'],
+      //teardown: 'stateful_teardown',
     },
     {
       name: 'serverless',

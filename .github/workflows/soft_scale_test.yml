@@ -57,7 +57,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run Playwright tests
-      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
@@ -95,7 +95,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run Playwright tests
-      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
@@ -133,7 +133,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run Playwright tests
-      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
@@ -171,7 +171,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run Playwright tests
-      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
@@ -209,7 +209,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run Playwright tests
-      run: npx playwright test infrastructure.serverless.spec.ts --project serverless
+      run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
