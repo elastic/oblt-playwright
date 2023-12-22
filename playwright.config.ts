@@ -2,15 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 import { constants } from 'buffer';
 import path from 'path';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
 require('dotenv').config();
+let apiKey = process.env.API_KEY;
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 
 export default defineConfig({
@@ -98,6 +92,19 @@ export default defineConfig({
       },
       dependencies: ['serverless_setup'],
       //teardown: 'serverless_teardown',
+    },
+    {
+      name: 'api',
+      testMatch: 'api_tests.spec.ts',
+      use: {
+        extraHTTPHeaders: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "accept": "application/json",
+          "kbn-xsrf": "true",
+          "Authorization": apiKey,
+        },
+      },
+      dependencies: [],
     },
   ],
 });
