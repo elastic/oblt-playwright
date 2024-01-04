@@ -1,14 +1,14 @@
-import { test, expect } from '@playwright/test';
-import { assert } from 'console';
+import {test} from '../../tests/fixtures/serverless/basePage';
+import {expect} from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm').click();
+test.beforeEach(async ({ landingPage }) => {
+  await landingPage.goto();
+  await landingPage.clickApplications();
 });
 
-test('APM - Services', async ({ page }) => {
+test('APM - Services', async ({ page, landingPage }) => {
   // Navigates to Observability > APM > Services.
-  await page.getByRole('link', { name: 'Services' }).click();
+  await landingPage.clickServices();
   await page.waitForLoadState('networkidle');
   
   // Clicks on the service name with the highest error rate from the Inventory.
@@ -69,9 +69,9 @@ test('APM - Services', async ({ page }) => {
   // await page.waitForLoadState('networkidle');
 });
 
-test('APM - Traces', async ({ page }) => {
+test('APM - Traces', async ({ page, landingPage }) => {
   // Navigates to Observability > APM > Traces.
-  await page.getByRole('link', { name: 'Traces' }).click();
+  await landingPage.clickTraces();
   await page.waitForLoadState('networkidle');
   
   // Opens the "Explorer" tab, filters data by http.response.status_code : 502.
@@ -104,9 +104,9 @@ test('APM - Traces', async ({ page }) => {
   await page.waitForLoadState('networkidle');
 });
   
-test('APM - Dependencies', async ({ page }) => {
+test('APM - Dependencies', async ({ page, landingPage }) => {
   // Navigates to Observability > APM > Dependencies.
-  await page.getByRole('link', { name: 'Dependencies' }).click();
+  await landingPage.clickDependencies();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
 
   // Filters data by selected date picker option.

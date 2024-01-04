@@ -1,11 +1,12 @@
-import { test, expect } from '@playwright/test';
+import {test} from '../../tests/fixtures/serverless/basePage';
+import {expect} from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.getByTestId('accordionArrow accordionArrow-observability_project_nav.metrics').click();
+test.beforeEach(async ({ page, landingPage }) => {
+  await landingPage.goto();
+  await landingPage.clickInfrastructure();
 });
 
-test('Infrastructure - Cluster Overview dashboard', async ({ page }) => {
+test('Infrastructure - Cluster Overview dashboard', async ({ page, datePicker }) => {
   // Navigates to Dashboards, filters dashboards by Kubernetes tag.
   await page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]').click();
   await expect(page.locator('xpath=//*[@id="dashboardListingHeading"]')).toBeVisible();
@@ -19,10 +20,10 @@ test('Infrastructure - Cluster Overview dashboard', async ({ page }) => {
   await page.waitForLoadState('networkidle');
 
   // Filters data by last 1 hour.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await datePicker.clickDatePicker();
+  await datePicker.fillTimeValue('1');
+  await datePicker.selectTimeUnit('Hours');
+  await datePicker.clickApplyButton();
   
   // Asserts "Cores used vs total cores" visualization visibility.
   await expect(page.locator('xpath=//div[@data-title="Cores used vs total cores"]//canvas[@class="echCanvasRenderer"]'), '"Cores used vs total cores" visualization should be visible').toBeVisible();
@@ -55,9 +56,10 @@ test('Infrastructure - Cluster Overview dashboard', async ({ page }) => {
   await page.getByTestId('euiFlyoutCloseButton').click();
 });
   
-test('Infrastructure - Inventory', async ({ page }) => {
+test('Infrastructure - Inventory', async ({ page, landingPage, datePicker }) => {
   // Navigates to Observability > Infrastructure > Inventory.
-  await page.locator('xpath=//*[contains(text(),"Inventory")]').click();
+  // await page.locator('xpath=//*[contains(text(),"Inventory")]').click();
+  await landingPage.clickInventory();
 
   // Ensures "Hosts" is selected as "Show" option. Clicks on any displayed host to open the detailed view.
   await page.locator('xpath=//span[contains(text(),"Dismiss")]').click();
@@ -65,13 +67,13 @@ test('Infrastructure - Inventory', async ({ page }) => {
   await page.getByTestId('waffleSortByValue').click();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
   await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  if (await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).isVisible()) {
-    await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  } else {
-    await page.locator('xpath=//input[@aria-label="Time value"]').fill('30');
-    await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Days');
-    await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  await datePicker.clickDatePicker();
+  if (await datePicker.assertSelectedDate()) {
+    await datePicker.selectDate();
+  } else {    
+    await datePicker.fillTimeValue('30');
+    await datePicker.selectTimeUnit('Days');
+    await datePicker.clickApplyButton();
   }
   await page.waitForLoadState('networkidle');
 
@@ -126,19 +128,20 @@ test('Infrastructure - Inventory', async ({ page }) => {
   await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
 
   // Filters data by selected date picker option.
-  await expect(page.getByTestId('superDatePickerToggleQuickMenuButton')).toBeVisible();
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await datePicker.assertDatePickerVisibility();
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
   // Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.
   await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]'), '"Pod CPU Usage" visualization should be visible').toBeVisible();
   await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podMemoryUsage"]//div[contains(@class, "echChartContent")]'), '"Pod Memory Usage" visualization should be visible').toBeVisible();
 });
 
-test('Infrastructure - Hosts', async ({ page }) => {
+test('Infrastructure - Hosts', async ({ page, landingPage, datePicker }) => {
   // Navigates to Observability > Infrastructure > Hosts.
-  await page.getByRole('link', { name: 'Hosts' }).click();
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  // await page.getByRole('link', { name: 'Hosts' }).click();
+  await landingPage.clickHosts();
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
   await page.waitForLoadState('networkidle');
 
   // Asserts "Host CPU Usage" visualization visibility.
@@ -182,9 +185,8 @@ test('Infrastructure - Hosts', async ({ page }) => {
   // Clicks on the "Open in Logs"
   // await page.locator('xpath=//*[contains(text(),"Open in Logs")]').click();
   // await page.waitForLoadState('networkidle');
-  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  // await datePicker.clickDatePicker();
+  // await datePicker.selectDate();
   // Asserts "Pod CPU Usage" visualization visibility.
   // await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]'), '"Pod CPU Usage" visualization should be visible').toBeVisible();
   // await page.waitForLoadState('networkidle');
