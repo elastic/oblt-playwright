@@ -15,7 +15,7 @@ serverless_setup('Authentication & Setup', async ( {page} ) => {
   
   // Navigates to Project Settings > Management > Saved Objects.
   await page.locator('xpath=//button[@aria-controls="project_settings_project_nav"][2]').click();
-  await page.locator('xpath=//span[contains(text(),"Management")]').click();
+  await page.locator('xpath=//div[@id="project_settings_project_nav"]//span[contains(text(),"Management")]').click();
   await expect(page.locator('xpath=//a[contains(text(),"Saved Objects")]')).toBeVisible();
   await page.locator('xpath=//a[contains(text(),"Saved Objects")]').click();
 

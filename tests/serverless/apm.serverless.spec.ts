@@ -6,14 +6,14 @@ test.beforeEach(async ({ landingPage }) => {
   await landingPage.clickApplications();
 });
 
-test('APM - Services', async ({ page, landingPage }) => {
+test('APM - Services', async ({ page, landingPage, datePicker }) => {
   // Navigates to Observability > APM > Services.
   await landingPage.clickServices();
   await page.waitForLoadState('networkidle');
   
   // Clicks on the service name with the highest error rate from the Inventory.
-  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  // await datePicker.clickDatePicker();
+  // await datePicker.selectDate();
   // await page.waitForLoadState('networkidle');
   // await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
   // await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
@@ -30,8 +30,8 @@ test('APM - Services', async ({ page, landingPage }) => {
   
   // Opens the "Transactions" tab. Clicks on the most impactful transaction.
   await page.getByTestId('transactionsTab').click();
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
   await page.waitForLoadState('networkidle');
   await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
   await page.waitForLoadState('networkidle');
@@ -55,8 +55,8 @@ test('APM - Services', async ({ page, landingPage }) => {
   // await page.waitForLoadState('networkidle');
   
   // Filters logs by selected date picker option, then filters by error messages.
-  // await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  // await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  // await datePicker.clickDatePicker();
+  // await datePicker.selectDate();
   // await page.waitForLoadState('networkidle');
   // await page.getByPlaceholder('Search field names').click();
   // await page.getByPlaceholder('Search field names').fill('error');
@@ -69,7 +69,7 @@ test('APM - Services', async ({ page, landingPage }) => {
   // await page.waitForLoadState('networkidle');
 });
 
-test('APM - Traces', async ({ page, landingPage }) => {
+test('APM - Traces', async ({ page, landingPage, datePicker }) => {
   // Navigates to Observability > APM > Traces.
   await landingPage.clickTraces();
   await page.waitForLoadState('networkidle');
@@ -77,8 +77,8 @@ test('APM - Traces', async ({ page, landingPage }) => {
   // Opens the "Explorer" tab, filters data by http.response.status_code : 502.
   await page.getByRole('tab', { name: 'Explorer' }).click();
   await page.waitForLoadState('networkidle');
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
   await page.waitForLoadState('networkidle');
   await page.getByPlaceholder('Filter your data using KQL syntax').click();
   await page.getByPlaceholder('Filter your data using KQL syntax').fill('http.response.status_code : 502');
@@ -104,14 +104,14 @@ test('APM - Traces', async ({ page, landingPage }) => {
   await page.waitForLoadState('networkidle');
 });
   
-test('APM - Dependencies', async ({ page, landingPage }) => {
+test('APM - Dependencies', async ({ page, landingPage, datePicker }) => {
   // Navigates to Observability > APM > Dependencies.
   await landingPage.clickDependencies();
   await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
 
   // Filters data by selected date picker option.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
   await page.waitForLoadState('networkidle');
 
   // Selects the dependency, then navigates to the "Operations" tab.
