@@ -12,6 +12,7 @@ export default class LandingPage {
     }
 
 // Locators
+dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
 applications = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm');
 services = () => this.page.getByRole('link', { name: 'Services' });
 traces = () => this.page.getByRole('link', { name: 'Traces' });
@@ -25,16 +26,23 @@ projectSettings = () => this.page.locator('xpath=//button[@aria-controls="projec
 projectManagement = () => this.page.locator('xpath=//span[contains(text(),"Management")]');
 fleet = () => this.page.locator('xpath=//span[contains(text(),"Fleet")]');
 
+public async clickDashboards() {
+    await this.dashboards().click();
+    }
+
 // Applications actions
 public async clickApplications() {
     await this.applications().click();
 }
+
 public async clickServices() {
     await this.services().click();
 }
+
 public async clickTraces() {
     await this.traces().click();
 }
+
 public async clickDependencies() {
     await this.dependencies().click();
 }
@@ -43,9 +51,11 @@ public async clickDependencies() {
 public async clickInfrastructure() {
     await this.infrastructure().click();
 }
+
 public async clickInventory() {
     await this.inventory().click();
 }
+
 public async clickHosts() {
     await this.hosts().click();
 }
@@ -54,9 +64,11 @@ public async clickHosts() {
 public async clickSettings() {
     await this.projectSettings().click();
 }
+
 public async clickManagement() {
     await this.projectManagement().click();
 }
+
 public async clickFleet() {
     await this.fleet().click();
 }

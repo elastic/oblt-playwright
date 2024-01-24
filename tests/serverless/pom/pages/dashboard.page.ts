@@ -9,6 +9,8 @@ export default class DashboardPage {
 
 dashboardHeading = () => this.page.locator('xpath=//*[@id="dashboardListingHeading"]');
 dashboardTable = () => this.page.locator('xpath=//tbody[@class="css-0"]');
+tags = () => this.page.locator('xpath=//span[@data-text="Tags"]');
+tagKubernetes = () => this.page.getByTestId('tag-searchbar-option-Kubernetes');
 visualizationOptions = () => this.page.getByTestId('embeddablePanelToggleMenuIcon');
 inspector = () => this.page.getByTestId('embeddablePanelAction-openInspector');
 inspectorChooser = () => this.page.getByTestId('inspectorViewChooser');
@@ -20,21 +22,35 @@ flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
 public async assertHeadingVisibility() {
     await expect(this.dashboardHeading()).toBeVisible();
     }
+
 public async assertTableVisibility() {
     await expect(this.dashboardTable()).toBeVisible();
     }
+
+public async clickTags() {
+    await this.tags().click();
+    }
+
+public async filterByKubernetesTag() {
+    await this.tags().click();
+    await this.tagKubernetes().click();
+    }
+
 public async clickOptions() {
     await this.visualizationOptions().click();
     }
+
 public async openRequestsView() {
     await this.inspector().click();
     await this.inspectorChooser().click();
     await this.inspectorRequests().click();
     }
+
 public async queryToClipboard() {
     await this.inspectorRequestDetail().click();
     await this.inspectorRequestCopyClipboardButton().click();
     }
+    
 public async closeFlyout() {
     await this.flyoutCloseButton().click();
     }
@@ -54,5 +70,9 @@ public async logQueryTime(name: string, {page}) {
 
 public async assertVisualizationVisibility(title: string, {page}) {
     await expect(page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be visible').toBeVisible();
+    }
+
+public async kubernetesVisualizationOptions(title: string, {page}) {
+    await page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
     }
 }
