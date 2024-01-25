@@ -1,113 +1,81 @@
 import {test} from '../../tests/fixtures/serverless/basePage';
-import {expect} from '@playwright/test';
 
 test.beforeEach(async ({ landingPage }) => {
   await landingPage.goto();
   await landingPage.clickApplications();
 });
 
-test('APM - Services', async ({ page, landingPage, datePicker }) => {
+test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page, servicesPage }) => {
+  const throughput = "throughput";
+
   // Navigates to Observability > APM > Services.
   await landingPage.clickServices();
-  await page.waitForLoadState('networkidle');
-  
-  // Clicks on the service name with the highest error rate from the Inventory.
-  // await datePicker.clickDatePicker();
-  // await datePicker.selectDate();
-  // await page.waitForLoadState('networkidle');
-  // await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
-  // await page.locator('xpath=//span[@title="Failed transaction rate"]').click();
-  // await expect(page.locator('xpath=//*[@data-icon-type="sortUp"]')).toBeVisible();
-  // await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//a').click();
-  // await page.waitForLoadState('networkidle');
-  await page.locator('xpath=//span[contains(text(),"opbeans-go")]').click();
+  await servicesPage.selectServiceOpbeansGo();
   await page.waitForLoadState('networkidle');
   
   // Filters data by selected date picker option.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  await page.waitForLoadState('networkidle');
-  
-  // Opens the "Transactions" tab. Clicks on the most impactful transaction.
-  await page.getByTestId('transactionsTab').click();
   await datePicker.clickDatePicker();
   await datePicker.selectDate();
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
-  await page.waitForLoadState('networkidle');
-  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[@class="euiTableRowCell euiTableRowCell--middle"][1]//a').click();
-  await expect(page.locator('xpath=//div[@data-test-subj="throughput"]//div[contains(@class, "echChartContent")]')).toBeVisible();
-  await page.waitForLoadState('networkidle');
+  
+  // Opens the "Transactions" tab. Clicks on the most impactful transaction.
+  await servicesPage.openTransactionsTab();
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
+  await servicesPage.assertVisualizationVisibility(throughput, {page});
+  await servicesPage.selectMostImpactfulTransaction();
+  await servicesPage.assertVisualizationVisibility(throughput, {page});
   
   // Clicks on the "Failed transaction correlations" tab.
-  await page.getByRole('tab', { name: 'Failed transaction correlations' }).click();
+  await servicesPage.openFailedTransactionCorrelationsTab();
   await page.waitForLoadState('networkidle');
   
   // Sorts the result by field value. Filters the result by a particular field value by clicking on the "+".
-  await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow euiTableRow-hasActions euiTableRow-isClickable"][1]//td[@class="euiTableRowCell euiTableRowCell--hasActions euiTableRowCell--middle"]//span[1]//button')).toBeVisible();
-  await page.getByRole('button', { name: 'Field value', exact: true }).click();
-  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow euiTableRow-hasActions euiTableRow-isClickable"][1]//td[@class="euiTableRowCell euiTableRowCell--hasActions euiTableRowCell--middle"]//span[1]//button').click();
+  await servicesPage.assertCorrelationButtonVisibility();
+  await servicesPage.filterByFieldValue();
+  await servicesPage.filterByCorrelationValue();
   await page.waitForLoadState('networkidle');
   
   // Clicks on "Investigate", selects "Host logs".
-  // await page.getByRole('button', { name: 'Investigate' }).click();
-  // await page.getByRole('link', { name: 'Host logs' }).click();
-  // await page.waitForLoadState('networkidle');
+  await servicesPage.clickInvestigate();
+  await servicesPage.clickHostLogsButton();
+  await page.waitForLoadState('networkidle');
   
   // Filters logs by selected date picker option, then filters by error messages.
-  // await datePicker.clickDatePicker();
-  // await datePicker.selectDate();
-  // await page.waitForLoadState('networkidle');
-  // await page.getByPlaceholder('Search field names').click();
-  // await page.getByPlaceholder('Search field names').fill('error');
-  // await page.waitForLoadState('networkidle');
-  // await page.getByTestId('fieldToggle-error.message').click();
-  // await page.waitForLoadState('networkidle');
+  await datePicker.clickDatePicker();
+  await datePicker.selectDate();
+  await page.waitForLoadState('networkidle');
+  await logsExplorerPage.filterLogsByError();
+  await page.waitForLoadState('networkidle');
   
   // Expands certain document.
-  // await page.locator('xpath=//div[@data-grid-row-index="1"]//button').click();
-  // await page.waitForLoadState('networkidle');
+  await logsExplorerPage.expandLogsDataGridRow();
+  await page.waitForLoadState('networkidle');
 });
 
-test('APM - Traces', async ({ page, landingPage, datePicker }) => {
+test('APM - Traces', async ({ datePicker, landingPage, page, servicesPage, tracesPage }) => {
   // Navigates to Observability > APM > Traces.
   await landingPage.clickTraces();
   await page.waitForLoadState('networkidle');
   
   // Opens the "Explorer" tab, filters data by http.response.status_code : 502.
-  await page.getByRole('tab', { name: 'Explorer' }).click();
+  await tracesPage.openExplorerTab();
   await page.waitForLoadState('networkidle');
   await datePicker.clickDatePicker();
   await datePicker.selectDate();
   await page.waitForLoadState('networkidle');
-  await page.getByPlaceholder('Filter your data using KQL syntax').click();
-  await page.getByPlaceholder('Filter your data using KQL syntax').fill('http.response.status_code : 502');
-  await page.getByTestId('apmTraceSearchBoxSearchButton').click();
+  await tracesPage.filterBy('http.response.status_code : 502');
   await page.waitForLoadState('networkidle');
   
   // Clicks on the "View related error" in the timeline.
-  const relatedError = page.locator('xpath=(//a[@title="View related error"])[1]');
-  const relatedErrors = page.locator('xpath=(//a[@title="View 2 related errors"])[1]');
-
-  if (await relatedError.isHidden()){
-    await page.keyboard.press('ArrowDown');
-  } 
-  
-  await expect.soft(relatedError || relatedErrors).toBeVisible();
-
-  if (await relatedError.isVisible()) {
-    await relatedError.click();
-  } else {
-    await relatedErrors.click();
-  }
-
-  await page.waitForLoadState('networkidle');
+  await tracesPage.clickRelatedError();
+  await servicesPage.assertErrorDistributionChartVisibility();
 });
-  
-test('APM - Dependencies', async ({ page, landingPage, datePicker }) => {
+
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, logsExplorerPage, page }) => {
   // Navigates to Observability > APM > Dependencies.
   await landingPage.clickDependencies();
-  await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a')).toBeVisible();
+  await dependenciesPage.assertTableVisibility();
 
   // Filters data by selected date picker option.
   await datePicker.clickDatePicker();
@@ -115,21 +83,21 @@ test('APM - Dependencies', async ({ page, landingPage, datePicker }) => {
   await page.waitForLoadState('networkidle');
 
   // Selects the dependency, then navigates to the "Operations" tab.
-  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a').click();
-  await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]')).toBeVisible();
-  await page.getByRole('tab', { name: 'Operations' }).click();
-  await expect(page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]')).toBeVisible();
+  await dependenciesPage.clickTableRow();
+  await dependenciesPage.assertTableVisibility();
+  await dependenciesPage.openOperationsTab();
+  await dependenciesPage.assertTableVisibility();
 
   // Clicks on the most impactful operation.
-  await page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a').click();
-  await expect (page.locator('xpath=//*[@type="transaction"]//*[@color]')).toBeVisible();
+  await dependenciesPage.clickTableRow();
+  await dependenciesPage.assertTimelineTransactionVisibility();
 
   // Clicks on the transaction in the timeline to open the detailed view.
-  await page.locator('xpath=//*[@type="transaction"]//*[@color]').click();
-  await expect (page.locator('xpath=//*[@role="tabpanel"]')).toBeVisible();
+  await dependenciesPage.clickTimelineTransaction();
+  await dependenciesPage.assertTabPanelVisibility();
 
   // Clicks on "Investigate", selects "Trace logs".
-  await page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]').click();
-  // await page.getByRole('link', { name: 'Trace logs' }).click();
-  // await expect (page.locator('xpath=//div[@data-grid-row-index="0"]')).toBeVisible();
+  await dependenciesPage.clickInvestigateButton();
+  await dependenciesPage.clickTraceLogsButton();
+  await logsExplorerPage.assertDataGridRowVisibility();
 });
