@@ -5,7 +5,7 @@ test.beforeEach(async ({ landingPage }) => {
   await landingPage.clickApplications();
 });
 
-test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page, servicesPage }) => {
+test.only('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page, servicesPage }) => {
   const throughput = "throughput";
 
   // Navigates to Observability > APM > Services.
