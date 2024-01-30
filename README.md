@@ -7,6 +7,9 @@ ELASTIC_USERNAME =
 ELASTIC_PASSWORD = 
 DATE_PICKER = 'Last 24 hours'
 API_KEY = 
+
+// Path to json report
+REPORT_FILE = ../test-results/results.json
 ```
 
 Commonly used date picker options:
@@ -44,8 +47,18 @@ To authorize access to Elasticsearch resources, pass your API key into `API_KEY`
 npx playwright test --project api
 ```
 
-## Test report
+## Test report (HTML)
 
 ```
 npx playwright show-report
 ```
+
+## Flattening JSON report
+
+To split JSON report into multiple files (each representing a single test):
+
+```
+node tools\split_report.ts
+```
+
+Resulting files stored in the same directory as the original report.
