@@ -25,7 +25,7 @@ Commonly used date picker options:
 ## Preconditions
 Install Playwright https://playwright.dev/docs/intro
 
-Elastic deployment/project has APM and Kubernetes datasets.
+Elastic deployment/project has [required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data_mapping.md).
 Tests should be run during ongoing data collection.
 
 ## Running tests
