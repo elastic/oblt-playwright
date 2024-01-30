@@ -2,13 +2,14 @@
 Create .env file in the root directory with the following environmental variables:
 
 ```
+// Required
 ELASTIC_URL = 
 ELASTIC_USERNAME = 
 ELASTIC_PASSWORD = 
 DATE_PICKER = 'Last 24 hours'
-API_KEY = 
 
-// Path to json report
+// Optional
+API_KEY = 
 REPORT_FILE = ../test-results/results.json
 ```
 

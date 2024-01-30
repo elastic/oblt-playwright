@@ -9,7 +9,7 @@ import ServicesPage from "../../serverless/pom/pages/services.page";
 import TracesPage from "../../serverless/pom/pages/traces.page";
 
 
-export const test = base.extend<{dashboardPage: DashboardPage, datePicker: DatePicker, dependencies: DependenciesPage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
+export const test = base.extend<{dashboardPage: DashboardPage, datePicker: DatePicker, dependenciesPage: DependenciesPage, infrastructurePage: InfrastructurePage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
 ({
     dashboardPage: async({page}, use) => {
         await use(new DashboardPage(page));
