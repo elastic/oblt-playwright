@@ -12,6 +12,7 @@ export default class LandingPage {
     }
 
 // Locators
+discover = () => this.page.locator('xpath=//a[@id="observability-log-explorer"]');
 dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
 applications = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm');
 services = () => this.page.getByRole('link', { name: 'Services' });
@@ -25,6 +26,10 @@ hosts = () => this.page.getByRole('link', { name: 'Hosts' });
 projectSettings = () => this.page.locator('xpath=//button[@aria-controls="project_settings_project_nav"][2]');
 projectManagement = () => this.page.locator('xpath=//span[contains(text(),"Management")]');
 fleet = () => this.page.locator('xpath=//span[contains(text(),"Fleet")]');
+
+public async clickDiscover() {
+    await this.discover().click();
+    }
 
 public async clickDashboards() {
     await this.dashboards().click();
