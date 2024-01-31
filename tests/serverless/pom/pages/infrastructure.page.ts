@@ -85,23 +85,23 @@ public async closeInfraAssetDetailsFlyout() {
     await this.flyoutInfraAssetDetailsCloseButton().click();
     }
 
-public async logQuery({page}) {
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+public async logQuery() {
+    let clipboardData = await this.page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
     }
 
-public async hostsVisualizationOptions(title: string, {page}) {
-    await page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]`).click();
+public async hostsVisualizationOptions(title: string) {
+    await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]`).click();
     }
 
-public async assertVisualizationVisibility(title: string, {page}) {
-    if (await page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
-    await page.keyboard.press('ArrowDown');
+public async assertVisibilityVisualization(title: string) {
+    if (await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
+    await this.page.keyboard.press('ArrowDown');
   }
-  await expect(page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+  await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
     }
 
-public async assertPodVisualizationVisibility(title: string, {page}) {
-    await expect(page.locator(`xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+public async assertVisibilityPodVisualization(title: string) {
+    await expect(this.page.locator(`xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
     }
 }

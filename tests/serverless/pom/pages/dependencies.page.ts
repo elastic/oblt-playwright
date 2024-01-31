@@ -18,7 +18,7 @@ export default class DependenciesPage {
         await this.dependencyTableRow().click();
         }
 
-    public async assertTabPanelVisibility() {
+    public async assertVisibilityTabPanel() {
         await expect(this.tabPanel()).toBeVisible();
         }
 
@@ -26,7 +26,7 @@ export default class DependenciesPage {
         await this.dependenciesOperationsTab().click();
         }
 
-    public async assertTableVisibility() {
+    public async assertVisibilityTable() {
         await expect(this.dependencyTableRow()).toBeVisible();
         }
 
@@ -34,7 +34,7 @@ export default class DependenciesPage {
         await this.timelineTransaction().click();
         }
 
-    public async assertTimelineTransactionVisibility() {
+    public async assertVisibilityTimelineTransaction() {
         await expect(this.timelineTransaction()).toBeVisible();
         }
 

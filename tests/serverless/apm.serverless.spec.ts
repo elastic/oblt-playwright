@@ -22,16 +22,16 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
   await servicesPage.openTransactionsTab();
   await datePicker.clickDatePicker();
   await datePicker.selectDate();
-  await servicesPage.assertVisualizationVisibility(throughput, {page});
+  await servicesPage.assertVisibilityVisualization(throughput);
   await servicesPage.selectMostImpactfulTransaction();
-  await servicesPage.assertVisualizationVisibility(throughput, {page});
+  await servicesPage.assertVisibilityVisualization(throughput);
   
   // Clicks on the "Failed transaction correlations" tab.
   await servicesPage.openFailedTransactionCorrelationsTab();
   await page.waitForLoadState('networkidle');
   
   // Sorts the result by field value. Filters the result by a particular field value by clicking on the "+".
-  await servicesPage.assertCorrelationButtonVisibility();
+  await servicesPage.assertVisibilityCorrelationButton();
   await servicesPage.filterByFieldValue();
   await servicesPage.filterByCorrelationValue();
   await page.waitForLoadState('networkidle');
@@ -69,13 +69,13 @@ test('APM - Traces', async ({ datePicker, landingPage, page, servicesPage, trace
   
   // Clicks on the "View related error" in the timeline.
   await tracesPage.clickRelatedError();
-  await servicesPage.assertErrorDistributionChartVisibility();
+  await servicesPage.assertVisibilityErrorDistributionChart();
 });
 
 test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, logsExplorerPage, page }) => {
   // Navigates to Observability > APM > Dependencies.
   await landingPage.clickDependencies();
-  await dependenciesPage.assertTableVisibility();
+  await dependenciesPage.assertVisibilityTable();
 
   // Filters data by selected date picker option.
   await datePicker.clickDatePicker();
@@ -84,20 +84,20 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
 
   // Selects the dependency, then navigates to the "Operations" tab.
   await dependenciesPage.clickTableRow();
-  await dependenciesPage.assertTableVisibility();
+  await dependenciesPage.assertVisibilityTable();
   await dependenciesPage.openOperationsTab();
-  await dependenciesPage.assertTableVisibility();
+  await dependenciesPage.assertVisibilityTable();
 
   // Clicks on the most impactful operation.
   await dependenciesPage.clickTableRow();
-  await dependenciesPage.assertTimelineTransactionVisibility();
+  await dependenciesPage.assertVisibilityTimelineTransaction();
 
   // Clicks on the transaction in the timeline to open the detailed view.
   await dependenciesPage.clickTimelineTransaction();
-  await dependenciesPage.assertTabPanelVisibility();
+  await dependenciesPage.assertVisibilityTabPanel();
 
   // Clicks on "Investigate", selects "Trace logs".
   await dependenciesPage.clickInvestigateButton();
   await dependenciesPage.clickTraceLogsButton();
-  await logsExplorerPage.assertDataGridRowVisibility();
+  await logsExplorerPage.assertVisibilityDataGridRow();
 });

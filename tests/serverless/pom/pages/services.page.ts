@@ -29,8 +29,8 @@ export default class ServicesPage {
         await this.mostImpactfulTransaction().click();
         }
 
-    public async assertVisualizationVisibility(title: string, {page}) {
-        await expect(page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+    public async assertVisibilityVisualization(title: string) {
+        await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
         }
         
     public async openFailedTransactionCorrelationsTab() {
@@ -41,7 +41,7 @@ export default class ServicesPage {
         await this.filterByCorrelationValueButton().click();
         }
 
-    public async assertCorrelationButtonVisibility() {
+    public async assertVisibilityCorrelationButton() {
         await expect(this.filterByCorrelationValueButton()).toBeVisible();
         }
 
@@ -57,7 +57,7 @@ export default class ServicesPage {
         await this.investigateHostLogsButton().click();
         }
 
-    public async assertErrorDistributionChartVisibility() {
+    public async assertVisibilityErrorDistributionChart() {
         await expect(this.errorDistributionChart()).toBeVisible();
         }
 }

@@ -23,7 +23,7 @@ export default class LogsExplorerPage {
         await this.logsExplorerTab().click();
         }
 
-    public async assertCanvasVisibility() {
+    public async assertVisibilityCanvas() {
         await expect(this.logsCanvas()).toBeVisible();
         }
     
@@ -37,19 +37,19 @@ export default class LogsExplorerPage {
         await this.logsDataGridRow().click();
         }
 
-    public async assertDataGridRowVisibility() {
+    public async assertVisibilityDataGridRow() {
         await expect(this.logsDataGridRow()).toBeVisible();
         }
 
-    public async assertFlyoutLogMessageVisibility() {
+    public async assertVisibilityFlyoutLogMessage() {
         await expect(this.flyoutLogMessage()).toBeVisible();
         }
 
-    public async assertFlyoutServiceVisibility() {
+    public async assertVisibilityFlyoutService() {
         await expect(this.flyoutService()).toBeVisible();
         }
 
-    public async assertDocViewerVisibility() {
+    public async assertVisibilityDocViewer() {
         await expect(this.docViewer()).toBeVisible();
         }
 

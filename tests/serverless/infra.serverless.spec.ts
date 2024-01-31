@@ -12,8 +12,8 @@ test('Infrastructure - Cluster Overview dashboard', async ({ page, landingPage, 
 
   // Navigates to Dashboards, filters dashboards by Kubernetes tag.
   await landingPage.clickDashboards();
-  await dashboardPage.assertHeadingVisibility();
-  await dashboardPage.assertTableVisibility();
+  await dashboardPage.assertVisibilityHeading();
+  await dashboardPage.assertVisibilityTable();
   await dashboardPage.filterByKubernetesTag();
   await page.waitForLoadState('networkidle');
 
@@ -28,29 +28,29 @@ test('Infrastructure - Cluster Overview dashboard', async ({ page, landingPage, 
   await datePicker.clickApplyButton();
   
   // Asserts "Cores used vs total cores" visualization visibility.
-  await dashboardPage.assertVisualizationVisibility(coresUsedVsTotal, {page});
+  await dashboardPage.assertVisibilityVisualization(coresUsedVsTotal);
   
   // Logs Elasticsearch query.
-  await dashboardPage.kubernetesVisualizationOptions(coresUsedVsTotal, {page});
+  await dashboardPage.kubernetesVisualizationOptions(coresUsedVsTotal);
   await dashboardPage.openRequestsView();
   await dashboardPage.queryToClipboard();
   console.log('[Metrics Kubernetes] Cores used vs total cores.');
-  await dashboardPage.logQuery({page});
+  await dashboardPage.logQuery();
   await dashboardPage.closeFlyout();
   
   // Asserts "Top memory intensive pods" visualization visibility.
-  await dashboardPage.assertVisualizationVisibility(topMemoryIntensivePods, {page});
+  await dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods);
   
   // Logs Elasticsearch query.
-  await dashboardPage.kubernetesVisualizationOptions(topMemoryIntensivePods, {page});
+  await dashboardPage.kubernetesVisualizationOptions(topMemoryIntensivePods);
   await dashboardPage.openRequestsView();
   await dashboardPage.queryToClipboard();
   console.log('[Metrics Kubernetes] Top memory intensive pods.');
-  await dashboardPage.logQuery({page});
+  await dashboardPage.logQuery();
   await dashboardPage.closeFlyout();
 });
 
-test.only('Infrastructure - Inventory', async ({ page, infrastructurePage, landingPage, datePicker }) => {
+test('Infrastructure - Inventory', async ({ page, infrastructurePage, landingPage, datePicker }) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
@@ -73,8 +73,8 @@ test.only('Infrastructure - Inventory', async ({ page, infrastructurePage, landi
   }
   await page.waitForLoadState('networkidle');
   // Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.
-  await infrastructurePage.assertVisualizationVisibility(cpuUsage, {page});
-  await infrastructurePage.assertVisualizationVisibility(memoryUsage, {page});
+  await infrastructurePage.assertVisibilityVisualization(cpuUsage);
+  await infrastructurePage.assertVisibilityVisualization(memoryUsage);
 
   // Returns back to Observability > Infrastructure > Inventory.
   await infrastructurePage.closeInfraAssetDetailsFlyout();
@@ -93,8 +93,8 @@ test.only('Infrastructure - Inventory', async ({ page, infrastructurePage, landi
   await datePicker.clickDatePicker();
   await datePicker.selectDate();
   // Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.
-  await infrastructurePage.assertPodVisualizationVisibility(podCpuUsage, {page});
-  await infrastructurePage.assertPodVisualizationVisibility(podMemoryUsage, {page});
+  await infrastructurePage.assertVisibilityPodVisualization(podCpuUsage);
+  await infrastructurePage.assertVisibilityPodVisualization(podMemoryUsage);
 });
 
 test('Infrastructure - Hosts', async ({ page, infrastructurePage, landingPage, datePicker }) => {
@@ -108,8 +108,8 @@ test('Infrastructure - Hosts', async ({ page, infrastructurePage, landingPage, d
   await page.waitForLoadState('networkidle');
 
   // Asserts "Host CPU Usage" & "Host Normalized Load" visualizations visibility.
-  await infrastructurePage.assertVisualizationVisibility(cpuUsage, {page});
-  await infrastructurePage.assertVisualizationVisibility(normalizedLoad, {page});
+  await infrastructurePage.assertVisibilityVisualization(cpuUsage);
+  await infrastructurePage.assertVisibilityVisualization(normalizedLoad);
 
   // Clicks on the "Logs" tab, filters logs by searching "error".
   await infrastructurePage.openHostsLogs();

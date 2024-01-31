@@ -19,11 +19,11 @@ inspectorRequestDetail = () => this.page.getByTestId('inspectorRequestDetailRequ
 inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
 flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
 
-public async assertHeadingVisibility() {
+public async assertVisibilityHeading() {
     await expect(this.dashboardHeading()).toBeVisible();
     }
 
-public async assertTableVisibility() {
+public async assertVisibilityTable() {
     await expect(this.dashboardTable()).toBeVisible();
     }
 
@@ -55,24 +55,24 @@ public async closeFlyout() {
     await this.flyoutCloseButton().click();
     }
 
-public async logQuery({page}) {
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+public async logQuery() {
+    let clipboardData = await this.page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
     }
 
-public async logRequestTime(name: string, {page}) {
-    console.log(name, process.env.DATE_PICKER , "| Request time:", await page.locator('xpath=//span[contains(@class, "euiBadge__text")]').textContent());
+public async logRequestTime(name: string) {
+    console.log(name, process.env.DATE_PICKER , "| Request time:", await this.page.locator('xpath=//span[contains(@class, "euiBadge__text")]').textContent());
     }
 
-public async logQueryTime(name: string, {page}) {
-    console.log(name, process.env.DATE_PICKER , "| Query time:", await page.locator('xpath=//tr[@class="euiTableRow"][5]/td[2]//span[contains(@class, "euiTableCellContent__text")]').textContent());
+public async logQueryTime(name: string) {
+    console.log(name, process.env.DATE_PICKER , "| Query time:", await this.page.locator('xpath=//tr[@class="euiTableRow"][5]/td[2]//span[contains(@class, "euiTableCellContent__text")]').textContent());
     }
 
-public async assertVisualizationVisibility(title: string, {page}) {
-    await expect(page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be visible').toBeVisible();
+public async assertVisibilityVisualization(title: string) {
+    await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be visible').toBeVisible();
     }
 
-public async kubernetesVisualizationOptions(title: string, {page}) {
-    await page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
+public async kubernetesVisualizationOptions(title: string) {
+    await this.page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
     }
 }
