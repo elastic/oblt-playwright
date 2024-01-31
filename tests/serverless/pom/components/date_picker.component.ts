@@ -13,7 +13,7 @@ timeUnit = () => this.page.locator('xpath=//*[@aria-label="Time unit"]');
 applyButton = () => this.page.locator('xpath=//span[contains(text(), "Apply")]');
 selectedDate = () => this.page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER });
 
-public async assertDatePickerVisibility() {
+public async assertVisibilityDatePicker() {
     await expect(this.datePicker()).toBeVisible();
 }
 public async clickDatePicker() {

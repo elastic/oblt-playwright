@@ -1,5 +1,4 @@
 import {test} from '../../tests/fixtures/serverless/basePage';
-import {expect} from '@playwright/test';
 
 test.beforeEach(async ({ page, landingPage }) => {
   await landingPage.goto();
@@ -89,7 +88,7 @@ test('Infrastructure - Inventory', async ({ page, infrastructurePage, landingPag
   await infrastructurePage.clickTableCell();
   await infrastructurePage.clickPopoverK8sMetrics();
   // Filters data by selected date picker option.
-  await datePicker.assertDatePickerVisibility();
+  await datePicker.assertVisibilityDatePicker();
   await datePicker.clickDatePicker();
   await datePicker.selectDate();
   // Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.
