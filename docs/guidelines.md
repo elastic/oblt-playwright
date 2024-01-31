@@ -25,8 +25,8 @@ await <page>.<method>;
 ```
 |   | Tip |
 | ------------- | ------------- |
-| `<fixtures>`  | [Pages/components](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) that you're going to use.<br><br>Example:<br><br>`{ datePicker, landingPage, logsExplorerPage, page, servicesPage }`<br><br>Note: `page` is always required.  |
 | `<test section>`  | [Navigation method](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#landingpage) to a target section.<br><br>Example:<br><br>`clickInfrastructure();`  |
+| `<fixtures>`  | [Pages/components](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) that you're going to use.<br><br>Example:<br><br>`{ datePicker, landingPage, logsExplorerPage, page, servicesPage }`<br><br>Note: `page` is always required.  |
 | `<page>.<method>` | Specify target page and desired action separated by a dot.<br>Use [this section](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) to check what methods are available for the specified page/component.<br><br>Example:<br><br>`await logsExplorerPage.clickLogsExplorerTab();`<br>`await logsExplorerPage.assertVisibilityCanvas();`<br>`await logsExplorerPage.assertVisibilityDataGridRow();`<br><br>Some methods require passing a parameter:<br><br>`assertVisibilityVisualization(string)`<br><br>For example, you might need to pass a visualization name:<br><br>`assertVisibilityVisualization('infraAssetDetailsKPIcpuUsage')`<br><br>If a method is used repeatedly across the test, it is recommended adding a variable for the value:<br><br>`const cpuUsage = 'infraAssetDetailsKPIcpuUsage';`<br>`await infrastructurePage.assertVisibilityVisualization(cpuUsage);` |
 
 **General tip:**
@@ -34,11 +34,6 @@ await <page>.<method>;
 [Make tests as isolated as possible](https://playwright.dev/docs/best-practices#make-tests-as-isolated-as-possible)
 
 > Each test should be completely isolated from another test and should run independently with its own local storage, session storage, data, cookies etc. [Test isolation](https://playwright.dev/docs/browser-contexts) improves reproducibility, makes debugging easier and prevents cascading test failures.
-
-
-## Creating a test from scratch
-
-...
 
 # Available methods
 
