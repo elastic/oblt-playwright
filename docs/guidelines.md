@@ -206,3 +206,30 @@ await <page>.<method>;
 | `clickRelatedError()` |
 | `filterBy(string)` |
 </details>
+
+## Adding a new method to existing page/component model
+
+Check if there's a locator to UI element you need to interact with among [available](https://github.com/elastic/oblt-playwright/tree/main/tests/serverless/pom) for that page. If there's not, add a new one using the following template:
+
+```
+<locatorFunction> = () => this.page.<locator>;
+```
+|   | Tip  |
+| :------------ | ------------- |
+| `<locatorFunction>` | Example:<br><br>`logsExplorerTab` |
+| `<locator>` | Specify a locator to UI element.<br>Check this [guide](https://playwright.dev/docs/locators) on locating elements.<br><br>Examples:<br><br>`getByTestId('logExplorerTab')`<br>`locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]')`<br>`getByRole('link', { name: 'Traces' })` |
+
+Now create a method using that locator(s).
+
+```
+public async <methodName>(<parameters>) {
+        await this.<locatorFunction>.<action>;
+        }
+```
+
+|   | Tip  |
+| :------------ | ------------- |
+| `<methodName>` | Example:<br><br>`expandLogsDataGridRow()` |
+| `<parameters>` | Example:<br><br>`assertVisibilityPodVisualization(title: string)` |
+| `<locatorFunction>` | Specify a locator function.<br><br>Examples:<br><br>`logsExplorerTab()` |
+| `<action>` | Specify an action to perform against a locator. See this [page](https://playwright.dev/docs/input) to check available actions.<br><br>Examples:<br><br>`click()`<br>`fill('error')` |
