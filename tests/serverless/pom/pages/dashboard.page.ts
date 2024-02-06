@@ -55,17 +55,17 @@ public async closeFlyout() {
     await this.flyoutCloseButton().click();
     }
 
-public async logQuery() {
+public async logQuery(title: string) {
     let clipboardData = await this.page.evaluate("navigator.clipboard.readText()");
-    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
+    console.log(title, ': ', '\n', clipboardData, '\n');
     }
 
 public async logRequestTime(name: string) {
-    console.log(name, process.env.DATE_PICKER , "| Request time:", await this.page.locator('xpath=//span[contains(@class, "euiBadge__text")]').textContent());
+    console.log(name, " ", process.env.DATE_PICKER , "| Request time:", await this.page.locator('xpath=//span[contains(@class, "euiBadge__text")]').textContent());
     }
 
 public async logQueryTime(name: string) {
-    console.log(name, process.env.DATE_PICKER , "| Query time:", await this.page.locator('xpath=//tr[@class="euiTableRow"][5]/td[2]//span[contains(@class, "euiTableCellContent__text")]').textContent());
+    console.log(name, " ", process.env.DATE_PICKER , "| Query time:", await this.page.locator('xpath=//tr[@class="euiTableRow"][5]/td[2]//span[contains(@class, "euiTableCellContent__text")]').textContent());
     }
 
 public async assertVisibilityVisualization(title: string) {

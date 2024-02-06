@@ -6,7 +6,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('Average container CPU core usage', async ({page, dashboardPage, datePicker}) => {
-  const name = "Average container CPU core usage |";
+  const name = "Average container CPU core usage";
   const title = "[Playwright Test] Average container CPU core usage in ns";
 
   // Navigates to Dashboards, opens "Average container CPU core usage in ns" dashboard.
@@ -26,12 +26,12 @@ test('Average container CPU core usage', async ({page, dashboardPage, datePicker
 
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });
 
 test('Average container memory usage in bytes', async ({page, dashboardPage, datePicker}) => {
-  const name = "Average container memory usage in bytes |";
+  const name = "Average container memory usage in bytes";
   const title = "[Playwright Test] Average container memory usage in bytes";
 
   // Navigates to Dashboards, opens "Average container memory usage in bytes" dashboard.
@@ -51,12 +51,12 @@ test('Average container memory usage in bytes', async ({page, dashboardPage, dat
 
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });
 
 test('CPU usage per container of the total node cpu', async ({page, dashboardPage, datePicker}) => {
-  const name = "CPU usage per container of the total node cpu |";
+  const name = "CPU usage per container of the total node cpu";
   const title = "[Playwright Test] CPU usage per container of the total node cpu";
 
   // Navigates to Dashboards, opens "CPU usage per container of the total node cpu" dashboard.
@@ -76,12 +76,12 @@ test('CPU usage per container of the total node cpu', async ({page, dashboardPag
   
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });
 
 test('CPU usage per pod of the total node cpu', async ({page, dashboardPage, datePicker}) => {
-  const name = "CPU usage per pod of the total node cpu |";
+  const name = "CPU usage per pod of the total node cpu";
   const title = "[Playwright Test] CPU usage per pod of the total node cpu";
 
   // Navigates to Dashboards, opens "CPU usage per pod of the total node cpu" dashboard.
@@ -101,12 +101,12 @@ test('CPU usage per pod of the total node cpu', async ({page, dashboardPage, dat
   
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });
 
 test('Memory usage per container of the total node memory', async ({page, dashboardPage, datePicker}) => {
-  const name = "Memory usage per container of the total node memory |";
+  const name = "Memory usage per container of the total node memory";
   const title = "[Playwright Test] Memory usage per container of the total node memory";
 
   // Navigates to Dashboards, opens "Memory usage per container of the total node memory" dashboard.
@@ -126,12 +126,12 @@ test('Memory usage per container of the total node memory', async ({page, dashbo
   
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });
 
 test('Memory usage per pod of the total node memory', async ({page, dashboardPage, datePicker}) => {
-  const name = "Memory usage per pod of the total node memory |";
+  const name = "Memory usage per pod of the total node memory";
   const title = "[Playwright Test] Memory usage per pod of the total node memory";
 
   // Navigates to Dashboards, opens "Memory usage per pod of the total node memory" dashboard.
@@ -151,12 +151,12 @@ test('Memory usage per pod of the total node memory', async ({page, dashboardPag
   
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });
 
 test('Percentile CPU Usage per container', async ({page, dashboardPage, datePicker}) => {
-  const name = "Percentile CPU Usage per container |";
+  const name = "Percentile CPU Usage per container";
   const title = "[Playwright Test] Percentile CPU Usage per container";
 
   // Navigates to Dashboards, opens "Percentile CPU Usage per container" dashboard.
@@ -176,6 +176,6 @@ test('Percentile CPU Usage per container', async ({page, dashboardPage, datePick
   
   // Logs Elasticsearch query.
   await dashboardPage.queryToClipboard();
-  await dashboardPage.logQuery();
+  await dashboardPage.logQuery(name);
   await dashboardPage.closeFlyout();
 });

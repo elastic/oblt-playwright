@@ -85,9 +85,9 @@ public async closeInfraAssetDetailsFlyout() {
     await this.flyoutInfraAssetDetailsCloseButton().click();
     }
 
-public async logQuery() {
+public async logQuery(title: string) {
     let clipboardData = await this.page.evaluate("navigator.clipboard.readText()");
-    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
+    console.log(title, ': ', '\n', clipboardData, '\n');
     }
 
 public async hostsVisualizationOptions(title: string) {

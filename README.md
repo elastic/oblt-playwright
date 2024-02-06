@@ -54,12 +54,31 @@ npx playwright test --project api
 npx playwright show-report
 ```
 
-## Flattening JSON report
+## Get Elasticsearch-friendly JSON test report 
 
-To split JSON report into multiple files (each representing a single test):
+Playwright spits out JSON test reports that have nested structure, which not quite suitable for Elasticsearch - results for each test is a separate array with its own fields. The problem is nested field type is not supported in Kibana visualizations. To solve this, use [this script](https://github.com/elastic/oblt-playwright/blob/main/tools/split_report.ts) to flatten and split a report by each test:
 
 ```
 node tools\split_report.ts
 ```
+<details>
+<summary>Here is an example of how the outcome of that script might look like</summary>
+
+```
+{
+  "title": "Infrastructure - Cluster Overview dashboard",
+  "startTime": "2024-02-02T12:50:18.767Z",
+  "status": "passed",
+  "duration": 59414,
+  "step01": 4351,
+  "step02": 1064,
+  "step03": 24160,
+  "workerIndex": 1,
+  "retry": 0,
+  "errors": [],
+  "timeout": 300000
+}
+```
+</details>
 
 Resulting files stored in the same directory as the original report.
