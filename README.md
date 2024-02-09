@@ -38,7 +38,13 @@ npx playwright test --project stateful --headed
 To run a specific test, specify its name in the command. Example:
 
 ```
-npx playwright test k8s_aggs.ess.spec.ts --project stateful --headed
+npx playwright test apm.serverless.spec.ts --project serverless --headed
+```
+
+To run an authorization test, execute `serverless.setup.ts` or `stateful.setup.ts` as follows:
+
+```
+npx playwright test serverless.setup.ts
 ```
 
 ### API testing

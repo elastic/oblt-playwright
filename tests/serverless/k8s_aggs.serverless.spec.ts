@@ -1,6 +1,20 @@
 import {test} from '../../tests/fixtures/serverless/basePage';
 import {expect} from '@playwright/test';
 
+test.beforeAll(async ({ page }) => {
+  // Navigates to Project Settings > Management > Saved Objects.
+  await page.locator('xpath=//button[@aria-controls="project_settings_project_nav"][2]').click();
+  await page.locator('xpath=//div[@id="project_settings_project_nav"]//span[contains(text(),"Management")]').click();
+  await expect(page.locator('xpath=//a[contains(text(),"Saved Objects")]')).toBeVisible();
+  await page.locator('xpath=//a[contains(text(),"Saved Objects")]').click();
+
+  // Uploads dashboards.
+  await page.getByRole('button', { name: 'Import' }).click();
+  await page.locator('xpath=//input[@type="file"]').setInputFiles('./tests/fixtures/dashboards/dashboards.ndjson');
+  await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
+  await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
+});
+
 test.beforeEach(async ({ page }) => {
   await page.goto('/app/dashboards');
 });

@@ -32,29 +32,25 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
     await servicesPage.assertVisibilityVisualization(throughput);
   });
   
-  // Step 04 - Clicks on the "Failed transaction correlations" tab.
+  // Step 04 - Clicks on the "Failed transaction correlations" tab. Filters the result by a particular field value.
   await test.step('step04', async () => {
     await servicesPage.openFailedTransactionCorrelationsTab();
     await page.waitForLoadState('networkidle');
-  });
-  
-  // Step 05 - Sorts the result by field value. Filters the result by a particular field value by clicking on the "+".
-  await test.step('step05', async () => {
     await servicesPage.assertVisibilityCorrelationButton();
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
     await page.waitForLoadState('networkidle');
   });
   
-  // Step 06 - Clicks on "Investigate", navigates to "Host logs".
-  await test.step('step06', async () => {
+  // Step 05 - Clicks on "Investigate", navigates to "Host logs".
+  await test.step('step05', async () => {
     await servicesPage.clickInvestigate();
     await servicesPage.clickHostLogsButton();
     await page.waitForLoadState('networkidle');
   });
   
-  // Step 07 - Filters logs by selected date picker option, then filters by error messages.
-  await test.step('step07', async () => {
+  // Step 06 - Filters logs by selected date picker option, then filters by error messages.
+  await test.step('step06', async () => {
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
     await page.waitForLoadState('networkidle');
@@ -62,8 +58,8 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
     await page.waitForLoadState('networkidle');
   });
   
-  // Step 08 - Expands certain document.
-  await test.step('step08', async () => {
+  // Step 07 - Expands certain document.
+  await test.step('step07', async () => {
     await logsExplorerPage.expandLogsDataGridRow();
     await page.waitForLoadState('networkidle');
   });
