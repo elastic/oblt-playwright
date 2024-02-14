@@ -26,12 +26,13 @@ Commonly used date picker options:
 - Last 30 days
 
 ### Create alerting rules
-It is recommended to create alerting rules before generating any data.
-Specify relevant project name in the test command:
+In case there is a need to assess the impact of alerting rules execution on performance, it is recommended to create alerting rules before generating any data by running the following command: 
 
 ```
-npx playwright test --project serverless_setup_alerting_rules
+npx playwright test alerting_rules.api.spec.ts --project api
 ```
+
+Note: API key is required.
 
 ## Running tests
 

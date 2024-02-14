@@ -93,24 +93,15 @@ export default defineConfig({
       //teardown: 'serverless_teardown',
     },
     {
-      name: 'serverless_setup_alerting_rules',
-      testMatch: 'serverless.setup_alerting_rules.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        viewport: {width: 1920, height: 1080},
-        storageState: STORAGE_STATE,
-      },
-      dependencies: ['serverless_auth'],
-    },
-    {
       name: 'api',
       testMatch: '**\/*.api.spec.ts',
       use: {
         extraHTTPHeaders: {
-          "Content-Type": "application/json;charset=UTF-8",
           "accept": "application/json",
-          "kbn-xsrf": "true",
           "Authorization": apiKey,
+          "Content-Type": "application/json;charset=UTF-8",
+          "kbn-xsrf": "true",          
+          "x-elastic-internal-origin": "kibana"
         },
       },
       dependencies: [],
