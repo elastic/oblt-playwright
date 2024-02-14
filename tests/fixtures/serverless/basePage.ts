@@ -1,4 +1,5 @@
 import {test as base} from "@playwright/test";
+import AlertsPage from "../../serverless/pom/pages/alerts.page";
 import DashboardPage from "../../serverless/pom/pages/dashboard.page";
 import DatePicker from "../../serverless/pom/components/date_picker.component";
 import DependenciesPage from "../../serverless/pom/pages/dependencies.page";
@@ -9,8 +10,12 @@ import ServicesPage from "../../serverless/pom/pages/services.page";
 import TracesPage from "../../serverless/pom/pages/traces.page";
 
 
-export const test = base.extend<{dashboardPage: DashboardPage, datePicker: DatePicker, dependenciesPage: DependenciesPage, infrastructurePage: InfrastructurePage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
+export const test = base.extend<{alertsPage: AlertsPage, dashboardPage: DashboardPage, datePicker: DatePicker, dependenciesPage: DependenciesPage, infrastructurePage: InfrastructurePage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
 ({
+    alertsPage: async({page}, use) => {
+        await use(new AlertsPage(page));
+    },
+    
     dashboardPage: async({page}, use) => {
         await use(new DashboardPage(page));
     },

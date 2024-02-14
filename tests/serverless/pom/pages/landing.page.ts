@@ -14,6 +14,7 @@ export default class LandingPage {
 // Locators
 discover = () => this.page.locator('xpath=//a[@id="observability-log-explorer"]');
 dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
+alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
 applications = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm');
 services = () => this.page.getByRole('link', { name: 'Services' });
 traces = () => this.page.getByRole('link', { name: 'Traces' });
@@ -33,6 +34,10 @@ public async clickDiscover() {
 
 public async clickDashboards() {
     await this.dashboards().click();
+    }
+
+public async clickAlerts() {
+    await this.alerts().click();
     }
 
 // Applications actions

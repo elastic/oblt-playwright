@@ -6,6 +6,7 @@ export default class InfrastructurePage {
     constructor(page: Page) {
         this.page = page;
     }
+    
 dismiss = () => this.page.locator('xpath=//span[contains(text(),"Dismiss")]');
 sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
 sortWaffleByValue = () => this.page.getByTestId('waffleSortByValue');

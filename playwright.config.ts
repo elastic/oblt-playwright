@@ -1,5 +1,4 @@
 import { defineConfig, devices } from '@playwright/test';
-import { constants } from 'buffer';
 import path from 'path';
 
 require('dotenv').config();
@@ -40,19 +39,18 @@ export default defineConfig({
     permissions: ["clipboard-read"],
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: 'stateful_setup',
       testMatch: 'stateful.setup.ts',
     },
     {
-      name: 'serverless_setup',
-      testMatch: 'serverless.setup.ts',
+      name: 'serverless_auth',
+      testMatch: 'serverless.auth.ts',
       use: {
         testIdAttribute: 'data-test-id',
         viewport: {width: 1920, height: 1080},
-      }
+      },
     },
     {
       name: 'stateful_teardown',
@@ -91,12 +89,22 @@ export default defineConfig({
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
       },
-      dependencies: ['serverless_setup'],
+      dependencies: ['serverless_auth'],
       //teardown: 'serverless_teardown',
     },
     {
+      name: 'serverless_setup_alerting_rules',
+      testMatch: 'serverless.setup_alerting_rules.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1080},
+        storageState: STORAGE_STATE,
+      },
+      dependencies: ['serverless_auth'],
+    },
+    {
       name: 'api',
-      testMatch: 'api_tests.spec.ts',
+      testMatch: '**\/*.api.spec.ts',
       use: {
         extraHTTPHeaders: {
           "Content-Type": "application/json;charset=UTF-8",

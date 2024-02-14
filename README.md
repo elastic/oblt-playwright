@@ -7,8 +7,6 @@ ELASTIC_URL =
 ELASTIC_USERNAME = 
 ELASTIC_PASSWORD = 
 DATE_PICKER = 'Last 24 hours'
-
-// Optional
 API_KEY = 
 REPORT_FILE = ../test-results/results.json
 ```
@@ -29,22 +27,36 @@ Elastic deployment/project has [required datasets](https://github.com/elastic/ob
 Tests should be run during ongoing data collection.
 
 ## Running tests
-To run all tests, specify project name (`stateful` or `serverless`) in the following command:
+
+By default, tests run in headless mode. To launch browsers in headed mode, use the `--headed` flag.
+
+### Run all tests
+Specify project name (`stateful` or `serverless`) in the test command. Example:
 
 ```
-npx playwright test --project stateful --headed
+npx playwright test --project serverless --headed
 ```
 
-To run a specific test, specify its name in the command. Example:
+### Run a specific test
+Specify test name in the test command. Example:
 
 ```
 npx playwright test apm.serverless.spec.ts --project serverless --headed
 ```
 
-To run an authorization test, execute `serverless.setup.ts` or `stateful.setup.ts` as follows:
+### Run an authorization test
+Execute `serverless.auth.ts` or `stateful.setup.ts` as follows:
 
 ```
-npx playwright test serverless.setup.ts
+npx playwright test serverless.auth.ts
+```
+
+### Create alerting rules
+It is recommended to create alerting rules before generating any data.
+Specify relevant project name in the test command:
+
+```
+npx playwright test --project serverless_setup_alerting_rules
 ```
 
 ### API testing
