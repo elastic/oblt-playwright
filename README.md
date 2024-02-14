@@ -2,7 +2,6 @@
 Create .env file in the root directory with the following environmental variables:
 
 ```
-// Required
 ELASTIC_URL = 
 ELASTIC_USERNAME = 
 ELASTIC_PASSWORD = 
@@ -64,12 +63,6 @@ To authorize access to Elasticsearch resources, pass your API key into `API_KEY`
 
 ```
 npx playwright test --project api
-```
-
-## Test report (HTML)
-
-```
-npx playwright show-report
 ```
 
 ## Get Elasticsearch-friendly JSON test report 
