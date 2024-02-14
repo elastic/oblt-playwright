@@ -1,3 +1,9 @@
+## Preconditions
+Install Playwright https://playwright.dev/docs/intro
+
+Elastic deployment/project has [required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data_mapping.md).
+Tests should be run during ongoing data collection.
+
 ## Setup 
 Create .env file in the root directory with the following environmental variables:
 
@@ -19,11 +25,13 @@ Commonly used date picker options:
 - Last 7 days
 - Last 30 days
 
-## Preconditions
-Install Playwright https://playwright.dev/docs/intro
+### Create alerting rules
+It is recommended to create alerting rules before generating any data.
+Specify relevant project name in the test command:
 
-Elastic deployment/project has [required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data_mapping.md).
-Tests should be run during ongoing data collection.
+```
+npx playwright test --project serverless_setup_alerting_rules
+```
 
 ## Running tests
 
@@ -48,14 +56,6 @@ Execute `serverless.auth.ts` or `stateful.setup.ts` as follows:
 
 ```
 npx playwright test serverless.auth.ts
-```
-
-### Create alerting rules
-It is recommended to create alerting rules before generating any data.
-Specify relevant project name in the test command:
-
-```
-npx playwright test --project serverless_setup_alerting_rules
 ```
 
 ### API testing
