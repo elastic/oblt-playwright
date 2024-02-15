@@ -2,8 +2,8 @@ import {test, expect} from '@playwright/test';
 
 test.describe.serial('Create alerting rules', () => {
     test('Error count threshold.', async({request}) => { 
-        var ruleName = "[Playwright Test] apm.error_rate";
-        var response = await request.post('/api/alerting/rule', {
+        const ruleName = "[Playwright Test] apm.error_rate";
+        let response = await request.post('/api/alerting/rule', {
             data: {
                 "params":{
                     "threshold":5000,
@@ -21,12 +21,14 @@ test.describe.serial('Create alerting rules', () => {
         expect(response.status()).toBe(200);
         const name = await response.text();
         expect(name).toContain(ruleName);
-        console.log("Alerting rule has been created.");
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
     });
 
     test('Failed transaction rate threshold.', async({request}) => { 
-        var ruleName = "[Playwright Test] apm.transaction_error_rate";
-        var response = await request.post('/api/alerting/rule', {
+        const ruleName = "[Playwright Test] apm.transaction_error_rate";
+        let response = await request.post('/api/alerting/rule', {
             data: {
                 "params":{
                     "threshold":25,
@@ -44,12 +46,14 @@ test.describe.serial('Create alerting rules', () => {
         expect(response.status()).toBe(200);
         const name = await response.text();
         expect(name).toContain(ruleName);
-        console.log("Alerting rule has been created.");
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
     });
 
     test('Latency threshold.', async({request}) => { 
-        var ruleName = "[Playwright Test] apm.transaction_duration";
-        var response = await request.post('/api/alerting/rule', {
+        const ruleName = "[Playwright Test] apm.transaction_duration";
+        let response = await request.post('/api/alerting/rule', {
             data: {
                 "params":{
                     "aggregationType":"avg",
@@ -68,12 +72,14 @@ test.describe.serial('Create alerting rules', () => {
         expect(response.status()).toBe(200);
         const name = await response.text();
         expect(name).toContain(ruleName);
-        console.log("Alerting rule has been created.");
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
     });
 
     test('Hosts - Memory threshold.', async({request}) => { 
-        var ruleName = "[Playwright Test] metrics.alert.inventory.threshold";
-        var response = await request.post('/api/alerting/rule', {
+        const ruleName = "[Playwright Test] host.memory.threshold";
+        let response = await request.post('/api/alerting/rule', {
             data: {
                 "params":{
                     "nodeType":"host",
@@ -104,7 +110,122 @@ test.describe.serial('Create alerting rules', () => {
         expect(response.status()).toBe(200);
         const name = await response.text();
         expect(name).toContain(ruleName);
-        console.log("Alerting rule has been created.");
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
     });
 
+    test('Hosts - CPU threshold.', async({request}) => { 
+        const ruleName = "[Playwright Test] host.cpu.threshold";
+        let response = await request.post('/api/alerting/rule', {
+            data: {
+                "params":{
+                    "nodeType":"host",
+                    "criteria":[
+                        {
+                            "metric":"cpu",
+                            "comparator":">",
+                            "threshold":[3],
+                            "timeSize":1,
+                            "timeUnit":"m",
+                            "customMetric":{
+                                "type":"custom",
+                                "id":"alert-custom-metric",
+                                "aggregation":"avg",
+                                "field":""
+                            }
+                        }
+                    ],
+                    "sourceId":"default"
+                },
+                "consumer":"alerts",
+                "schedule":{"interval":"1m"},
+                "name":ruleName,
+                "rule_type_id":"metrics.alert.inventory.threshold"
+            }
+        })
+        
+        expect(response.status()).toBe(200);
+        const name = await response.text();
+        expect(name).toContain(ruleName);
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
+    });
+
+    test('Kubernetes Pods - Memory threshold.', async({request}) => { 
+        const ruleName = "[Playwright Test] pod.memory.threshold";
+        let response = await request.post('/api/alerting/rule', {
+            data: {
+                "params":{
+                    "nodeType":"pod",
+                    "criteria":[
+                        {
+                            "metric":"memory",
+                            "comparator":">",
+                            "threshold":[12],
+                            "timeSize":1,
+                            "timeUnit":"m",
+                            "customMetric":{
+                                "type":"custom",
+                                "id":"alert-custom-metric",
+                                "aggregation":"avg",
+                                "field":""
+                            }
+                        }
+                    ],
+                    "sourceId":"default"
+                },
+                "consumer":"alerts",
+                "schedule":{"interval":"1m"},
+                "name":ruleName,
+                "rule_type_id":"metrics.alert.inventory.threshold"
+            }
+        })
+        
+        expect(response.status()).toBe(200);
+        const name = await response.text();
+        expect(name).toContain(ruleName);
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
+    });
+
+    test('Kubernetes Pods - Outbound traffic threshold.', async({request}) => { 
+        const ruleName = "[Playwright Test] pod.outbound_traffic.threshold";
+        let response = await request.post('/api/alerting/rule', {
+            data: {
+                "params":{
+                    "nodeType":"pod",
+                    "criteria":[
+                        {
+                            "metric":"tx",
+                            "comparator":">",
+                            "threshold":[35000],
+                            "timeSize":1,
+                            "timeUnit":"m",
+                            "customMetric":{
+                                "type":"custom",
+                                "id":"alert-custom-metric",
+                                "aggregation":"avg",
+                                "field":""
+                            }
+                        }
+                    ],
+                    "sourceId":"default"
+                },
+                "consumer":"alerts",
+                "schedule":{"interval":"1m"},
+                "name":ruleName,
+                "rule_type_id":"metrics.alert.inventory.threshold"
+            }
+        })
+        
+        expect(response.status()).toBe(200);
+        const name = await response.text();
+        expect(name).toContain(ruleName);
+        if (response.status() >= 200 && response.status() < 300) {
+            console.log("Alerting rule", ruleName, "has been created.")
+        }
+    });
 });
