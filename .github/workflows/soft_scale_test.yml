@@ -1,5 +1,8 @@
 name: Test at a scale (10 Kibana sessions)
 on: workflow_dispatch
+permissions:
+  contents: read
+
 jobs:
   install:
     timeout-minutes: 60

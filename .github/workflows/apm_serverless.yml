@@ -1,5 +1,8 @@
 name: APM on Serverless
 on: workflow_dispatch
+permissions:
+  contents: read
+
 jobs:
   install:
     timeout-minutes: 60
