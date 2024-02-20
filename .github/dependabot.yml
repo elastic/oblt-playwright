@@ -13,6 +13,7 @@ updates:
     directory: "/"
     reviewers:
       - "elastic/observablt-ci"
+      - "ablnk"
     schedule:
       interval: "weekly"
       day: "sunday"
