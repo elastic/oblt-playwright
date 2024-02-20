@@ -9,11 +9,11 @@ jobs:
     name: 🔍 Install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
  
       - name: Cache node_modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-node-modules
         with:
           path: |
@@ -21,7 +21,7 @@ jobs:
           key: modules-${{ hashFiles('package-lock.json') }}
  
       - name: Cache Playwright binaries
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-playwright
         with:
           path: |
@@ -41,19 +41,19 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: 18
     - name: Cache node_modules
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           node_modules
         key: modules-${{ hashFiles('package-lock.json') }}
  
     - name: Cache Playwright
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/ms-playwright
@@ -66,7 +66,7 @@ jobs:
         ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
         ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
