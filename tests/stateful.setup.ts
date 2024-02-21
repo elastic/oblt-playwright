@@ -1,7 +1,7 @@
 import { expect, test as ess_setup } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 
-ess_setup('Authentication & Setup', async ({page}) => {
+ess_setup('Authentication', async ({page}) => {
   await page.goto(process.env.ELASTIC_URL);
   await page.getByRole('button', { name: 'Log in with Elasticsearch' }).click();
   await page.getByLabel('Username').fill(process.env.ELASTIC_USERNAME);

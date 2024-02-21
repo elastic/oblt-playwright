@@ -46,20 +46,16 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
   await test.step('step05', async () => {
     await servicesPage.clickInvestigate();
     await servicesPage.clickHostLogsButton();
-    await page.waitForLoadState('networkidle');
+    await logsExplorerPage.assertVisibilityCanvas();
   });
   
-  // Step 06 - Filters logs by selected date picker option, then filters by error messages.
+  // Step 06 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.
   await test.step('step06', async () => {
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
     await page.waitForLoadState('networkidle');
     await logsExplorerPage.filterLogsByError();
     await page.waitForLoadState('networkidle');
-  });
-  
-  // Step 07 - Expands certain document.
-  await test.step('step07', async () => {
     await logsExplorerPage.expandLogsDataGridRow();
     await page.waitForLoadState('networkidle');
   });
@@ -91,7 +87,6 @@ test('APM - Traces', async ({ datePicker, landingPage, page, servicesPage, trace
 });
 
 test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, logsExplorerPage, page }) => {
-  
   // Step 01 - Navigates to Observability > APM > Dependencies.
   await test.step('step01', async () => {
     await landingPage.clickDependencies();
