@@ -41,8 +41,8 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'stateful_setup',
-      testMatch: 'stateful.setup.ts',
+      name: 'stateful_auth',
+      testMatch: 'stateful.auth.ts',
     },
     {
       name: 'serverless_auth',
@@ -78,7 +78,7 @@ export default defineConfig({
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
       },
-      dependencies: ['stateful_setup'],
+      dependencies: ['stateful_auth'],
       //teardown: 'stateful_teardown',
     },
     {

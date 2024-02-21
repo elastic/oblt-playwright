@@ -63,7 +63,7 @@ npx playwright test apm.serverless.spec.ts --project serverless --headed
 
 ### Run an authorization test
 
-Execute `serverless.auth.ts` or `stateful.setup.ts` as follows:
+Execute `serverless.auth.ts` or `stateful.auth.ts` as follows:
 
 ```
 npx playwright test serverless.auth.ts
