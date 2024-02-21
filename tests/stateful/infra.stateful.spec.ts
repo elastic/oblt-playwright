@@ -1,207 +1,168 @@
-import { test, expect } from '@playwright/test';
+import {test} from '../../tests/fixtures/stateful/basePage';
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/');
-  await page.getByTestId('toggleNavButton').click();
+test.beforeEach(async ({ landingPage }) => {
+  await landingPage.goto();
+  await landingPage.clickObservabilitySolutionLink();
 });
 
-test('Infrastructure - Cluster Overview dashboard', async ({ page }) => {
-  // Navigates to Dashboards, filters dashboards by Kubernetes tag.
-  await page.locator('xpath=//a[@data-test-subj="collapsibleNavAppLink-overview" and contains(text(),"Analytics")]').click();
-  await page.locator('xpath=//a[contains(text(),"Dashboard")]').click();
-  await expect(page.locator('xpath=//*[@id="dashboardListingHeading"]')).toBeVisible();
-  await expect(page.locator('xpath=//tbody[@class="css-0"]')).toBeVisible();
-  await page.locator('xpath=//span[@data-text="Tags"]').click();
-  await page.getByTestId('tag-searchbar-option-Kubernetes').click();
-  await page.waitForLoadState('networkidle');
+test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, landingPage, page }) => {
+  const coresUsedVsTotal = "Cores used vs total cores";
+  const topMemoryIntensivePods = "Top memory intensive pods";
 
-  // Opens [Metrics Kubernetes] Cluster Overview dashboard.
-  await page.getByRole('link', { name: '[Metrics Kubernetes] Cluster Overview' }).click();
-  await page.waitForLoadState('networkidle');
+  // Step 01 - Navigates to Dashboards, filters dashboards by Kubernetes tag.
+  await test.step('step01', async () => {
+    await page.goto('/app/dashboards');
+    await dashboardPage.assertVisibilityHeading();
+    await dashboardPage.assertVisibilityTable();
+    await dashboardPage.filterByKubernetesTag();
+    await page.waitForLoadState('networkidle');
+  });
 
-  // Filters data by last 1 hour.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.locator('xpath=//input[@aria-label="Time value"]').fill('1');
-  await page.locator('xpath=//*[@aria-label="Time unit"]').selectOption('Hours');
-  await page.locator('xpath=//span[contains(text(), "Apply")]').click();
+  // Step 02 - Opens [Metrics Kubernetes] Cluster Overview dashboard.
+  await test.step('step02', async () => {
+    await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
+    await page.waitForLoadState('networkidle');
+  });
 
-  // Asserts "Cores used vs total cores" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-title="Cores used vs total cores"]//canvas[@class="echCanvasRenderer"]'), '"Cores used vs total cores" visualization should be visible').toBeVisible();
-  // Logs Elasticsearch query.
-  await page.locator('xpath=//button[@aria-label="Panel options for Cores used vs total cores"]').click();
-  await page.getByTestId('embeddablePanelAction-openInspector').click();
-  await page.getByTestId('inspectorViewChooser').click();
-  await page.getByTestId('inspectorViewChooserRequests').click();
-  await page.getByTestId('inspectorRequestDetailRequest').click();
-  await page.getByTestId('inspectorRequestCopyClipboardButton').click();
-  console.log('[Metrics Kubernetes] Cores used vs total cores.');
-  async function logQuery() {
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
-    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
-  logQuery();
-  await page.getByTestId('euiFlyoutCloseButton').click();
+  // Step 03 - Filters data by selected time unit.
+  await test.step('step03', async () => {
+    await datePicker.clickDatePicker();
+    await datePicker.fillTimeValue('1');
+    await datePicker.selectTimeUnit('Hours');
+    await datePicker.clickApplyButton();
+  });
+
+  // Step 04 - Logs Elasticsearch query - [Metrics Kubernetes] Cores used vs total cores.
+  await test.step('step04', async () => {
+    await dashboardPage.assertVisibilityVisualization(coresUsedVsTotal);
+    await dashboardPage.kubernetesVisualizationOptions(coresUsedVsTotal);
+    await dashboardPage.openRequestsView();
+    await dashboardPage.queryToClipboard();
+    await dashboardPage.logQuery(coresUsedVsTotal);
+    await dashboardPage.closeFlyout();
+  });
   
-  // Asserts "Top memory intensive pods" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-title="Top memory intensive pods"]//canvas[@class="echCanvasRenderer"]'), '"Top memory intensive pods" visualization should be visible').toBeVisible();
-  // Logs Elasticsearch query.
-  await page.locator('xpath=//button[@aria-label="Panel options for Top memory intensive pods"]').click();
-  await page.getByTestId('embeddablePanelAction-openInspector').click();
-  await page.getByTestId('inspectorViewChooser').click();
-  await page.getByTestId('inspectorViewChooserRequests').click();
-  await page.getByTestId('inspectorRequestDetailRequest').click();
-  await page.getByTestId('inspectorRequestCopyClipboardButton').click();
-  console.log('[Metrics Kubernetes] Top memory intensive pods.');
-  logQuery();
-  await page.getByTestId('euiFlyoutCloseButton').click();
+  // Step 05 - Logs Elasticsearch query - [Metrics Kubernetes] Top memory intensive pods.
+  await test.step('step05', async () => {
+    await dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods);
+    await dashboardPage.kubernetesVisualizationOptions(topMemoryIntensivePods);
+    await dashboardPage.openRequestsView();
+    await dashboardPage.queryToClipboard();
+    await dashboardPage.logQuery(topMemoryIntensivePods);
+    await dashboardPage.closeFlyout();
+  });
 });
 
-test('Infrastructure - Inventory', async ({ page }) => {
-  // Navigates to Observability > Infrastructure > Inventory.
-  await page.getByRole('link', { name: 'Infrastructure' }).click();
-  await expect(page.locator('xpath=//h1[contains(text(),"Inventory")]')).toBeVisible();
-
-  // Ensures "Hosts" is selected as "Show" option. Clicks on any displayed host to open the detailed view.
-  await page.locator('xpath=//span[contains(text(),"Dismiss")]').click();
-  await page.getByTestId('waffleSortByDropdown').click();
-  await page.getByTestId('waffleSortByValue').click();
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]').click({ force: true });
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  await page.waitForLoadState('networkidle');
-
-  // Asserts "Host CPU Usage" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//div[contains(@class, "echChartContent")]'), '"Host CPU Usage" visualization should be visible').toBeVisible();
-  await page.waitForLoadState('networkidle');
-  // Logs Elasticsearch query.
-  await page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsKPIcpuUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
-  await page.locator('xpath=//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
-  await page.getByTestId('inspectorViewChooser').click();
-  await page.getByTestId('inspectorViewChooserRequests').click();
-  await page.getByTestId('inspectorRequestDetailRequest').click();
-  await page.getByTestId('inspectorRequestCopyClipboardButton').click();
-  console.log('Host: Percentage of CPU time spent in states other than Idle and IOWait, normalized by the number of CPU cores.');
-  async function logQuery() {
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
-    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
-  logQuery();
-  await page.locator('xpath=//div[@data-test-subj="inspectorPanel"]//button[@data-test-subj="euiFlyoutCloseButton"]').click();
-
-  // Asserts "Host Memory Usage" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//div[contains(@class, "echChartContent")]'), '"Host Memory Usage" visualization should be visible').toBeVisible();
-  await page.waitForLoadState('networkidle');
-  // Logs Elasticsearch query.
-  await page.locator('xpath=//div[@data-test-embeddable-id="infraAssetDetailsMetricsChartmemoryUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
-  await page.locator('xpath=//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
-  await page.getByTestId('inspectorViewChooser').click();
-  await page.getByTestId('inspectorViewChooserRequests').click();
-  await page.getByTestId('inspectorRequestDetailRequest').click();
-  await page.getByTestId('inspectorRequestCopyClipboardButton').click();
-  console.log('Host: Memory usage.');
-  logQuery();
-  await page.locator('xpath=//div[@data-test-subj="inspectorPanel"]//button[@data-test-subj="euiFlyoutCloseButton"]').click();
-
-  // Returns back to Observability > Infrastructure > Inventory.
-  await page.locator('xpath=//div[@data-component-name="infraAssetDetailsFlyout"]//button[@data-test-subj="euiFlyoutCloseButton"]').click();
-
-  // Selects "Pods" as "Show" option.
-  await page.getByTestId('openInventorySwitcher').click();
-  await page.getByTestId('goToPods').click();
-
-  // Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]').hover();
-  await page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]/div[@data-test-subj="nodeContainer"][1]').click({ force: true });
-  await page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]').click();
-
-  // Filters data by selected date picker option.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  // Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]'), '"Pod CPU Usage" visualization should be visible').toBeVisible();
-  await expect(page.locator('xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="podMemoryUsage"]//div[contains(@class, "echChartContent")]'), '"Pod Memory Usage" visualization should be visible').toBeVisible();
-});
-
-test('Infrastructure - Hosts', async ({ page }) => {
-  // Navigates to Observability > Infrastructure > Hosts.
-  await page.getByRole('link', { name: 'Infrastructure' }).click();
-  await page.getByRole('link', { name: 'Hosts' }).click();
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-
-  // Asserts "Host CPU Usage" visualization visibility.
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//div[contains(@class, "echChartContent")]'), '"Host CPU Usage" visualization should be visible').toBeVisible();
-  // Logs Elasticsearch query.
-  await page.locator('xpath=//div[@data-test-embeddable-id="hostsViewKPI-cpuUsage"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
-  await page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
-  await page.getByTestId('inspectorViewChooser').click();
-  await page.getByTestId('inspectorViewChooserRequests').click();
-  await page.getByTestId('inspectorRequestDetailRequest').click();
-  await page.getByTestId('inspectorRequestCopyClipboardButton').click();
-  console.log('All hosts: Percentage of CPU time spent in states other than Idle and IOWait, normalized by the number of CPU cores.');
-  async function logQuery() {
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
-    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
-  logQuery();
-  await page.getByTestId('euiFlyoutCloseButton').click();
-
-  // Asserts "Host Normalized Load" visualization visibility.
-  if (await page.locator('xpath=//div[@data-test-embeddable-id="hostsView-metricChart-normalizedLoad1m"]//div[contains(@class, "echChartContent")]').isHidden()){
-    await page.keyboard.press('ArrowDown');
-  }
+test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
+  const cpuUsage = "infraAssetDetailsKPIcpuUsage";
+  const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
+  const podCpuUsage = "podCpuUsage";
+  const podMemoryUsage = "podMemoryUsage";
   
-  await expect(page.locator('xpath=//div[@data-test-embeddable-id="hostsView-metricChart-normalizedLoad1m"]//div[contains(@class, "echChartContent")]'), '"Host Normalized Load" visualization should be visible').toBeVisible();
-  // Logs Elasticsearch query.
-  await page.locator('xpath=//div[@data-test-embeddable-id="hostsView-metricChart-normalizedLoad1m"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]').click();
-  await page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]').click();
-  await page.getByTestId('inspectorViewChooser').click();
-  await page.getByTestId('inspectorViewChooserRequests').click();
-  await page.getByTestId('inspectorRequestDetailRequest').click();
-  await page.getByTestId('inspectorRequestCopyClipboardButton').click();
-  console.log('All hosts: Normalized Load.');
-  logQuery();
-  await page.getByTestId('euiFlyoutCloseButton').click();
+  // Step 01 - Navigates to Observability > Infrastructure > Inventory. 
+  await test.step('step01', async () => {
+    await observabilityPage.clickInventory();
+  });
 
-  // Clicks on the "Logs" tab, filters logs by searching "error".
-  await page.getByTestId('hostsView-tabs-logs').click();
-  await page.locator('xpath=//input[@placeholder="Search for log entries..."]').fill('error');
+  // Step 02 - Clicks on any displayed host to open the detailed view.
+  await test.step('step02', async () => {
+    await infrastructurePage.clickDismiss();
+    await infrastructurePage.sortByMetricValue();
+    await infrastructurePage.clickNodeWaffleContainer();
+  });
+  
+  // Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.
+  await test.step('step03', async () => {
+    await datePicker.clickDatePicker();
+    if (await datePicker.assertSelectedDate()) {
+      await datePicker.selectDate();
+    } else {    
+      await datePicker.fillTimeValue('30');
+      await datePicker.selectTimeUnit('Days');
+      await datePicker.clickApplyButton();
+    }
+    await page.waitForLoadState('networkidle');
+    await infrastructurePage.assertVisibilityVisualization(cpuUsage);
+    await infrastructurePage.assertVisibilityVisualization(memoryUsage);
+  });
 
-  // Clicks on the "Open in Logs"
-  await page.locator('xpath=//*[contains(text(),"Open in Logs")]').click();
-  await page.waitForLoadState('networkidle');
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  // Asserts "Pod CPU Usage" visualization visibility.
-  await expect(page.locator('xpath=//div[@id="podCpuUsage"]//div[contains(@class, "echChartContent")]'), '"Pod CPU Usage" visualization should be visible').toBeVisible();
-  await page.waitForLoadState('networkidle');
+  // Step 04 - Returns back to Observability > Infrastructure > Inventory. Selects "Pods" as "Show" option.
+  await test.step('step04', async () => {
+    await infrastructurePage.closeInfraAssetDetailsFlyout();
+    await infrastructurePage.switchInventoryToPodsView();
+    await page.waitForLoadState('networkidle');
+  });
+
+  // Step 05 - Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.
+  await test.step('step05', async () => {
+    await infrastructurePage.sortByMetricValue();
+    await infrastructurePage.switchToTableView();
+    await page.waitForLoadState('networkidle');
+    await infrastructurePage.clickTableCell();
+    await infrastructurePage.clickPopoverK8sMetrics();
+  });
+
+  // Step 06 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.
+  await test.step('step06', async () => {
+    await datePicker.assertVisibilityDatePicker();
+    await datePicker.clickDatePicker();
+    await datePicker.selectDate();
+    await infrastructurePage.assertVisibilityPodVisualization(podCpuUsage);
+    await infrastructurePage.assertVisibilityPodVisualization(podMemoryUsage);
+  });
 });
 
-test('Infrastructure - Metrics Explorer', async ({ page }) => {
-  // Navigates to Observability > Infrastructure > Metrics Explorer.
-  await page.getByRole('link', { name: 'Infrastructure' }).click();
-  await page.getByTestId('observability-nav-metrics-metrics_explorer').click();
-  await page.waitForLoadState('networkidle');
+test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
+  const cpuUsage = "hostsViewKPI-cpuUsage";
+  const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
+  
+  // Step 01 - Navigates to Observability > Infrastructure > Hosts.
+  await test.step('step01', async () => {
+    await observabilityPage.clickHosts();
+  });
 
-  // Aggregates by 95th Percentile.
-  await page.getByTestId('infraMetricsExplorerAggregationPickerSelect').click();
-  await page.waitForLoadState('networkidle');
+  // Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Normalized Load" visualizations visibility.
+  await test.step('step02', async () => {
+    await datePicker.clickDatePicker();
+    await datePicker.selectDate();
+    await page.waitForLoadState('networkidle');
+    await infrastructurePage.assertVisibilityVisualization(cpuUsage);
+    await infrastructurePage.assertVisibilityVisualization(normalizedLoad);
+  });
 
-  // Filters data by selected date picker option.
-  await page.getByTestId('superDatePickerToggleQuickMenuButton').click();
-  await page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER }).click();
-  await expect(page.getByTestId('globalLoadingIndicator')).toBeVisible();
-  await expect(page.getByTestId('globalLoadingIndicator-hidden')).toBeVisible();
+  // Step 03 - Clicks the "Logs" tab, filters logs by searching errors.
+  await test.step('step03', async () => {
+    await infrastructurePage.openHostsLogs();
+    await infrastructurePage.searchErrors();
+  });
+});
 
-  // Selects "kubernetes.namespace" as "graph per" option. Searches for "kube-system".
-  await page.locator('xpath=//input[@aria-label="Graph per"]').click();
-  await page.locator('xpath=//input[@aria-label="Graph per"]').fill('kubernetes.namespace');
-  await page.keyboard.press('ArrowDown');
-  await page.keyboard.press('Enter');
-  await page.waitForLoadState('networkidle');
-  await page.locator('xpath=//input[@data-test-subj="infraSearchField"]').click();
-  await page.locator('xpath=//input[@data-test-subj="infraSearchField"]').fill('kube-system');
-  await page.keyboard.press('Enter');
-  await expect(page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]'), 'Metrics visualization should be visible').toBeVisible();
+test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
+  // Step 01 - Navigates to Observability > Infrastructure > Metrics Explorer.
+  await test.step('step01', async () => {
+    await observabilityPage.clickMetricsExplorer();
+    await infrastructurePage.assertVisibilityMetricsCanvas();
+  });
+
+  // Step 02 - Aggregates by 95th Percentile.
+  await test.step('step02', async () => {
+    await infrastructurePage.aggregateBy95thPercentile();
+    await page.waitForLoadState('networkidle');
+  });
+
+  // Step 03 - Filters data by selected date picker option.
+  await test.step('step03', async () => {
+    await datePicker.assertVisibilityDatePicker();
+    await datePicker.clickDatePicker();
+    await datePicker.selectDate();
+    await page.waitForLoadState('networkidle');
+  });
+
+  // Step 04 - Selects "kubernetes.namespace" as "graph per" option. Searches for "kube-system".
+  await test.step('step03', async () => {
+    await infrastructurePage.graphPerKubernetesNamespace();
+    await page.waitForLoadState('networkidle');
+    await infrastructurePage.filterByKubesystemNamespace();
+    await infrastructurePage.assertVisibilityMetricsCanvas();
+  });
 });

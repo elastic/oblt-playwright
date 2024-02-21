@@ -14,6 +14,7 @@ services = () => this.page.getByTestId('observability-nav-apm-services');
 traces = () => this.page.getByTestId('observability-nav-apm-traces');
 dependencies = () => this.page.getByTestId('observability-nav-apm-dependencies');
 inventory = () => this.page.getByTestId('observability-nav-metrics-inventory');
+metricsExplorer = () => this.page.getByTestId('observability-nav-metrics-metrics_explorer');
 hosts = () => this.page.getByTestId('observability-nav-metrics-hosts');
 
 // Actions
@@ -39,6 +40,10 @@ public async clickDependencies() {
 
 public async clickInventory() {
     await this.inventory().click();
+}
+
+public async clickMetricsExplorer() {
+    await this.metricsExplorer().click();
 }
 
 public async clickHosts() {

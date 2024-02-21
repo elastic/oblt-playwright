@@ -5,7 +5,7 @@ test.beforeEach(async ({ page, landingPage }) => {
   await landingPage.clickInfrastructure();
 });
 
-test('Infrastructure - Cluster Overview dashboard', async ({ page, landingPage, dashboardPage, datePicker }) => {
+test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, landingPage, page }) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top memory intensive pods";
 
@@ -53,7 +53,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ page, landingPage, 
   });
 });
 
-test('Infrastructure - Inventory', async ({ page, infrastructurePage, landingPage, datePicker }) => {
+test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, landingPage, page }) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
@@ -82,7 +82,6 @@ test('Infrastructure - Inventory', async ({ page, infrastructurePage, landingPag
       await datePicker.clickApplyButton();
     }
     await page.waitForLoadState('networkidle');
-    // 
     await infrastructurePage.assertVisibilityVisualization(cpuUsage);
     await infrastructurePage.assertVisibilityVisualization(memoryUsage);
   });
@@ -113,7 +112,7 @@ test('Infrastructure - Inventory', async ({ page, infrastructurePage, landingPag
   });
 });
 
-test('Infrastructure - Hosts', async ({ page, infrastructurePage, landingPage, datePicker }) => {
+test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, landingPage, page }) => {
   const cpuUsage = "hostsViewKPI-cpuUsage";
   const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
 

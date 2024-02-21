@@ -1,11 +1,11 @@
 import {test as base} from "@playwright/test";
 // import AlertsPage from "../../stateful/pom/pages/alerts.page";
-// import DashboardPage from "../../stateful/pom/pages/dashboard.page";
+import DashboardPage from "../../stateful/pom/pages/dashboard.page";
 import DatasetsPage from "../../stateful/pom/pages/datasets.page";
 import DatePicker from "../../stateful/pom/components/date_picker.component";
 import DependenciesPage from "../../stateful/pom/pages/dependencies.page";
 import DiscoverPage from "../../stateful/pom/pages/discover.page";
-//import InfrastructurePage from "../../stateful/pom/pages/infrastructure.page";
+import InfrastructurePage from "../../stateful/pom/pages/infrastructure.page";
 import LandingPage from "../../stateful/pom/pages/landing.page";
 import LogsExplorerPage from "../../stateful/pom/pages/logs_explorer.page";
 import ObservabilityPage from "../../stateful/pom/pages/observability.page";
