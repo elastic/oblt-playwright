@@ -21,7 +21,14 @@ API_KEY =
 REPORT_FILE = ../test-results/results.json
 ```
 
-Commonly used date picker options:
+#### Verbose logging
+
+To enable verbose logging, set the `DEBUG` environmental variable:
+```
+DEBUG = "pw:api"
+```
+
+#### Commonly used date picker options:
 
 - Last 15 minutes
 - Last 30 minutes
@@ -82,7 +89,7 @@ npx playwright test --project api
 Playwright spits out JSON test reports that have nested structure, which not quite suitable for Elasticsearch - results for each test is a separate array with its own fields. The problem is nested field type is not supported in Kibana visualizations. To solve this, use [this script](https://github.com/elastic/oblt-playwright/blob/main/tools/split_report.ts) to flatten and split a report by each test:
 
 ```
-node tools\split_report.ts
+node utils\split_json_report.ts
 ```
 <details>
 <summary>Here is an example of how the outcome of that script might look like</summary>

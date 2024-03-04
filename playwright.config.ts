@@ -43,6 +43,15 @@ export default defineConfig({
     {
       name: 'stateful_auth',
       testMatch: 'stateful.auth.ts',
+      use: {
+        viewport: {width: 1920, height: 1080},
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        }
+      }
     },
     {
       name: 'serverless_auth',
@@ -50,6 +59,12 @@ export default defineConfig({
       use: {
         testIdAttribute: 'data-test-id',
         viewport: {width: 1920, height: 1080},
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        }
       },
     },
     {
@@ -59,6 +74,12 @@ export default defineConfig({
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
         testIdAttribute: 'data-test-subj',
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        }
       },
     },
     {
@@ -68,6 +89,12 @@ export default defineConfig({
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
         testIdAttribute: 'data-test-subj',
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        }
       },
     },
     {
@@ -77,6 +104,13 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
+        trace: 'on',
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        }
       },
       dependencies: ['stateful_auth'],
       //teardown: 'stateful_teardown',
@@ -88,6 +122,12 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        }
       },
       dependencies: ['serverless_auth'],
       //teardown: 'serverless_teardown',
