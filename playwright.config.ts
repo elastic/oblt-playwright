@@ -104,7 +104,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
-        trace: 'on',
         launchOptions: {
           logger: {
             isEnabled: () => true,
