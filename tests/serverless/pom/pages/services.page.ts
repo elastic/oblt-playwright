@@ -7,6 +7,7 @@ export default class ServicesPage {
         this.page = page;
     }
 
+    dismissServiceGroupsTour = () => this.page.getByTestId('apmServiceGroupsTourDismissButton');
     opbeansGo = () => this.page.locator('xpath=//span[contains(text(),"opbeans-go")]');
     servicesTransactionsTab = () => this.page.getByTestId('transactionsTab');
     mostImpactfulTransaction = () => this.page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[@class="euiTableRowCell euiTableRowCell--middle"][1]//a');

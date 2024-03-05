@@ -17,6 +17,11 @@ export default class ServicesPage {
     investigateHostLogsButton = () => this.page.getByRole('link', { name: 'Host logs' });
     errorDistributionChart = () => this.page.getByTestId('errorDistribution');
 
+    public async assertVisibilityServiceOpbeansGo() {
+        const truthiness = await this.opbeansGo().isVisible({timeout: 10000});
+        return truthiness;
+        }
+    
     public async selectServiceOpbeansGo() {
         await this.opbeansGo().click();
         }

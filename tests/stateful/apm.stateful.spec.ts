@@ -1,4 +1,16 @@
-import {test} from '../../tests/fixtures/stateful/basePage';
+import { test } from '../../tests/fixtures/stateful/basePage';
+import { expect } from "@playwright/test";
+
+test.beforeAll('Check APM data', async ({request}) => {
+  console.log(`... checking APM data.`);
+  let response = await request.get('internal/apm/has_data', {
+      data: {}
+  })
+  expect(response.status()).toBe(200);
+  const body = await response.text();
+  expect(body, 'Availability of APM data').toContain("true");
+  console.log(`✓ APM data is checked.`);
+});
 
 test.beforeEach(async ({ landingPage }) => {
   await landingPage.goto();
@@ -6,41 +18,33 @@ test.beforeEach(async ({ landingPage }) => {
 });
 
 test.afterEach(async ({}, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus) {
-    console.log(`...[${testInfo.title}] failed due to ${testInfo.error}`);
-} else {
+  if (testInfo.status == testInfo.expectedStatus) {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
 test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage, page, servicesPage }, testInfo) => {
   const throughput = "throughput";
-  
+
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Selects opbeans-go.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Filters data by selected date picker option. Selects opbeans-go.`);
     await observabilityPage.clickServices();
+    await datePicker.clickDatePicker();
+    await datePicker.selectDate();
+    await datePicker.assertSelectedDate();
     await servicesPage.selectServiceOpbeansGo();
     await page.waitForLoadState('networkidle');
   });
   
   await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected date picker option.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
-    await page.waitForLoadState('networkidle');
-  });
-  
-  await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Opens the "Transactions" tab. Clicks on the most impactful transaction.`);
+    console.log(`\n[${testInfo.title}] Step 02 - Opens the "Transactions" tab. Clicks on the most impactful transaction.`);
     await servicesPage.openTransactionsTab();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
     await servicesPage.assertVisibilityVisualization(throughput);
     await servicesPage.selectMostImpactfulTransaction();
     await servicesPage.assertVisibilityVisualization(throughput);
   });
   
-  await test.step('step04', async () => {
-    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the "Failed transaction correlations" tab. Filters the result by a particular field value.`);
+  await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "Failed transaction correlations" tab. Filters the result by a particular field value.`);
     await servicesPage.openFailedTransactionCorrelationsTab();
     await page.waitForLoadState('networkidle');
     await servicesPage.assertVisibilityCorrelationButton();
@@ -49,16 +53,16 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
     await page.waitForLoadState('networkidle');
   });
   
-  await test.step('step05', async () => {
-    console.log(`\n[${testInfo.title}] Step 05 - Clicks on "Investigate", navigates to "Logs Explorer".`);
+  await test.step('step04', async () => {
+    console.log(`\n[${testInfo.title}] Step 04 - Clicks on "Investigate", navigates to "Logs Explorer".`);
     await servicesPage.clickInvestigate();
     await servicesPage.clickHostLogsButton();
     await observabilityPage.clickExplorer();
     await logsExplorerPage.assertVisibilityCanvas();
   });
   
-  await test.step('step06', async () => {
-    console.log(`\n[${testInfo.title}] Step 06 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
+  await test.step('step05', async () => {
+    console.log(`\n[${testInfo.title}] Step 05 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
     await page.waitForLoadState('networkidle');
