@@ -42,7 +42,6 @@ test.describe.serial('Fleet', () => {
             const responseBody = JSON.parse(await response.text());
             console.log("Integration has been added.");
             return responseBody;
-        });
-
+        });        
 });
 });

@@ -1,4 +1,30 @@
-import {test} from '../../tests/fixtures/stateful/basePage';
+import { test } from '../../tests/fixtures/stateful/basePage';
+import { expect } from "@playwright/test";
+
+test.beforeAll('Check node data', async ({request}) => {
+  console.log(`... checking node data.`);
+  const currentTime = Date.now();
+  const rangeTime = currentTime - 1200000;
+
+  let response = await request.post('api/metrics/snapshot', {
+      data: {
+          "filterQuery":"",
+          "metrics":[{"type":"cpu"}],
+          "nodeType":"host","sourceId":"default",
+          "accountId":"",
+          "region":"",
+          "groupBy":[],
+          "timerange":{"interval":"1m","to":currentTime,"from":rangeTime,"lookbackSize":5},
+          "includeTimeseries":true,
+          "dropPartialBuckets":true
+      }
+  })
+  expect(response.status()).toBe(200);
+  const jsonData = JSON.parse(await response.text());
+  const nodesArr = jsonData.nodes;
+  expect(nodesArr, 'The number of available nodes in the Inventory should not be less than 1.').not.toHaveLength(0);
+  console.log(`✓ Node data is checked.`);
+});
 
 test.beforeEach(async ({ landingPage }) => {
   await landingPage.goto();
@@ -137,6 +163,7 @@ test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observab
   });
 });
 
+// Skipped until Metrics Explorer is available in Serverless.
 test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
   // Step 01 - Navigates to Observability > Infrastructure > Metrics Explorer.
   await test.step('step01', async () => {
