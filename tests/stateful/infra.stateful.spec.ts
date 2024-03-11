@@ -31,12 +31,17 @@ test.beforeEach(async ({ landingPage }) => {
   await landingPage.clickObservabilitySolutionLink();
 });
 
-test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, landingPage, page }) => {
+test.afterEach(async ({}, testInfo) => {
+  if (testInfo.status == testInfo.expectedStatus) {
+    console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
+}});
+
+test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top memory intensive pods";
 
-  // Step 01 - Navigates to Dashboards, filters dashboards by Kubernetes tag.
   await test.step('step01', async () => {
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Dashboards, filters dashboards by Kubernetes tag.`);
     await page.goto('/app/dashboards');
     await dashboardPage.assertVisibilityHeading();
     await dashboardPage.assertVisibilityTable();
@@ -44,22 +49,22 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await page.waitForLoadState('networkidle');
   });
 
-  // Step 02 - Opens [Metrics Kubernetes] Cluster Overview dashboard.
   await test.step('step02', async () => {
+    console.log(`\n[${testInfo.title}] Step 02 - Opens [Metrics Kubernetes] Cluster Overview dashboard.`);
     await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
     await page.waitForLoadState('networkidle');
   });
 
-  // Step 03 - Filters data by selected time unit.
   await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit.`);
     await datePicker.clickDatePicker();
     await datePicker.fillTimeValue('1');
     await datePicker.selectTimeUnit('Hours');
     await datePicker.clickApplyButton();
   });
 
-  // Step 04 - Logs Elasticsearch query - [Metrics Kubernetes] Cores used vs total cores.
   await test.step('step04', async () => {
+    console.log(`\n[${testInfo.title}] Step 04 - Logs Elasticsearch query - [Metrics Kubernetes] Cores used vs total cores.`);
     await dashboardPage.assertVisibilityVisualization(coresUsedVsTotal);
     await dashboardPage.kubernetesVisualizationOptions(coresUsedVsTotal);
     await dashboardPage.openRequestsView();
@@ -68,8 +73,8 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await dashboardPage.closeFlyout();
   });
   
-  // Step 05 - Logs Elasticsearch query - [Metrics Kubernetes] Top memory intensive pods.
   await test.step('step05', async () => {
+    console.log(`\n[${testInfo.title}] Step 05 - Logs Elasticsearch query - [Metrics Kubernetes] Top memory intensive pods.`);
     await dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods);
     await dashboardPage.kubernetesVisualizationOptions(topMemoryIntensivePods);
     await dashboardPage.openRequestsView();
@@ -79,26 +84,26 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   });
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
+test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
   const podMemoryUsage = "podMemoryUsage";
   
-  // Step 01 - Navigates to Observability > Infrastructure > Inventory. 
   await test.step('step01', async () => {
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Inventory.`);
     await observabilityPage.clickInventory();
   });
 
-  // Step 02 - Clicks on any displayed host to open the detailed view.
   await test.step('step02', async () => {
+    console.log(`\n[${testInfo.title}] Step 02 - Clicks on any displayed host to open the detailed view.`);
     await infrastructurePage.clickDismiss();
     await infrastructurePage.sortByMetricValue();
     await infrastructurePage.clickNodeWaffleContainer();
   });
   
-  // Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.
   await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
     await datePicker.clickDatePicker();
     if (await datePicker.assertSelectedDate()) {
       await datePicker.selectDate();
@@ -112,15 +117,15 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
     await infrastructurePage.assertVisibilityVisualization(memoryUsage);
   });
 
-  // Step 04 - Returns back to Observability > Infrastructure > Inventory. Selects "Pods" as "Show" option.
   await test.step('step04', async () => {
+    console.log(`\n[${testInfo.title}] Step 04 - Returns back to Observability > Infrastructure > Inventory. Selects "Pods" as "Show" option.`);
     await infrastructurePage.closeInfraAssetDetailsFlyout();
     await infrastructurePage.switchInventoryToPodsView();
     await page.waitForLoadState('networkidle');
   });
 
-  // Step 05 - Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.
   await test.step('step05', async () => {
+    console.log(`\n[${testInfo.title}] Step 05 - Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.`);
     await infrastructurePage.sortByMetricValue();
     await infrastructurePage.switchToTableView();
     await page.waitForLoadState('networkidle');
@@ -128,8 +133,8 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
     await infrastructurePage.clickPopoverK8sMetrics();
   });
 
-  // Step 06 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.
   await test.step('step06', async () => {
+    console.log(`\n[${testInfo.title}] Step 06 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.`);
     await datePicker.assertVisibilityDatePicker();
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
@@ -138,17 +143,17 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
   });
 });
 
-test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
+test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
   const cpuUsage = "hostsViewKPI-cpuUsage";
   const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
-  
-  // Step 01 - Navigates to Observability > Infrastructure > Hosts.
+   
   await test.step('step01', async () => {
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Hosts.`);
     await observabilityPage.clickHosts();
   });
 
-  // Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Normalized Load" visualizations visibility.
   await test.step('step02', async () => {
+    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Normalized Load" visualizations visibility.`);
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
     await page.waitForLoadState('networkidle');
@@ -156,37 +161,37 @@ test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observab
     await infrastructurePage.assertVisibilityVisualization(normalizedLoad);
   });
 
-  // Step 03 - Clicks the "Logs" tab, filters logs by searching errors.
   await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Clicks the "Logs" tab, filters logs by searching errors.`);
     await infrastructurePage.openHostsLogs();
     await infrastructurePage.searchErrors();
   });
 });
 
 // Skipped until Metrics Explorer is available in Serverless.
-test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, infrastructurePage, observabilityPage, page }) => {
-  // Step 01 - Navigates to Observability > Infrastructure > Metrics Explorer.
+test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
   await test.step('step01', async () => {
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Metrics Explorer.`);
     await observabilityPage.clickMetricsExplorer();
     await infrastructurePage.assertVisibilityMetricsCanvas();
   });
 
-  // Step 02 - Aggregates by 95th Percentile.
   await test.step('step02', async () => {
+    console.log(`\n[${testInfo.title}] Step 02 - Aggregates by 95th Percentile.`);
     await infrastructurePage.aggregateBy95thPercentile();
     await page.waitForLoadState('networkidle');
   });
 
-  // Step 03 - Filters data by selected date picker option.
   await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected date picker option.`);
     await datePicker.assertVisibilityDatePicker();
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
     await page.waitForLoadState('networkidle');
   });
 
-  // Step 04 - Selects "kubernetes.namespace" as "graph per" option. Searches for "kube-system".
   await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 04 - Selects "kubernetes.namespace" as "graph per" option. Searches for "kube-system".`);
     await infrastructurePage.graphPerKubernetesNamespace();
     await page.waitForLoadState('networkidle');
     await infrastructurePage.filterByKubesystemNamespace();

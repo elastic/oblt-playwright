@@ -11,10 +11,11 @@ ess_auth('Authentication', async ({page}) => {
   await page.getByLabel('Password', { exact: true }).fill(process.env.ELASTIC_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
 
-  const [ index ] = await waitForOneOf([
+  const [ index, locator ] = await waitForOneOf([
     page.locator('xpath=//a[@aria-label="Elastic home"]'),
     page.locator('xpath=//div[@data-test-subj="loginErrorMessage"]'),
   ]);
+  console.log([ index, locator ]);
   const isAuthenticated = index === 0;
   if (isAuthenticated) {
     await page.context().storageState({path: STORAGE_STATE});
