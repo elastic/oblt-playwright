@@ -7,12 +7,12 @@ export default class DependenciesPage {
         this.page = page;
     }
 
-    dependenciesOperationsTab = () => this.page.getByRole('tab', { name: 'Operations' });
-    dependencyTableRow = () => this.page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a');
-    timelineTransaction = () => this.page.locator('xpath=(//div[@type="transaction"])[1]//*[@color]');
-    tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
-    investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
-    investigateTraceLogsButton = () => this.page.getByRole('link', { name: 'Trace logs' });
+    private readonly dependenciesOperationsTab = () => this.page.getByRole('tab', { name: 'Operations' });
+    private readonly dependencyTableRow = () => this.page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a');
+    private readonly timelineTransaction = () => this.page.locator('xpath=(//div[@type="transaction"])[1]//*[@color]');
+    private readonly tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
+    private readonly investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
+    private readonly investigateTraceLogsButton = () => this.page.getByRole('link', { name: 'Trace logs' });
 
     public async clickTableRow() {
         await this.dependencyTableRow().click();

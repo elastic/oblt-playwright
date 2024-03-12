@@ -7,17 +7,17 @@ export default class LogsExplorerPage {
         this.page = page;
     }
 
-    logsExplorerTab = () => this.page.getByTestId('logExplorerTab');
-    logsSearchField = () => this.page.getByPlaceholder('Search field names');
-    fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
-    logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
-    logsDataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
-    flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
-    flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
-    docViewer = () => this.page.getByTestId('kbnDocViewer');
-    datasetSelectorButton = () => this.page.getByTestId('datasetSelectorPopoverButton');
-    datasetNginx = () => this.page.locator('xpath=//button//span[text()="Nginx"]');
-    datasetNginxAccess = () => this.page.locator('xpath=//button//span[text()="access"]');
+    private readonly logsExplorerTab = () => this.page.getByTestId('logExplorerTab');
+    private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
+    private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
+    private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
+    private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
+    private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
+    private readonly flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
+    private readonly docViewer = () => this.page.getByTestId('kbnDocViewer');
+    private readonly datasetSelectorButton = () => this.page.getByTestId('datasetSelectorPopoverButton');
+    private readonly datasetNginx = () => this.page.locator('xpath=//button//span[text()="Nginx"]');
+    private readonly datasetNginxAccess = () => this.page.locator('xpath=//button//span[text()="access"]');
 
     public async clickLogsExplorerTab() {
         await this.logsExplorerTab().click();

@@ -7,12 +7,11 @@ export default class DiscoverPage {
         this.page = page;
     }
 
-    canvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
-    dataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
-    dataGridRowToggle = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]//button[@data-test-subj="docTableExpandToggleColumn"]');
-    dataViewSwitcher = () => this.page.getByTestId('discover-dataView-switch-link');
-    dataViewLogs = () => this.page.locator('xpath=//button//span[text()="access"]');
-    dataViewMetrics = () => this.page.locator('xpath=//li[@value="logs-*"]');
+    private readonly canvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
+    private readonly dataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
+    private readonly dataViewSwitcher = () => this.page.getByTestId('discover-dataView-switch-link');
+    private readonly dataViewLogs = () => this.page.locator('xpath=//button//span[text()="access"]');
+    private readonly dataViewMetrics = () => this.page.locator('xpath=//li[@value="logs-*"]');
 
 
     public async assertVisibilityCanvas() {

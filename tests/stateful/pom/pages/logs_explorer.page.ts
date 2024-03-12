@@ -7,17 +7,17 @@ export default class LogsExplorerPage {
         this.page = page;
     }
 
-    logsSearchField = () => this.page.getByPlaceholder('Search field names');
-    toggleErrorMessage = () => this.page.getByTestId('field-error.log.message');
-    toggleTopValue = () => this.page.locator('xpath=//div[@data-test-subj="dscFieldStats-topValues-bucket"][1]//button[1]');
-    logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
-    logsDataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
-    flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
-    flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
-    docViewer = () => this.page.getByTestId('kbnDocViewer');
-    datasetSelectorButton = () => this.page.getByTestId('datasetSelectorPopoverButton');
-    datasetNginx = () => this.page.locator('xpath=//button//span[text()="Nginx"]');
-    datasetNginxAccess = () => this.page.locator('xpath=//button//span[text()="access"]');
+    private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
+    private readonly toggleErrorMessage = () => this.page.getByTestId('field-error.log.message');
+    private readonly toggleTopValue = () => this.page.locator('xpath=//div[@data-test-subj="dscFieldStats-topValues-bucket"][1]//button[1]');
+    private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
+    private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
+    private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
+    private readonly flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
+    private readonly docViewer = () => this.page.getByTestId('kbnDocViewer');
+    private readonly datasetSelectorButton = () => this.page.getByTestId('datasetSelectorPopoverButton');
+    private readonly datasetNginx = () => this.page.locator('xpath=//button//span[text()="Nginx"]');
+    private readonly datasetNginxAccess = () => this.page.locator('xpath=//button//span[text()="access"]');
 
     public async assertVisibilityCanvas() {
         await expect(this.logsCanvas()).toBeVisible();

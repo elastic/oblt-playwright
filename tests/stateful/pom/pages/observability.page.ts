@@ -7,46 +7,44 @@ export default class ObservabilityPage {
         this.page = page;
     }
 
-// Locators
-alerts = () => this.page.getByTestId('observability-nav-observability-overview-alerts');
-explorer = () => this.page.getByTestId('observability-nav-observability-logs-explorer-explorer');
-services = () => this.page.getByTestId('observability-nav-apm-services');
-traces = () => this.page.getByTestId('observability-nav-apm-traces');
-dependencies = () => this.page.getByTestId('observability-nav-apm-dependencies');
-inventory = () => this.page.getByTestId('observability-nav-metrics-inventory');
-metricsExplorer = () => this.page.getByTestId('observability-nav-metrics-metrics_explorer');
-hosts = () => this.page.getByTestId('observability-nav-metrics-hosts');
+    private readonly alerts = () => this.page.getByTestId('observability-nav-observability-overview-alerts');
+    private readonly explorer = () => this.page.getByTestId('observability-nav-observability-logs-explorer-explorer');
+    private readonly services = () => this.page.getByTestId('observability-nav-apm-services');
+    private readonly traces = () => this.page.getByTestId('observability-nav-apm-traces');
+    private readonly dependencies = () => this.page.getByTestId('observability-nav-apm-dependencies');
+    private readonly inventory = () => this.page.getByTestId('observability-nav-metrics-inventory');
+    private readonly metricsExplorer = () => this.page.getByTestId('observability-nav-metrics-metrics_explorer');
+    private readonly hosts = () => this.page.getByTestId('observability-nav-metrics-hosts');
 
-// Actions
-public async clickAlerts() {
-    await this.alerts().click();
-}
+    public async clickAlerts() {
+        await this.alerts().click();
+    }
 
-public async clickExplorer() {
-    await this.explorer().click();
-}
+    public async clickExplorer() {
+        await this.explorer().click();
+    }
 
-public async clickServices() {
-    await this.services().click();
-}
+    public async clickServices() {
+        await this.services().click();
+    }
 
-public async clickTraces() {
-    await this.traces().click();
-}
+    public async clickTraces() {
+        await this.traces().click();
+    }
 
-public async clickDependencies() {
-    await this.dependencies().click();
-}
+    public async clickDependencies() {
+        await this.dependencies().click();
+    }
 
-public async clickInventory() {
-    await this.inventory().click();
-}
+    public async clickInventory() {
+        await this.inventory().click();
+    }
 
-public async clickMetricsExplorer() {
-    await this.metricsExplorer().click();
-}
+    public async clickMetricsExplorer() {
+        await this.metricsExplorer().click();
+    }
 
-public async clickHosts() {
-    await this.hosts().click();
-}
+    public async clickHosts() {
+        await this.hosts().click();
+    }
 }

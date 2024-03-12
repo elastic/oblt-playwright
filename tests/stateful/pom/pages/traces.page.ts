@@ -7,12 +7,12 @@ export default class TracesPage {
         this.page = page;
     }
 
-    tracesExplorerTab = () => this.page.getByRole('tab', { name: 'Explorer' });
-    explorerSearchField = () => this.page.getByPlaceholder('Filter your data using KQL syntax');
-    explorerSearchButton = () => this.page.getByTestId('apmTraceSearchBoxSearchButton');
-    relatedError = () => this.page.locator('xpath=(//a[@title="View related error"])[1]');
-    relatedErrors = () => this.page.locator('xpath=(//a[@title="View 2 related errors"])[1]');
-    arrowDown = () => this.page.keyboard.press('ArrowDown');
+    private readonly tracesExplorerTab = () => this.page.getByRole('tab', { name: 'Explorer' });
+    private readonly explorerSearchField = () => this.page.getByPlaceholder('Filter your data using KQL syntax');
+    private readonly explorerSearchButton = () => this.page.getByTestId('apmTraceSearchBoxSearchButton');
+    private readonly relatedError = () => this.page.locator('xpath=(//a[@title="View related error"])[1]');
+    private readonly relatedErrors = () => this.page.locator('xpath=(//a[@title="View 2 related errors"])[1]');
+    private readonly arrowDown = () => this.page.keyboard.press('ArrowDown');
 
     public async openExplorerTab() {
         await this.tracesExplorerTab().click();
