@@ -34,7 +34,7 @@ jobs:
  
       - name: Install Playwright Browsers
         if: steps.cache-playwright.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps
 
   test:
     needs: install
@@ -60,15 +60,15 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run SLO transforms performance tests
-      run: npx playwright test slos.api.spec.ts
+      run: npx playwright test slos.api.spec.ts > test_result_log.txt
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_ES: ${{ secrets.ELASTIC_ES }}
         API_KEY: ${{ secrets.API_KEY }}
 
     - uses: actions/upload-artifact@v4
-      if: always()
+      if: success()
       with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+        name: test_result_log
+        path: test_result_log.txt
+        retention-days: 90
