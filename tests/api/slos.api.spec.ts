@@ -221,8 +221,16 @@ test.describe.serial('SLO performance tests', () => {
 
       await test.step('Calculate the time SLO transforms took to run.', async () => {
         let result = endTime - startTime;
-        console.log('SLO transforms took:', result, 'ms.')
+        console.log(`SLO "${sloName}" transforms took:`, result, 'ms.')
         return result;
         });
+
+      await test.step(`Delete SLO ${sloName}.`, async () => {
+        let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
+            data: {
+            }
+        });
+        expect(deleteResponse.status()).toBe(204);
+          });
     });
 });

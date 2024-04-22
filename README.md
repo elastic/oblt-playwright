@@ -14,6 +14,7 @@ Create .env file in the root directory with the following environmental variable
 
 ```
 ELASTIC_URL = 
+ELASTIC_ES =
 ELASTIC_USERNAME = 
 ELASTIC_PASSWORD = 
 DATE_PICKER = 'Last 24 hours'
