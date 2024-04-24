@@ -135,8 +135,6 @@ test('sli.apm.transactionDuration', async({request}) => {
       }).toBeGreaterThan(testStartTime);
     });
   console.log('The last @timestamp of the source data:', sourceTimestamp);
-  const startTime = Date.now();
-
 
   await test.step('Poll SLO indices for a document with the source data timestamp.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
@@ -216,20 +214,15 @@ test('sli.apm.transactionDuration', async({request}) => {
         timeout: 0,
       }).toEqual(sourceResponse);
     });
-  const endTime = Date.now();
 
-  await test.step(`Delete SLO ${sloName}.`, async () => {
+  await test.step('Teardown.', async () => {
+    console.log(`Deleting SLO "${sloName}"...`);
     let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
         data: {
         }
     });
     expect(deleteResponse.status()).toBe(204);
-    });
-
-  await test.step('Calculate the time SLO transforms took to run.', async () => {
-    let result = endTime - startTime;
-    expect(result).toBeGreaterThan(0);
-    console.log(`SLO "${sloName}" transforms took:`, result, 'ms.');
+    console.log(`SLO "${sloName}" has been deleted.`);
     });
 });
 
@@ -367,7 +360,6 @@ test('sli.apm.transactionErrorRate', async({request}) => {
       }).toBeGreaterThan(testStartTime);
     });
   console.log('The last @timestamp of the source data:', sourceTimestamp);
-  const startTime = Date.now();
 
   await test.step('Poll SLO indices for a document with certain timestamp.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
@@ -447,19 +439,14 @@ test('sli.apm.transactionErrorRate', async({request}) => {
         timeout: 0,
       }).toEqual(sourceResponse);
     });
-  const endTime = Date.now();
 
-  await test.step(`Delete SLO ${sloName}.`, async () => {
+  await test.step('Teardown.', async () => {
+    console.log(`Deleting SLO "${sloName}"...`);
     let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
         data: {
         }
     });
     expect(deleteResponse.status()).toBe(204);
-    });
-
-  await test.step('Calculate the time SLO transforms took to run.', async () => {
-    let result = endTime - startTime;
-    expect(result).toBeGreaterThan(0);
-    console.log(`SLO "${sloName}" transforms took:`, result, 'ms.');
+    console.log(`SLO "${sloName}" has been deleted.`);
     });
 });
