@@ -6,7 +6,7 @@ permissions:
 jobs:
   install:
     timeout-minutes: 60
-    name: 🔍 Install
+    name: Install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,13 +70,13 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: all-blob-reports
-        path: blob-report
+        name: json-report-${{ github.run_id }}
+        path: json-report
         retention-days: 1
 
-  create-report:
+  parse-reports:
     needs: test
-    name: Create test report
+    name: Parse test reports
     if: success()
     
     runs-on: ubuntu-latest
@@ -90,12 +90,12 @@ jobs:
     - name: Download blob reports from GitHub Actions Artifacts
       uses: actions/download-artifact@v4
       with:
-        name: all-blob-reports
-        path: all-blob-reports
+        name: json-report-*
+        path: json-report
         merge-multiple: true
   
-    - name: Merge reports
-      run: npx playwright merge-reports --reporter html ./all-blob-reports
+    - name: Parse reports
+      run: node utils/slo_report_parser.ts
   
     - name: Upload test report
       uses: actions/upload-artifact@v4
