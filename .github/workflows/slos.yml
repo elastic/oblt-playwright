@@ -92,13 +92,14 @@ jobs:
       with:
         name: all-blob-reports
         path: all-blob-reports
+        merge-multiple: true
   
     - name: Merge reports
-      run: npx playwright merge-reports --reporter line ./all-blob-reports
+      run: npx playwright merge-reports --reporter html ./all-blob-reports
   
     - name: Upload test report
       uses: actions/upload-artifact@v4
       with:
-        name: test-report-${{ github.run_attempt }}
+        name: perf-test-report-${{ github.run_attempt }}
         path: playwright-report
         retention-days: 90
