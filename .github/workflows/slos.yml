@@ -1,5 +1,7 @@
 name: SLO performance tests
-on: workflow_dispatch
+on: 
+  schedule:
+    - cron: "0 0 * * *"
 permissions:
   contents: read
 
@@ -39,6 +41,7 @@ jobs:
   test:
     needs: install
     timeout-minutes: 60
+    name: Performance tests
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -60,7 +63,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run SLO transforms performance tests
-      run: npx playwright test slos.api.spec.ts > test_result_log.txt
+      run: npx playwright test slos.api.spec.ts
       env:
         ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
         ELASTIC_ES: ${{ secrets.ELASTIC_ES }}
@@ -69,6 +72,35 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: test_result_log
-        path: test_result_log.txt
+        name: all-blob-reports
+        path: blob-report
+        retention-days: 1
+
+  create-report:
+    needs: test
+    name: Create test report
+    if: success()
+    
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+  
+    - name: Install dependencies
+      run: npm ci
+  
+    - name: Download blob reports from GitHub Actions Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: all-blob-reports
+        path: all-blob-reports
+  
+    - name: Merge reports
+      run: npx playwright merge-reports --reporter line ./all-blob-reports
+  
+    - name: Upload test report
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-report-${{ github.run_attempt }}
+        path: playwright-report
         retention-days: 90

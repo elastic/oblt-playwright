@@ -15,11 +15,12 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  //workers: process.env.CI ? 1 : undefined,
-  workers: 1,
+  workers: process.env.CI ? 4 : undefined,
+  // workers: 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['json', { outputFile: 'test-results/results.json' }]],
-  //reporter: 'html',
+  reporter: process.env.CI ? 'blob' : 'line',
+  //reporter: [['json', { outputFile: 'test-results/results.json' }]],
+  //reporter: [['blob', { outputDir: 'test-results', fileName: `blob-report.zip` }]],
   /* Timeouts */
   timeout: 300000,
   expect: {timeout: 300000},
