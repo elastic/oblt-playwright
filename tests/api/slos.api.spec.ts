@@ -136,7 +136,7 @@ test('sli.apm.transactionDuration', async({request}) => {
     });
   console.log('The last @timestamp of the source data:', sourceTimestamp);
 
-  await test.step('Poll SLO indices for a document with the source data timestamp.', async () => {
+  await test.step('Poll SLO indices.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
     await expect.poll(async () => {
       let sloResponse = await request.post(`${process.env.ELASTIC_ES}/.slo-observability.sli-v3*/_async_search`, {
@@ -361,7 +361,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
     });
   console.log('The last @timestamp of the source data:', sourceTimestamp);
 
-  await test.step('Poll SLO indices for a document with certain timestamp.', async () => {
+  await test.step('Poll SLO indices.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
     await expect.poll(async () => {
       let sloResponse = await request.post(`${process.env.ELASTIC_ES}/.slo-observability.sli-v3*/_async_search`, {

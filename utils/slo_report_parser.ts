@@ -8,33 +8,32 @@ const rawData = fs.readFileSync(inputFilePath);
 const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;
 const outputDirectory = path.dirname(inputFilePath);
-const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
-const stepName = "Poll SLO indices for a document with certain timestamp.";
-let stepValue;
-let testName;
+const currentDate = Date.now();
+const stepName = "Poll SLO indices.";
+
 
 testSuites.forEach(suite => {
   suite.specs.forEach((spec) => {
     spec.tests.forEach(test => {
         test.results.forEach(result => {
-            (result.steps || []).forEach(step => {
+            let stepValue;
+            let testName;
+            result.steps.forEach(step => {
                 if (step.title === stepName) {
                     stepValue = step.duration;
-                    testName = spec.title
-                }
+                    testName = spec.title;
+                };
             });
+            const resultData = {
+                date: currentDate,
+                transformDuration: stepValue,
+                title: testName
+            };
+            const fileName = `${currentDate}_${testName}.json`;
+            const outputPath = path.join(outputDirectory, fileName);
+            fs.writeFileSync(outputPath, JSON.stringify(resultData, null, 2));
+            console.log(`File "${fileName}" has been created successfully.`);
         });
     });
   });
 });
-
-const result = {
-    date: Date.now(),
-    transformDuration: stepValue,
-    title: testName
-};
-
-const fileName = `${currentDate}_${testName.replace(/\s/g, "_").toLowerCase()}.json`;
-const outputPath = path.join(outputDirectory, fileName);
-fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
-console.log(`File "${fileName}" has been created successfully.`);

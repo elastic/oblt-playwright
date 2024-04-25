@@ -41,6 +41,11 @@ jobs:
     timeout-minutes: 60
     name: Performance tests
     runs-on: ubuntu-latest
+    env:
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
+        ELASTIC_ES: ${{ secrets.ELASTIC_ES }}
+        API_KEY: ${{ secrets.API_KEY }}
+        REPORT_FILE: ${{ secrets.REPORT_FILE }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -62,44 +67,47 @@ jobs:
     
     - name: Run SLO transforms performance tests
       run: npx playwright test slos.api.spec.ts
-      env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_ES: ${{ secrets.ELASTIC_ES }}
-        API_KEY: ${{ secrets.API_KEY }}
-
+      
     - uses: actions/upload-artifact@v4
       if: success()
       with:
-        name: json-report-${{ github.run_id }}
-        path: json-report
+        name: test-results
+        path: playwright-report
         retention-days: 1
 
-  parse-reports:
+  parse-report:
     needs: test
-    name: Parse test reports
+    name: Parse raw test report
     if: success()
-    
     runs-on: ubuntu-latest
+    env:
+        REPORT_FILE: ${{ secrets.REPORT_FILE }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
   
-    - name: Install dependencies
-      run: npm ci
-  
-    - name: Download blob reports from GitHub Actions Artifacts
+    - name: Download raw test report from artifacts
       uses: actions/download-artifact@v4
       with:
-        name: json-report-*
-        path: json-report
-        merge-multiple: true
-  
-    - name: Parse reports
+        path: /home/runner/work/oblt-playwright
+        
+    - name: Parse raw report
       run: node utils/slo_report_parser.ts
-  
+
+    - name: Remove raw test report from artifacts
+      run: rm -rf /home/runner/work/oblt-playwright/test-results/results.json
+      
     - name: Upload test report
       uses: actions/upload-artifact@v4
       with:
-        name: perf-test-report-${{ github.run_attempt }}
-        path: playwright-report
+        name: perf-test-report
+        path: /home/runner/work/oblt-playwright/test-results
         retention-days: 90
