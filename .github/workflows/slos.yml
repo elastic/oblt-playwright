@@ -1,5 +1,7 @@
 name: SLO performance tests
-on: workflow_dispatch
+on:
+  schedule:
+    - cron: '0 0 * * *'
 permissions:
   contents: read
 
