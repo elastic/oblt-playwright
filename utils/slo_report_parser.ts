@@ -29,7 +29,7 @@ testSuites.forEach(suite => {
                 transformDuration: stepValue,
                 title: testName
             };
-            const fileName = `${currentDate}_${testName}.json`;
+            const fileName = `perf_test_${testName}_${currentDate}.json`;
             const outputPath = path.join(outputDirectory, fileName);
             fs.writeFileSync(outputPath, JSON.stringify(resultData, null, 2));
             console.log(`File "${fileName}" has been created successfully.`);
