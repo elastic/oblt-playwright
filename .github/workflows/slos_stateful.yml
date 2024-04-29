@@ -46,6 +46,7 @@ jobs:
     env:
         API_KEY: ${{ secrets.API_KEY_STATEFUL }}
         ELASTIC_ES: ${{ secrets.ELASTIC_ES_STATEFUL }}
+        ELASTIC_URL: ${{ secrets.ELASTIC_URL_STATEFUL }}
         REPORT_FILE: ${{ secrets.REPORT_FILE }}
     steps:
     - uses: actions/checkout@v4
