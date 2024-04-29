@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-test.skip('sli.apm.transactionDuration', async({request}) => {
+test('sli.apm.transactionDuration', async({request}) => {
   test.setTimeout(0);
   const sloName = "[Playwright Test] APM latency";
   const testStartTime = Date.now();
@@ -226,7 +226,7 @@ test.skip('sli.apm.transactionDuration', async({request}) => {
     });
 });
 
-test.skip('sli.apm.transactionErrorRate', async({request}) => {
+test('sli.apm.transactionErrorRate', async({request}) => {
   test.setTimeout(0);
   const sloName = "[Playwright Test] APM availability";
   const testStartTime = Date.now();
@@ -497,7 +497,7 @@ test('sli.histogram.custom', async({request}) => {
   await test.step('Get the last timestamp of the source data.', async () => {
     console.log("Waiting for the next document in the source index...");
     await expect.poll(async () => {
-      sourceResponse = await request.post(`${process.env.ELASTIC_ES}/traces-apm*%2Capm-*%2Clogs-apm*%2Capm-*%2Cmetrics-apm*%2Capm-*/_async_search`, {
+      sourceResponse = await request.post(`${process.env.ELASTIC_ES}/metrics-*/_async_search`, {
             data: {
                 "sort": [
                   {
