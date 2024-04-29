@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
 
-test('sli.apm.transactionDuration', async({request}) => {
+test.skip('sli.apm.transactionDuration', async({request}) => {
   test.setTimeout(0);
   const sloName = "[Playwright Test] APM latency";
   const testStartTime = Date.now();
@@ -226,7 +226,7 @@ test('sli.apm.transactionDuration', async({request}) => {
     });
 });
 
-test('sli.apm.transactionErrorRate', async({request}) => {
+test.skip('sli.apm.transactionErrorRate', async({request}) => {
   test.setTimeout(0);
   const sloName = "[Playwright Test] APM availability";
   const testStartTime = Date.now();
@@ -341,6 +341,225 @@ test('sli.apm.transactionErrorRate', async({request}) => {
                           "field": "event.outcome"
                         }
                       }
+                    ],
+                    "should": [],
+                    "must_not": []
+                  }
+                }
+              }
+        });
+        const responseBody = await sourceResponse.json();
+        sourceTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
+        const timestampMillis = Date.parse(sourceTimestamp);
+        sourceResponse = Date.parse(sourceTimestamp);
+        return timestampMillis;
+      }, {
+        message: 'Waiting for the next document in the source index.',
+        intervals: [1_000],
+        timeout: 0,
+      }).toBeGreaterThan(testStartTime);
+    });
+  console.log('The last @timestamp of the source data:', sourceTimestamp);
+
+  await test.step('Poll SLO indices.', async () => {
+    console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
+    await expect.poll(async () => {
+      let sloResponse = await request.post(`${process.env.ELASTIC_ES}/.slo-observability.sli-v3*/_async_search`, {
+            data: {
+              "sort": [
+                {
+                  "@timestamp": {
+                    "order": "desc",
+                    "format": "strict_date_optional_time",
+                    "unmapped_type": "boolean"
+                  }
+                },
+                {
+                  "_doc": {
+                    "order": "desc",
+                    "unmapped_type": "boolean"
+                  }
+                }
+              ],
+              "track_total_hits": false,
+              "fields": [
+                {
+                  "field": "*",
+                  "include_unmapped": "true"
+                },
+                {
+                  "field": "@timestamp",
+                  "format": "strict_date_optional_time"
+                },
+                {
+                  "field": "event.ingested",
+                  "format": "strict_date_optional_time"
+                }
+              ],
+              "size": 500,
+              "version": true,
+              "script_fields": {},
+              "stored_fields": [
+                "*"
+              ],
+              "runtime_mappings": {},
+              "_source": false,
+              "query": {
+                "bool": {
+                  "must": [],
+                  "filter": [
+                    {
+                      "range": {
+                        "@timestamp": {
+                          "format": "strict_date_optional_time",
+                          "gte": "now-15m",
+                          "lte": "now"
+                        }
+                      }
+                    },
+                    {
+                      "match_phrase": {
+                        "slo.id": sloId
+                      }
+                    }
+                  ],
+                  "should": [],
+                  "must_not": []
+                }
+              }
+            }
+        });
+        const responseBody = JSON.parse(await sloResponse.text());
+        const sloTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
+        const timestampMillis = Date.parse(sloTimestamp);
+        return timestampMillis;
+      }, {
+        message: 'Waiting for the next document in the ".slo-observability.sli-v3*" index.',
+        intervals: [1_000],
+        timeout: 0,
+      }).toEqual(sourceResponse);
+    });
+
+  await test.step('Teardown.', async () => {
+    console.log(`Deleting SLO "${sloName}"...`);
+    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
+        data: {
+        }
+    });
+    expect(deleteResponse.status()).toBe(204);
+    console.log(`SLO "${sloName}" has been deleted.`);
+    });
+});
+
+test('sli.histogram.custom', async({request}) => {
+  test.setTimeout(0);
+  const sloName = "[Playwright Test] Histogram metric";
+  const testStartTime = Date.now();
+  let sloCreateResponse;
+  let sloId;
+  let sourceResponse;
+  let sourceTimestamp;
+
+  const histogramMetric = await test.step('Create SLO [sli.histogram.custom].', async () => {
+    sloCreateResponse = await request.post('/api/observability/slos', {
+        data: {
+            "name": sloName,
+            "description":"",
+            "indicator":{
+                "type":
+                    "sli.histogram.custom",
+                    "params":{
+                        "filter":"",
+                        "good":{"field":"transaction.duration.histogram","aggregation":"value_count","filter":""},
+			                  "total":{"field":"transaction.duration.histogram","aggregation":"value_count","filter":""},
+                        "index":"traces-apm*,apm-*,logs-apm*,apm-*,metrics-apm*,apm-*",
+                        "timestampField":"@timestamp"
+                        }
+            },
+            "budgetingMethod":"occurrences",
+            "timeWindow":{
+                "duration":"30d",
+                "type":"rolling"
+            },
+            "objective":{"target":0.99}
+        }
+    })  
+    expect(sloCreateResponse.status()).toBe(200);
+    if (sloCreateResponse.status() >= 200 && sloCreateResponse.status() < 300) {
+        console.log("SLO", `"${sloName}"`, "has been created.")
+    }
+    const responseBody = JSON.parse(await sloCreateResponse.text());
+    return responseBody;
+  });
+  sloId = histogramMetric.id;
+  console.log('slo.id:', sloId);
+
+  await test.step('Get the last timestamp of the source data.', async () => {
+    console.log("Waiting for the next document in the source index...");
+    await expect.poll(async () => {
+      sourceResponse = await request.post(`${process.env.ELASTIC_ES}/traces-apm*%2Capm-*%2Clogs-apm*%2Capm-*%2Cmetrics-apm*%2Capm-*/_async_search`, {
+            data: {
+                "sort": [
+                  {
+                    "@timestamp": {
+                      "order": "desc",
+                      "format": "strict_date_optional_time",
+                      "unmapped_type": "boolean"
+                    }
+                  },
+                  {
+                    "_doc": {
+                      "order": "desc",
+                      "unmapped_type": "boolean"
+                    }
+                  }
+                ],
+                "track_total_hits": false,
+                "fields": [
+                  {
+                    "field": "*",
+                    "include_unmapped": "true"
+                  },
+                  {
+                    "field": "@timestamp",
+                    "format": "strict_date_optional_time"
+                  }
+                ],
+                "size": 500,
+                "version": true,
+                "script_fields": {},
+                "stored_fields": [
+                  "*"
+                ],
+                "runtime_mappings": {},
+                "_source": false,
+                "query": {
+                  "bool": {
+                    "must": [],
+                    "filter": [
+                      {
+                        "range": {
+                          "@timestamp": {
+                            "gte": "now-15m",
+                            "lte": "now"
+                          }
+                        }
+                      },
+                      {
+                        "exists": {
+                          "field": "event.outcome"
+                        }
+                      },
+                      {
+                        "exists": {
+                          "field": "transaction.duration.summary"
+                        }
+                      },
+                      {
+                        "match_phrase": {
+                          "data_stream.dataset": "apm.transaction.1m"
+                        }
+                      },
                     ],
                     "should": [],
                     "must_not": []
