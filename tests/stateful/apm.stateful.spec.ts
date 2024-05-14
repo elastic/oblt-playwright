@@ -1,9 +1,17 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
+let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check APM data', async ({request}) => {
   console.log(`... checking APM data.`);
   let response = await request.get('internal/apm/has_data', {
+      headers: {
+        "accept": "application/json",
+        "Authorization": apiKey,
+        "Content-Type": "application/json;charset=UTF-8",
+        "kbn-xsrf": "true",          
+        "x-elastic-internal-origin": "kibana"
+      },
       data: {}
   })
   expect(response.status()).toBe(200);

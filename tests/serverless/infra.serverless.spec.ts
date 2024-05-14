@@ -1,5 +1,6 @@
 import { test } from '../../tests/fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
+let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check node data', async ({request}) => {
   console.log(`... checking node data.`);
@@ -7,6 +8,13 @@ test.beforeAll('Check node data', async ({request}) => {
   const rangeTime = currentTime - 1200000;
 
   let response = await request.post('api/metrics/snapshot', {
+      headers: {
+          "accept": "application/json",
+          "Authorization": apiKey,
+          "Content-Type": "application/json;charset=UTF-8",
+          "kbn-xsrf": "true",          
+          "x-elastic-internal-origin": "kibana"
+      },
       data: {
           "filterQuery":"",
           "metrics":[{"type":"cpu"}],
@@ -144,7 +152,7 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, land
 });
 
 test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, landingPage, page }, testInfo) => {
-  const cpuUsage = "hostsViewKPI-cpuUsage";
+  const cpuUsage = "hostsView-metricChart-cpuUsage";
   const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
 
   await test.step('step01', async () => {

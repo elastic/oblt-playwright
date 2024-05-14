@@ -98,7 +98,11 @@ export default class InfrastructurePage {
         if (await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
         await this.page.keyboard.press('ArrowDown');
     }
+    const startTime = performance.now();
     await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+    const endTime = performance.now();
+    const elapsedTime = endTime - startTime;
+    console.log(`"${title}" took:`, elapsedTime)
         }
 
     public async assertVisibilityPodVisualization(title: string) {

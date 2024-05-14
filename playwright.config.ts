@@ -109,13 +109,6 @@ export default defineConfig({
             log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
           }
         },
-        extraHTTPHeaders: {
-          "accept": "application/json",
-          "Authorization": apiKey,
-          "Content-Type": "application/json;charset=UTF-8",
-          "kbn-xsrf": "true",          
-          "x-elastic-internal-origin": "kibana"
-        },
       },
       dependencies: ['stateful_auth'],
       //teardown: 'stateful_teardown',
@@ -132,13 +125,6 @@ export default defineConfig({
             isEnabled: () => true,
             log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
           }
-        },
-        extraHTTPHeaders: {
-          "accept": "application/json",
-          "Authorization": apiKey,
-          "Content-Type": "application/json;charset=UTF-8",
-          "kbn-xsrf": "true",          
-          "x-elastic-internal-origin": "kibana"
         },
       },
       dependencies: ['serverless_auth'],
