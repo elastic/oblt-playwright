@@ -152,7 +152,7 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
 });
 
 test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
-  const cpuUsage = "hostsViewKPI-cpuUsage";
+  const cpuUsage = "hostsView-metricChart-cpuUsage";
   const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
    
   await test.step('step01', async () => {
