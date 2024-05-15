@@ -18,6 +18,7 @@ export default class InfrastructurePage {
     private readonly tableCell = () => this.page.locator('xpath=(//tbody//td)[1]//span[contains(@class, "euiTableCellContent__text")]');
     private readonly tableCellHosts = () => this.page.locator('xpath=//tbody//tr[1]//td//span[contains(@class, "euiTableCellContent__text")]');
     private readonly popoverK8sMetrics = () => this.page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]');
+    private readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
     private readonly hostsLogs = () => this.page.getByTestId('hostsView-tabs-logs');
     private readonly logsSearchField = () => this.page.locator('xpath=//input[@placeholder="Search for log entries..."]');
     private readonly inspector = () => this.page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]');
@@ -61,6 +62,10 @@ export default class InfrastructurePage {
 
     public async clickPopoverK8sMetrics() {
         await this.popoverK8sMetrics().click();
+        }
+
+    public async openHostsMetricsTab() {
+        await this.hostsMetricsTab().click();
         }
 
     public async openHostsLogs() {

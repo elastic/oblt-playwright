@@ -91,7 +91,7 @@ test('Hosts - Landing page.', async ({ datePicker, infrastructurePage, page }, t
     });
     const elapsedTime = endTime - startTime;
     console.log("[Hosts landing page] All visualizations loading time:", elapsedTime);
-  });
+});
 
 test('Hosts - Individual page.', async ({ datePicker, infrastructurePage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
@@ -143,4 +143,63 @@ test('Hosts - Individual page.', async ({ datePicker, infrastructurePage, page }
     });
     const elapsedTime = endTime - startTime;
     console.log("[Hosts individual page] All visualizations loading time:", elapsedTime);
+});
+
+test('Hosts - Individual page - Metrics tab.', async ({ datePicker, infrastructurePage, page }, testInfo) => {
+    const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
+    const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
+    const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
+    const loadBreakdown = "infraAssetDetailsMetricChartloadBreakdown";
+    const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
+    const memoryUsageBreakdown = "infraAssetDetailsMetricChartmemoryUsageBreakdown";
+    const rxTx = "infraAssetDetailsMetricChartrxTx";
+    const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
+    const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
+    const diskThroughput = "infraAssetDetailsMetricChartdiskThroughputReadWrite";
+    const logRate = "infraAssetDetailsMetricChartlogRate";
+    const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
+    const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
+    const nodeDiskCapacity = "infraAssetDetailsMetricChartnodeDiskCapacity";
+    const nodePodCapacity = "infraAssetDetailsMetricChartnodePodCapacity";
+
+    let startTime;
+    let endTime;
+
+    await test.step('step01', async () => {
+        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
+        await infrastructurePage.clickTableCellHosts();
+        await infrastructurePage.openHostsMetricsTab();
+    });
+
+    await test.step('step02', async () => {
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts visualizations loading time.`);
+        await datePicker.clickDatePicker();
+        await datePicker.fillTimeValue('90');
+        await datePicker.selectTimeUnit('Days');
+        await datePicker.clickApplyButton();
+        startTime = performance.now();
+        await page.evaluate("document.body.style.zoom=0.25");
+        await Promise.all([
+            infrastructurePage.assertVisibilityVisualization(cpuUsage),
+            infrastructurePage.assertVisibilityVisualization(cpuUsageBreakdown),
+            infrastructurePage.assertVisibilityVisualization(normalizedLoad),
+            infrastructurePage.assertVisibilityVisualization(loadBreakdown),
+            infrastructurePage.assertVisibilityVisualization(memoryUsage), 
+            infrastructurePage.assertVisibilityVisualization(memoryUsageBreakdown), 
+            infrastructurePage.assertVisibilityVisualization(rxTx),
+            infrastructurePage.assertVisibilityVisualization(diskUsageByMountPoint), 
+            infrastructurePage.assertVisibilityVisualization(diskIOReadWrite),
+            infrastructurePage.assertVisibilityVisualization(diskThroughput),
+            infrastructurePage.assertVisibilityVisualization(logRate),
+            infrastructurePage.assertVisibilityVisualization(nodeCpuCapacity), 
+            infrastructurePage.assertVisibilityVisualization(nodeMemoryCapacity),
+            infrastructurePage.assertVisibilityVisualization(nodeDiskCapacity),
+            infrastructurePage.assertVisibilityVisualization(nodePodCapacity)
+        ]).then((values) => {
+            console.log(values);
+          });
+        endTime = performance.now();
+    });
+    const elapsedTime = endTime - startTime;
+    console.log("[Hosts individual page metric tab] All visualizations loading time:", elapsedTime);
 });
