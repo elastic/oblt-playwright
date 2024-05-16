@@ -3,12 +3,12 @@ import { STORAGE_STATE } from "../playwright.config";
 import { waitForOneOf } from "../src/types.ts";
 
 serverless_auth('Authentication', async ({page}) => {
-  await page.goto(process.env.ELASTIC_URL);
+  await page.goto(process.env.KIBANA_HOST);
   console.log(`...waiting for login page elements to appear.`);
   await page.getByTestId('login-username').click();
-  await page.getByTestId('login-username').fill(process.env.ELASTIC_USERNAME);
+  await page.getByTestId('login-username').fill(process.env.KIBANA_USERNAME);
   await page.getByTestId('login-password').click();
-  await page.getByTestId('login-password').fill(process.env.ELASTIC_PASSWORD);
+  await page.getByTestId('login-password').fill(process.env.KIBANA_PASSWORD);
   await page.getByTestId('login-button').click();
   
   const [ index ] = await waitForOneOf([

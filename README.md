@@ -13,10 +13,10 @@ Have ideas for new user journeys? Check [the guide for creating a new test](http
 Create .env file in the root directory with the following environmental variables:
 
 ```
-ELASTIC_URL = 
-ELASTIC_ES =
-ELASTIC_USERNAME = 
-ELASTIC_PASSWORD = 
+KIBANA_HOST = 
+ELASTICSEARCH_HOST =
+KIBANA_USERNAME = 
+KIBANA_PASSWORD = 
 DATE_PICKER = 'Last 24 hours'
 API_KEY = 
 REPORT_FILE = ../test-results/results.json

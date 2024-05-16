@@ -6,7 +6,7 @@ permissions:
 jobs:
   install:
     timeout-minutes: 60
-    name: 🔍 Install
+    name: Install
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -62,9 +62,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -100,9 +100,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -138,9 +138,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -176,9 +176,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -214,9 +214,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test infra.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -252,9 +252,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test apm.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -290,9 +290,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test apm.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -328,9 +328,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test apm.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -366,9 +366,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test apm.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4
@@ -404,9 +404,9 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test apm.serverless.spec.ts --project serverless
       env:
-        ELASTIC_URL: ${{ secrets.ELASTIC_URL }}
-        ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
-        ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         DATE_PICKER: ${{ vars.DATE_PICKER }}
 
     - uses: actions/upload-artifact@v4

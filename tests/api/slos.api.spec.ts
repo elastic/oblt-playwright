@@ -48,7 +48,7 @@ test('sli.apm.transactionDuration', async({request}) => {
   await test.step('Get the last timestamp of the source data.', async () => {
     console.log("Waiting for the next document in the source index...");
     await expect.poll(async () => {
-      sourceResponse = await request.post(`${process.env.ELASTIC_ES}/metrics-*/_async_search`, {
+      sourceResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
             data: {
                 "sort": [
                   {
@@ -139,7 +139,7 @@ test('sli.apm.transactionDuration', async({request}) => {
   await test.step('Poll SLO indices.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
     await expect.poll(async () => {
-      let sloResponse = await request.post(`${process.env.ELASTIC_ES}/.slo-observability.sli-v3*/_async_search`, {
+      let sloResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/.slo-observability.sli-v3*/_async_search`, {
             data: {
               "sort": [
                 {
@@ -273,7 +273,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
   await test.step('Get the last timestamp of the source data.', async () => {
     console.log("Waiting for the next document in the source index...");
     await expect.poll(async () => {
-      sourceResponse = await request.post(`${process.env.ELASTIC_ES}/metrics-*/_async_search`, {
+      sourceResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
             data: {
                 "sort": [
                   {
@@ -364,7 +364,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
   await test.step('Poll SLO indices.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
     await expect.poll(async () => {
-      let sloResponse = await request.post(`${process.env.ELASTIC_ES}/.slo-observability.sli-v3*/_async_search`, {
+      let sloResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/.slo-observability.sli-v3*/_async_search`, {
             data: {
               "sort": [
                 {
@@ -497,7 +497,7 @@ test('sli.histogram.custom', async({request}) => {
   await test.step('Get the last timestamp of the source data.', async () => {
     console.log("Waiting for the next document in the source index...");
     await expect.poll(async () => {
-      sourceResponse = await request.post(`${process.env.ELASTIC_ES}/metrics-*/_async_search`, {
+      sourceResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
             data: {
                 "sort": [
                   {
@@ -583,7 +583,7 @@ test('sli.histogram.custom', async({request}) => {
   await test.step('Poll SLO indices.', async () => {
     console.log('Waiting for the next document in the ".slo-observability.sli-v3*" indices...');
     await expect.poll(async () => {
-      let sloResponse = await request.post(`${process.env.ELASTIC_ES}/.slo-observability.sli-v3*/_async_search`, {
+      let sloResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/.slo-observability.sli-v3*/_async_search`, {
             data: {
               "sort": [
                 {
