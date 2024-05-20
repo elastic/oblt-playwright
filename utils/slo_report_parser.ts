@@ -9,30 +9,26 @@ const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;
 const outputDirectory = path.dirname(inputFilePath);
 const currentDate = Date.now();
-const stepName = "Poll SLO indices.";
-
+const stepName = /^Poll.*/;
 
 testSuites.forEach(suite => {
   suite.specs.forEach((spec) => {
     spec.tests.forEach(test => {
         test.results.forEach(result => {
-            let stepValue;
-            let testName;
-            result.steps.forEach(step => {
-                if (step.title === stepName) {
-                    stepValue = step.duration;
-                    testName = spec.title;
+            (result.steps || []).forEach(step => {  
+                if (stepName.test(step.title)) {
+                    const resultData = {
+                        date: currentDate,
+                        transformDuration: step.duration,
+                        title: spec.title,
+                        step: step.title
+                    };
+                    const fileName = `perf_test_${spec.title}_${step.title}_${currentDate}.json`;
+                    const outputPath = path.join(outputDirectory, fileName);
+                    fs.writeFileSync(outputPath, JSON.stringify(resultData, null, 2));
+                    console.log(`File "${fileName}" has been created successfully.`);
                 };
             });
-            const resultData = {
-                date: currentDate,
-                transformDuration: stepValue,
-                title: testName
-            };
-            const fileName = `perf_test_${testName}_${currentDate}.json`;
-            const outputPath = path.join(outputDirectory, fileName);
-            fs.writeFileSync(outputPath, JSON.stringify(resultData, null, 2));
-            console.log(`File "${fileName}" has been created successfully.`);
         });
     });
   });
