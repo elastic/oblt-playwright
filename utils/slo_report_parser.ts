@@ -9,7 +9,7 @@ const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;
 const outputDirectory = path.dirname(inputFilePath);
 const currentDate = Date.now();
-const stepName = /^Poll.*/;
+const stepName = /^From.*/;
 
 testSuites.forEach(suite => {
   suite.specs.forEach((spec) => {
