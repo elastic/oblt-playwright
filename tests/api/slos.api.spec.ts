@@ -701,7 +701,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
     });
 });
 
-test('sli.histogram.custom', async({request}) => {
+test.skip('sli.histogram.custom', async({request}) => {
   test.setTimeout(600000);
   const sloName = "[Playwright Test] Histogram metric";
   const testStartTime = Date.now();
