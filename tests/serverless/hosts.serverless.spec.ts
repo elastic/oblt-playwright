@@ -2,7 +2,7 @@ import { test } from '../fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
 let apiKey = process.env.API_KEY;
 
-test.beforeAll('Check node data', async ({request}) => {
+test.beforeAll('Check node data', async ({ request }) => {
   console.log(`... checking node data.`);
   const currentTime = Date.now();
   const rangeTime = currentTime - 1200000;
@@ -31,7 +31,9 @@ test.beforeAll('Check node data', async ({request}) => {
   const jsonData = JSON.parse(await response.text());
   const nodesArr = jsonData.nodes;
   expect(nodesArr, 'The number of available nodes in the Inventory should not be less than 1.').not.toHaveLength(0);
-  console.log(`✓ Node data is checked.`);
+  if (response.status() == 200) {
+    console.log(`✓ Node data is checked.`);
+  }
 });
 
 test.beforeEach(async ({ landingPage }) => {
@@ -40,7 +42,7 @@ test.beforeEach(async ({ landingPage }) => {
   await landingPage.clickHosts();
 });
 
-test('Hosts - Landing page.', async ({ datePicker, infrastructurePage, page }, testInfo) => {
+test('Hosts - Landing page.', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -56,44 +58,50 @@ test('Hosts - Landing page.', async ({ datePicker, infrastructurePage, page }, t
     const diskWriteThroughput = "hostsView-metricChart-diskWriteThroughput";
     const rx = "hostsView-metricChart-rx";
     const tx = "hostsView-metricChart-tx";
-
-    let startTime;
-    let endTime;
   
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts visualizations loading time.`);
+        let startTime;
+        let endTime;
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await hostsPage.setHostsLimit500();
+        await datePicker.assertVisibilityDatePicker();
         await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue('90');
-        await datePicker.selectTimeUnit('Days');
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        startTime = performance.now();
         await page.evaluate("document.body.style.zoom=0.25");
+        startTime = performance.now();
         await Promise.all([
-            infrastructurePage.assertVisibilityKPIGrid(cpuUsageKPI),
-            infrastructurePage.assertVisibilityKPIGrid(normalizedLoadKPI),
-            infrastructurePage.assertVisibilityKPIGrid(memoryUsageKPI),
-            infrastructurePage.assertVisibilityKPIGrid(diskUsageKPI),
-            infrastructurePage.assertVisibilityVisualization(cpuUsage), 
-            infrastructurePage.assertVisibilityVisualization(normalizedLoad),
-            infrastructurePage.assertVisibilityVisualization(memoryUsage), 
-            infrastructurePage.assertVisibilityVisualization(memoryFree),
-            infrastructurePage.assertVisibilityVisualization(diskSpaceAvailable), 
-            infrastructurePage.assertVisibilityVisualization(diskIORead),
-            infrastructurePage.assertVisibilityVisualization(diskIOWrite), 
-            infrastructurePage.assertVisibilityVisualization(diskReadThroughput),
-            infrastructurePage.assertVisibilityVisualization(diskWriteThroughput), 
-            infrastructurePage.assertVisibilityVisualization(rx),
-            infrastructurePage.assertVisibilityVisualization(tx)
+            hostsPage.assertHostsNumber(),
+            hostsPage.assertVisibilityHostsTable(),
+            hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+            hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+            hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+            hostsPage.assertVisibilityVisualization(diskUsageKPI),
+            hostsPage.assertVisibilityVisualization(cpuUsage), 
+            hostsPage.assertVisibilityVisualization(normalizedLoad),
+            hostsPage.assertVisibilityVisualization(memoryUsage), 
+            hostsPage.assertVisibilityVisualization(memoryFree),
+            hostsPage.assertVisibilityVisualization(diskSpaceAvailable), 
+            hostsPage.assertVisibilityVisualization(diskIORead),
+            hostsPage.assertVisibilityVisualization(diskIOWrite), 
+            hostsPage.assertVisibilityVisualization(diskReadThroughput),
+            hostsPage.assertVisibilityVisualization(diskWriteThroughput), 
+            hostsPage.assertVisibilityVisualization(rx),
+            hostsPage.assertVisibilityVisualization(tx)
         ]).then((values) => {
+            console.log(`\n[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
             console.log(values);
           });
         endTime = performance.now();
+        const elapsedTime = endTime - startTime;
+        console.log("[Hosts landing page] All elements loading time:", elapsedTime);
+        return elapsedTime;
     });
-    const elapsedTime = endTime - startTime;
-    console.log("[Hosts landing page] All visualizations loading time:", elapsedTime);
+    
 });
 
-test('Hosts - Individual page.', async ({ datePicker, infrastructurePage, page }, testInfo) => {
+test('Hosts - Individual page.', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -107,45 +115,47 @@ test('Hosts - Individual page.', async ({ datePicker, infrastructurePage, page }
     const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
     const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
 
-    let startTime;
-    let endTime;
-
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
-        await infrastructurePage.clickTableCellHosts();
+        await hostsPage.clickTableCellHosts();
     });
 
     await test.step('step02', async () => {
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts visualizations loading time.`);
+        let startTime;
+        let endTime;
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await datePicker.assertVisibilityDatePicker();
         await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue('90');
-        await datePicker.selectTimeUnit('Days');
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        startTime = performance.now();
         await page.evaluate("document.body.style.zoom=0.25");
+        startTime = performance.now();
         await Promise.all([
-            infrastructurePage.assertVisibilityKPIGrid(cpuUsageKPI),
-            infrastructurePage.assertVisibilityKPIGrid(normalizedLoadKPI),
-            infrastructurePage.assertVisibilityKPIGrid(memoryUsageKPI),
-            infrastructurePage.assertVisibilityKPIGrid(diskUsageKPI),
-            infrastructurePage.assertVisibilityVisualization(cpuUsage), 
-            infrastructurePage.assertVisibilityVisualization(normalizedLoad),
-            infrastructurePage.assertVisibilityVisualization(memoryUsage), 
-            infrastructurePage.assertVisibilityVisualization(rxTx),
-            infrastructurePage.assertVisibilityVisualization(diskUsageByMountPoint), 
-            infrastructurePage.assertVisibilityVisualization(diskIOReadWrite),
-            infrastructurePage.assertVisibilityVisualization(nodeCpuCapacity), 
-            infrastructurePage.assertVisibilityVisualization(nodeMemoryCapacity),
+            hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+            hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+            hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+            hostsPage.assertVisibilityVisualization(diskUsageKPI),
+            hostsPage.assertVisibilityVisualization(cpuUsage), 
+            hostsPage.assertVisibilityVisualization(normalizedLoad),
+            hostsPage.assertVisibilityVisualization(memoryUsage), 
+            hostsPage.assertVisibilityVisualization(rxTx),
+            hostsPage.assertVisibilityVisualization(diskUsageByMountPoint), 
+            hostsPage.assertVisibilityVisualization(diskIOReadWrite),
+            hostsPage.assertVisibilityVisualization(nodeCpuCapacity), 
+            hostsPage.assertVisibilityVisualization(nodeMemoryCapacity),
         ]).then((values) => {
+            console.log(`\n[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
             console.log(values);
           });
         endTime = performance.now();
+        const elapsedTime = endTime - startTime;
+        console.log("[Hosts individual page] All elements loading time:", elapsedTime);
+        return elapsedTime;
     });
-    const elapsedTime = endTime - startTime;
-    console.log("[Hosts individual page] All visualizations loading time:", elapsedTime);
 });
 
-test('Hosts - Individual page - Metrics tab.', async ({ datePicker, infrastructurePage, page }, testInfo) => {
+test('Hosts - Individual page - Metrics tab.', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
@@ -162,44 +172,46 @@ test('Hosts - Individual page - Metrics tab.', async ({ datePicker, infrastructu
     const nodeDiskCapacity = "infraAssetDetailsMetricChartnodeDiskCapacity";
     const nodePodCapacity = "infraAssetDetailsMetricChartnodePodCapacity";
 
-    let startTime;
-    let endTime;
-
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
-        await infrastructurePage.clickTableCellHosts();
-        await infrastructurePage.openHostsMetricsTab();
+        await hostsPage.clickTableCellHosts();
+        await hostsPage.openHostsMetricsTab();
     });
 
     await test.step('step02', async () => {
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts visualizations loading time.`);
+        let startTime;
+        let endTime;
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await datePicker.assertVisibilityDatePicker();
         await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue('90');
-        await datePicker.selectTimeUnit('Days');
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        startTime = performance.now();
         await page.evaluate("document.body.style.zoom=0.25");
+        startTime = performance.now();
         await Promise.all([
-            infrastructurePage.assertVisibilityVisualization(cpuUsage),
-            infrastructurePage.assertVisibilityVisualization(cpuUsageBreakdown),
-            infrastructurePage.assertVisibilityVisualization(normalizedLoad),
-            infrastructurePage.assertVisibilityVisualization(loadBreakdown),
-            infrastructurePage.assertVisibilityVisualization(memoryUsage), 
-            infrastructurePage.assertVisibilityVisualization(memoryUsageBreakdown), 
-            infrastructurePage.assertVisibilityVisualization(rxTx),
-            infrastructurePage.assertVisibilityVisualization(diskUsageByMountPoint), 
-            infrastructurePage.assertVisibilityVisualization(diskIOReadWrite),
-            infrastructurePage.assertVisibilityVisualization(diskThroughput),
-            infrastructurePage.assertVisibilityVisualization(logRate),
-            infrastructurePage.assertVisibilityVisualization(nodeCpuCapacity), 
-            infrastructurePage.assertVisibilityVisualization(nodeMemoryCapacity),
-            infrastructurePage.assertVisibilityVisualization(nodeDiskCapacity),
-            infrastructurePage.assertVisibilityVisualization(nodePodCapacity)
+            hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
+            hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsageBreakdown),
+            hostsPage.assertVisibilityVisualizationMetricsTab(normalizedLoad),
+            hostsPage.assertVisibilityVisualizationMetricsTab(loadBreakdown),
+            hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
+            hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
+            hostsPage.assertVisibilityVisualizationMetricsTab(rxTx),
+            hostsPage.assertVisibilityVisualizationMetricsTab(diskUsageByMountPoint), 
+            hostsPage.assertVisibilityVisualizationMetricsTab(diskIOReadWrite),
+            hostsPage.assertVisibilityVisualizationMetricsTab(diskThroughput),
+            hostsPage.assertVisibilityVisualizationMetricsTab(logRate),
+            hostsPage.assertVisibilityVisualizationMetricsTab(nodeCpuCapacity), 
+            hostsPage.assertVisibilityVisualizationMetricsTab(nodeMemoryCapacity),
+            hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
+            hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
         ]).then((values) => {
+            console.log(`\n[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
             console.log(values);
           });
         endTime = performance.now();
+        const elapsedTime = endTime - startTime;
+        console.log("[Hosts individual page metric tab] All elements loading time:", elapsedTime);
+        return elapsedTime;
     });
-    const elapsedTime = endTime - startTime;
-    console.log("[Hosts individual page metric tab] All visualizations loading time:", elapsedTime);
 });

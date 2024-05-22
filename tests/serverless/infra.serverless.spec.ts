@@ -1,4 +1,4 @@
-import { test } from '../../tests/fixtures/serverless/basePage';
+import { test } from '../fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
 let apiKey = process.env.API_KEY;
 
@@ -92,9 +92,9 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   });
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, landingPage, page }, testInfo) => {
+test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, landingPage, page }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
-  const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
+  const memoryUsage = "infraAssetDetailsKPImemoryUsage";
   const podCpuUsage = "podCpuUsage";
   const podMemoryUsage = "podMemoryUsage";
 
@@ -105,9 +105,9 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, land
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Clicks on any displayed host to open the detailed view.`);
-    await infrastructurePage.clickDismiss();
-    await infrastructurePage.sortByMetricValue();
-    await infrastructurePage.clickNodeWaffleContainer();
+    await inventoryPage.clickDismiss();
+    await inventoryPage.sortByMetricValue();
+    await inventoryPage.clickNodeWaffleContainer();
   });
   
   await test.step('step03', async () => {
@@ -121,24 +121,24 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, land
       await datePicker.clickApplyButton();
     }
     await page.waitForLoadState('networkidle');
-    await infrastructurePage.assertVisibilityVisualization(cpuUsage);
-    await infrastructurePage.assertVisibilityVisualization(memoryUsage);
+    await inventoryPage.assertVisibilityVisualization(cpuUsage);
+    await inventoryPage.assertVisibilityVisualization(memoryUsage);
   });
 
   await test.step('step04', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Returns back to Observability > Infrastructure > Inventory. Selects "Pods" as "Show" option.`);
-    await infrastructurePage.closeInfraAssetDetailsFlyout();
-    await infrastructurePage.switchInventoryToPodsView();
+    await inventoryPage.closeInfraAssetDetailsFlyout();
+    await inventoryPage.switchInventoryToPodsView();
     await page.waitForLoadState('networkidle');
   });
 
   await test.step('step05', async () => {
     console.log(`\n[${testInfo.title}] Step 05 - Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.`);
-    await infrastructurePage.sortByMetricValue();
-    await infrastructurePage.switchToTableView();
+    await inventoryPage.sortByMetricValue();
+    await inventoryPage.switchToTableView();
     await page.waitForLoadState('networkidle');
-    await infrastructurePage.clickTableCell();
-    await infrastructurePage.clickPopoverK8sMetrics();
+    await inventoryPage.clickTableCell();
+    await inventoryPage.clickPopoverK8sMetrics();
   });
 
   await test.step('step06', async () => {
@@ -146,32 +146,7 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, land
     await datePicker.assertVisibilityDatePicker();
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
-    await infrastructurePage.assertVisibilityPodVisualization(podCpuUsage);
-    await infrastructurePage.assertVisibilityPodVisualization(podMemoryUsage);
-  });
-});
-
-test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, landingPage, page }, testInfo) => {
-  const cpuUsage = "hostsView-metricChart-cpuUsage";
-  const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
-
-  await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Hosts.`);
-    await landingPage.clickHosts();
-  });
-
-  await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Normalized Load" visualizations visibility.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
-    await page.waitForLoadState('networkidle');
-    await infrastructurePage.assertVisibilityVisualization(cpuUsage);
-    await infrastructurePage.assertVisibilityVisualization(normalizedLoad);
-  });
-
-  await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Clicks the "Logs" tab, filters logs by searching errors.`);
-    await infrastructurePage.openHostsLogs();
-    await infrastructurePage.searchErrors();
+    await inventoryPage.assertVisibilityPodVisualization(podCpuUsage);
+    await inventoryPage.assertVisibilityPodVisualization(podMemoryUsage);
   });
 });

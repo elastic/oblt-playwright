@@ -3,14 +3,15 @@ import AlertsPage from "../../serverless/pom/pages/alerts.page";
 import DashboardPage from "../../serverless/pom/pages/dashboard.page";
 import DatePicker from "../../serverless/pom/components/date_picker.component";
 import DependenciesPage from "../../serverless/pom/pages/dependencies.page";
-import InfrastructurePage from "../../serverless/pom/pages/infrastructure.page";
+import HostsPage from "../../serverless/pom/pages/hosts.page";
+import InventoryPage from "../../serverless/pom/pages/inventory.page";
 import LandingPage from "../../serverless/pom/pages/landing.page";
 import LogsExplorerPage from "../../serverless/pom/pages/logs_explorer.page";
 import ServicesPage from "../../serverless/pom/pages/services.page";
 import TracesPage from "../../serverless/pom/pages/traces.page";
 
 
-export const test = base.extend<{alertsPage: AlertsPage, dashboardPage: DashboardPage, datePicker: DatePicker, dependenciesPage: DependenciesPage, infrastructurePage: InfrastructurePage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
+export const test = base.extend<{alertsPage: AlertsPage, dashboardPage: DashboardPage, datePicker: DatePicker, dependenciesPage: DependenciesPage, hostsPage: HostsPage, inventoryPage: InventoryPage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
 ({
     alertsPage: async({page}, use) => {
         await use(new AlertsPage(page));
@@ -27,9 +28,13 @@ export const test = base.extend<{alertsPage: AlertsPage, dashboardPage: Dashboar
     dependenciesPage: async({page}, use) => {
         await use(new DependenciesPage(page));
     },
+
+    hostsPage: async({page}, use) => {
+        await use(new HostsPage(page));
+    },
     
-    infrastructurePage: async({page}, use) => {
-        await use(new InfrastructurePage(page));
+    inventoryPage: async({page}, use) => {
+        await use(new InventoryPage(page));
     },
     
     landingPage: async({page}, use) => {

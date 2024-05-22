@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 
-export default class InfrastructurePage {
+export default class InventoryPage {
     page: Page;
 
     constructor(page: Page) {
@@ -16,11 +16,7 @@ export default class InfrastructurePage {
     private readonly inventorySwitcherPods = () => this.page.getByTestId('goToPods');
     private readonly tableView = () => this.page.locator('xpath=//button[@title="Table view"]');
     private readonly tableCell = () => this.page.locator('xpath=(//tbody//td)[1]//span[contains(@class, "euiTableCellContent__text")]');
-    private readonly tableCellHosts = () => this.page.locator('xpath=//tbody//tr[1]//td//span[contains(@class, "euiTableCellContent__text")]');
     private readonly popoverK8sMetrics = () => this.page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]');
-    private readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
-    private readonly hostsLogs = () => this.page.getByTestId('hostsView-tabs-logs');
-    private readonly logsSearchField = () => this.page.locator('xpath=//input[@placeholder="Search for log entries..."]');
     private readonly inspector = () => this.page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]');
     private readonly inspectorChooser = () => this.page.getByTestId('inspectorViewChooser');
     private readonly inspectorRequests = () => this.page.getByTestId('inspectorViewChooserRequests');
@@ -56,24 +52,8 @@ export default class InfrastructurePage {
         await this.tableCell().click();
         }
 
-    public async clickTableCellHosts() {
-        await this.tableCellHosts().click();
-        }
-
     public async clickPopoverK8sMetrics() {
         await this.popoverK8sMetrics().click();
-        }
-
-    public async openHostsMetricsTab() {
-        await this.hostsMetricsTab().click();
-        }
-
-    public async openHostsLogs() {
-        await this.hostsLogs().click();
-        }
-
-    public async searchErrors() {
-        await this.logsSearchField().fill('error');
         }
 
     public async openRequestsView() {
@@ -104,15 +84,6 @@ export default class InfrastructurePage {
         await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//button[@data-test-subj="embeddablePanelToggleMenuIcon"]`).click();
         }
 
-    public async assertVisibilityKPIGrid(title: string) {
-        const startTime = performance.now();
-        await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
-        const endTime = performance.now();
-        const elapsedTime = endTime - startTime;
-        const result = `"${title}":, ${elapsedTime}`;
-        return result;
-        }
-
     public async assertVisibilityVisualization(title: string) {
         if (await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
         await this.page.keyboard.press('ArrowDown');
@@ -121,7 +92,7 @@ export default class InfrastructurePage {
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
         const endTime = performance.now();
         const elapsedTime = endTime - startTime;
-        const result = `"${title}":, ${elapsedTime}`;
+        const result = {[title]: elapsedTime};
         return result;
         }
 
