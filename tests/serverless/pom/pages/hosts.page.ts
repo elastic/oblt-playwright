@@ -34,8 +34,8 @@ export default class HostsPage {
         const startTime = performance.now();
         await expect(this.hostsNumber(), 'Hosts number should not be 0').not.toContainText('0');
         const endTime = performance.now();
-        const elapsedTime = endTime - startTime;
-        const result = {"Hosts number tile": elapsedTime};
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Hosts Count": elapsedTime};
         return result;
         }
 
@@ -43,8 +43,8 @@ export default class HostsPage {
         const startTime = performance.now();
         await expect(this.hostsTable(), 'Hosts table should be visible').toBeVisible();
         const endTime = performance.now();
-        const elapsedTime = endTime - startTime;
-        const result = {"Hosts table": elapsedTime};
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Host Names and Metrics": elapsedTime};
         return result;
         }
 
@@ -52,7 +52,7 @@ export default class HostsPage {
         const startTime = performance.now();
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
         const endTime = performance.now();
-        const elapsedTime = endTime - startTime;
+        const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
         return result;
         }
@@ -61,7 +61,7 @@ export default class HostsPage {
         const startTime = performance.now();
         await expect(this.page.locator(`xpath=//div[@data-test-subj="infraAssetDetailsMetricsTabContent"]//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
         const endTime = performance.now();
-        const elapsedTime = endTime - startTime;
+        const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
         return result;
         }

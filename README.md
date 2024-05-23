@@ -17,10 +17,10 @@ KIBANA_HOST =
 ELASTICSEARCH_HOST =
 KIBANA_USERNAME = 
 KIBANA_PASSWORD = 
-TIME_UNIT =
-TIME_VALUE =
+TIME_UNIT = 'Minutes'
+TIME_VALUE = 15
 DATE_PICKER = 'Last 24 hours'
-API_KEY = 
+API_KEY = 'ApiKey ...'
 REPORT_FILE = ../test-results/results.json
 ```
 

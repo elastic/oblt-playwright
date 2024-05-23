@@ -90,11 +90,13 @@ test('Hosts - Landing page.', async ({ datePicker, hostsPage, page }, testInfo) 
             hostsPage.assertVisibilityVisualization(rx),
             hostsPage.assertVisibilityVisualization(tx)
         ]).then((values) => {
-            console.log(`\n[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
+            endTime = performance.now();
+            const now = new Date();
+            console.log("\nTest date:", now.toISOString());
+            console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
             console.log(values);
           });
-        endTime = performance.now();
-        const elapsedTime = endTime - startTime;
+        const elapsedTime = (endTime - startTime) / 1000;
         console.log("[Hosts landing page] All elements loading time:", elapsedTime);
         return elapsedTime;
     });
@@ -145,11 +147,13 @@ test('Hosts - Individual page.', async ({ datePicker, hostsPage, page }, testInf
             hostsPage.assertVisibilityVisualization(nodeCpuCapacity), 
             hostsPage.assertVisibilityVisualization(nodeMemoryCapacity),
         ]).then((values) => {
-            console.log(`\n[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
+            endTime = performance.now();
+            const now = new Date();
+            console.log("\nTest date:", now.toISOString());
+            console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
             console.log(values);
           });
-        endTime = performance.now();
-        const elapsedTime = endTime - startTime;
+        const elapsedTime = (endTime - startTime) / 1000;
         console.log("[Hosts individual page] All elements loading time:", elapsedTime);
         return elapsedTime;
     });
@@ -206,11 +210,13 @@ test('Hosts - Individual page - Metrics tab.', async ({ datePicker, hostsPage, p
             hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
             hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
         ]).then((values) => {
-            console.log(`\n[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
+            endTime = performance.now();
+            const now = new Date();
+            console.log("\nTest date:", now.toISOString());
+            console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
             console.log(values);
           });
-        endTime = performance.now();
-        const elapsedTime = endTime - startTime;
+        const elapsedTime = (endTime - startTime) / 1000;
         console.log("[Hosts individual page metric tab] All elements loading time:", elapsedTime);
         return elapsedTime;
     });

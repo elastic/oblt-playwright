@@ -91,7 +91,7 @@ export default class InventoryPage {
         const startTime = performance.now();
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
         const endTime = performance.now();
-        const elapsedTime = endTime - startTime;
+        const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
         return result;
         }
