@@ -50,7 +50,10 @@ export default class HostsPage {
 
     public async assertVisibilityVisualization(title: string) {
         const startTime = performance.now();
-        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+        Promise.all([
+            await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible(),
+            await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "euiProgress")]`), 'Progress bar should not be visible').not.toBeVisible()
+            ]);
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
@@ -59,7 +62,10 @@ export default class HostsPage {
 
     public async assertVisibilityVisualizationMetricsTab(title: string) {
         const startTime = performance.now();
-        await expect(this.page.locator(`xpath=//div[@data-test-subj="infraAssetDetailsMetricsTabContent"]//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+        Promise.all([
+            await expect(this.page.locator(`xpath=//div[@data-test-subj="infraAssetDetailsMetricsTabContent"]//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible(),
+            await expect(this.page.locator(`xpath=//div[@data-test-subj="infraAssetDetailsMetricsTabContent"]//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "euiProgress")]`), 'Progress bar should not be visible').not.toBeVisible()
+            ]);
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
