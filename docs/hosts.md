@@ -1,6 +1,6 @@
-# How to run Hosts performance tests
+## How to run Hosts performance tests
 
-## Serverless
+### Serverless
 
 Create .env file in the root directory with the following environmental variables:
 

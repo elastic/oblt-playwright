@@ -63,8 +63,7 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
     const tx = "hostsView-metricChart-tx";
   
     await test.step('step01', async () => {
-        let startTime;
-        let endTime;
+        const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await hostsPage.setHostsLimit500();
         await datePicker.assertVisibilityDatePicker();
@@ -73,8 +72,8 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
         await page.evaluate("document.body.style.zoom=0.25");
-        startTime = performance.now();
-        await Promise.all([
+
+        const asyncResults = await Promise.all([
             hostsPage.assertHostsNumber(),
             hostsPage.assertVisibilityHostsTable(),
             hostsPage.assertVisibilityVisualization(cpuUsageKPI),
@@ -92,20 +91,22 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
             hostsPage.assertVisibilityVisualization(diskWriteThroughput), 
             hostsPage.assertVisibilityVisualization(rx),
             hostsPage.assertVisibilityVisualization(tx)
-        ]).then((values) => {
-            endTime = performance.now();
-            const now = new Date();
-            console.log("\nTest date:", now.toISOString());
-            console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
-            const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
-            const fileName = `${currentDate}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
-            const outputPath = path.join(outputDirectory, fileName);
-            fs.writeFileSync(outputPath, JSON.stringify(values, null, 2));
-            console.log(values);
-          });
-        const elapsedTime = (endTime - startTime) / 1000;
-        console.log("[Hosts landing page] All elements loading time:", elapsedTime);
-        return elapsedTime;
+        ]);
+        
+        const resultsObj = asyncResults.reduce((acc, obj) => {
+            return { ...acc, ...obj };
+        }, {});
+
+        const fileName = `${testStartTime}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+        const outputPath = path.join(outputDirectory, fileName);
+        const reportData = {
+            name: testInfo.title,
+            date: testStartTime,
+            time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
+            measurements: resultsObj
+        };        
+        fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
+        console.log(reportData);
     });
     
 });
@@ -130,8 +131,7 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
     });
 
     await test.step('step02', async () => {
-        let startTime;
-        let endTime;
+        const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.assertVisibilityDatePicker();
         await datePicker.clickDatePicker();
@@ -139,8 +139,8 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
         await page.evaluate("document.body.style.zoom=0.25");
-        startTime = performance.now();
-        await Promise.all([
+
+        const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualization(cpuUsageKPI),
             hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
             hostsPage.assertVisibilityVisualization(memoryUsageKPI),
@@ -153,20 +153,22 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
             hostsPage.assertVisibilityVisualization(diskIOReadWrite),
             hostsPage.assertVisibilityVisualization(nodeCpuCapacity), 
             hostsPage.assertVisibilityVisualization(nodeMemoryCapacity),
-        ]).then((values) => {
-            endTime = performance.now();
-            const now = new Date();
-            console.log("\nTest date:", now.toISOString());
-            console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
-            const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
-            const fileName = `${currentDate}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
-            const outputPath = path.join(outputDirectory, fileName);
-            fs.writeFileSync(outputPath, JSON.stringify(values, null, 2));
-            console.log(values);
-          });
-        const elapsedTime = (endTime - startTime) / 1000;
-        console.log("[Hosts individual page] All elements loading time:", elapsedTime);
-        return elapsedTime;
+        ]);
+
+        const resultsObj = asyncResults.reduce((acc, obj) => {
+            return { ...acc, ...obj };
+        }, {});
+
+        const fileName = `${testStartTime}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+        const outputPath = path.join(outputDirectory, fileName);
+        const reportData = {
+            name: testInfo.title,
+            date: testStartTime,
+            time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
+            measurements: resultsObj
+        };        
+        fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
+        console.log(reportData);
     });
 });
 
@@ -194,8 +196,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
     });
 
     await test.step('step02', async () => {
-        let startTime;
-        let endTime;
+        const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.assertVisibilityDatePicker();
         await datePicker.clickDatePicker();
@@ -203,8 +204,8 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
         await page.evaluate("document.body.style.zoom=0.25");
-        startTime = performance.now();
-        await Promise.all([
+
+        const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
             hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsageBreakdown),
             hostsPage.assertVisibilityVisualizationMetricsTab(normalizedLoad),
@@ -220,19 +221,21 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
             hostsPage.assertVisibilityVisualizationMetricsTab(nodeMemoryCapacity),
             hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
             hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
-        ]).then((values) => {
-            endTime = performance.now();
-            const now = new Date();
-            console.log("\nTest date:", now.toISOString());
-            console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
-            const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
-            const fileName = `${currentDate}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
-            const outputPath = path.join(outputDirectory, fileName);
-            fs.writeFileSync(outputPath, JSON.stringify(values, null, 2));
-            console.log(values);
-          });
-        const elapsedTime = (endTime - startTime) / 1000;
-        console.log("[Hosts individual page metric tab] All elements loading time:", elapsedTime);
-        return elapsedTime;
+        ]);
+
+        const resultsObj = asyncResults.reduce((acc, obj) => {
+            return { ...acc, ...obj };
+        }, {});
+
+        const fileName = `${testStartTime}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+        const outputPath = path.join(outputDirectory, fileName);
+        const reportData = {
+            name: testInfo.title,
+            date: testStartTime,
+            time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
+            measurements: resultsObj
+        };
+        fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
+        console.log(reportData);
     });
 });
