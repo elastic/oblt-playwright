@@ -2,8 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const reportFile = process.env.REPORT_FILE;
-const inputFilePath = reportFile;
+const inputFilePath = process.env.REPORT_FILE;
 const rawData = fs.readFileSync(inputFilePath);
 const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;

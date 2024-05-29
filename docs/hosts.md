@@ -11,6 +11,7 @@ KIBANA_PASSWORD =
 API_KEY = 'ApiKey ...'
 TIME_UNIT = 'Minutes'
 TIME_VALUE = 15
+HOSTS_DIR = ../test-reports/hosts
 ```
 
 Running tests:

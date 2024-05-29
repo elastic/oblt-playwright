@@ -1,6 +1,9 @@
 import { test } from '../fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
-let apiKey = process.env.API_KEY;
+const apiKey = process.env.API_KEY;
+const fs = require('fs');
+const path = require('path');
+const outputDirectory = process.env.HOSTS_DIR;
 
 test.beforeAll('Check node data', async ({ request }) => {
   console.log(`... checking node data.`);
@@ -42,7 +45,7 @@ test.beforeEach(async ({ landingPage }) => {
   await landingPage.clickHosts();
 });
 
-test('Hosts - Landing page.', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -94,6 +97,10 @@ test('Hosts - Landing page.', async ({ datePicker, hostsPage, page }, testInfo) 
             const now = new Date();
             console.log("\nTest date:", now.toISOString());
             console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
+            const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
+            const fileName = `${currentDate}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+            const outputPath = path.join(outputDirectory, fileName);
+            fs.writeFileSync(outputPath, JSON.stringify(values, null, 2));
             console.log(values);
           });
         const elapsedTime = (endTime - startTime) / 1000;
@@ -103,7 +110,7 @@ test('Hosts - Landing page.', async ({ datePicker, hostsPage, page }, testInfo) 
     
 });
 
-test('Hosts - Individual page.', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -151,6 +158,10 @@ test('Hosts - Individual page.', async ({ datePicker, hostsPage, page }, testInf
             const now = new Date();
             console.log("\nTest date:", now.toISOString());
             console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
+            const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
+            const fileName = `${currentDate}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+            const outputPath = path.join(outputDirectory, fileName);
+            fs.writeFileSync(outputPath, JSON.stringify(values, null, 2));
             console.log(values);
           });
         const elapsedTime = (endTime - startTime) / 1000;
@@ -159,7 +170,7 @@ test('Hosts - Individual page.', async ({ datePicker, hostsPage, page }, testInf
     });
 });
 
-test('Hosts - Individual page - Metrics tab.', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
@@ -214,6 +225,10 @@ test('Hosts - Individual page - Metrics tab.', async ({ datePicker, hostsPage, p
             const now = new Date();
             console.log("\nTest date:", now.toISOString());
             console.log(`[${testInfo.title}] Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}:`);
+            const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
+            const fileName = `${currentDate}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+            const outputPath = path.join(outputDirectory, fileName);
+            fs.writeFileSync(outputPath, JSON.stringify(values, null, 2));
             console.log(values);
           });
         const elapsedTime = (endTime - startTime) / 1000;

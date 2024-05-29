@@ -2,8 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const reportFile = process.env.REPORT_FILE;
-const inputFilePath = reportFile;
+const inputFilePath = process.env.REPORT_FILE;
 const rawData = fs.readFileSync(inputFilePath);
 const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;
@@ -16,10 +15,8 @@ testSuites.forEach(suite => {
         test.results.forEach(result => {
             let stepData = {};
             (result.steps || []).forEach(step => {
-              // Use step title as a field and duration as a value.
                 stepData[step.title] = step.duration;
             });
-            // Define test report structure.
             const jsonData = {
               title: spec.title,
               startTime: result.startTime,

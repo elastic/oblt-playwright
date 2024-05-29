@@ -32,7 +32,7 @@ export default class HostsPage {
 
     public async assertHostsNumber() {
         const startTime = performance.now();
-        await expect(this.hostsNumber(), 'Hosts number should not be 0').not.toContainText('0');
+        await expect(this.hostsNumber(), 'Hosts number should not be 0').not.toHaveText('0');
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {"Hosts Count": elapsedTime};
