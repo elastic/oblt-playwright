@@ -1,5 +1,4 @@
 import {test as base} from "@playwright/test";
-import AlertsPage from "../../serverless/pom/pages/alerts.page";
 import DashboardPage from "../../serverless/pom/pages/dashboard.page";
 import DatePicker from "../../serverless/pom/components/date_picker.component";
 import DependenciesPage from "../../serverless/pom/pages/dependencies.page";
@@ -11,45 +10,51 @@ import ServicesPage from "../../serverless/pom/pages/services.page";
 import TracesPage from "../../serverless/pom/pages/traces.page";
 
 
-export const test = base.extend<{alertsPage: AlertsPage, dashboardPage: DashboardPage, datePicker: DatePicker, dependenciesPage: DependenciesPage, hostsPage: HostsPage, inventoryPage: InventoryPage, landingPage: LandingPage, logsExplorerPage: LogsExplorerPage, servicesPage: ServicesPage, tracesPage: TracesPage}>
-({
-    alertsPage: async({page}, use) => {
-        await use(new AlertsPage(page));
-    },
-    
-    dashboardPage: async({page}, use) => {
-        await use(new DashboardPage(page));
-    },
+export const test = base.extend<{
+    dashboardPage: DashboardPage, 
+    datePicker: DatePicker, 
+    dependenciesPage: DependenciesPage, 
+    hostsPage: HostsPage, 
+    inventoryPage: InventoryPage, 
+    landingPage: LandingPage, 
+    logsExplorerPage: LogsExplorerPage, 
+    servicesPage: ServicesPage, 
+    tracesPage: TracesPage
+    }>
+    ({
+        dashboardPage: async({page}, use) => {
+            await use(new DashboardPage(page));
+        },
 
-    datePicker: async({page}, use) => {
-        await use(new DatePicker(page));
-    },
+        datePicker: async({page}, use) => {
+            await use(new DatePicker(page));
+        },
 
-    dependenciesPage: async({page}, use) => {
-        await use(new DependenciesPage(page));
-    },
+        dependenciesPage: async({page}, use) => {
+            await use(new DependenciesPage(page));
+        },
 
-    hostsPage: async({page}, use) => {
-        await use(new HostsPage(page));
-    },
-    
-    inventoryPage: async({page}, use) => {
-        await use(new InventoryPage(page));
-    },
-    
-    landingPage: async({page}, use) => {
-        await use(new LandingPage(page));
-    },
+        hostsPage: async({page}, use) => {
+            await use(new HostsPage(page));
+        },
+        
+        inventoryPage: async({page}, use) => {
+            await use(new InventoryPage(page));
+        },
+        
+        landingPage: async({page}, use) => {
+            await use(new LandingPage(page));
+        },
 
-    logsExplorerPage: async({page}, use) => {
-        await use(new LogsExplorerPage(page));
-    },
+        logsExplorerPage: async({page}, use) => {
+            await use(new LogsExplorerPage(page));
+        },
 
-    servicesPage: async({page}, use) => {
-        await use(new ServicesPage(page));
-    },
+        servicesPage: async({page}, use) => {
+            await use(new ServicesPage(page));
+        },
 
-    tracesPage: async({page}, use) => {
-        await use(new TracesPage(page));
-    }
-});
+        tracesPage: async({page}, use) => {
+            await use(new TracesPage(page));
+        }
+    });

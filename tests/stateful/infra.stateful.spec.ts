@@ -151,42 +151,17 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
   });
 });
 
-test('Infrastructure - Hosts', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
-  const cpuUsage = "hostsView-metricChart-cpuUsage";
-  const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
-   
-  await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Hosts.`);
-    await observabilityPage.clickHosts();
-  });
-
-  await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Normalized Load" visualizations visibility.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
-    await page.waitForLoadState('networkidle');
-    await infrastructurePage.assertVisibilityVisualization(cpuUsage);
-    await infrastructurePage.assertVisibilityVisualization(normalizedLoad);
-  });
-
-  await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Clicks the "Logs" tab, filters logs by searching errors.`);
-    await infrastructurePage.openHostsLogs();
-    await infrastructurePage.searchErrors();
-  });
-});
-
 // Skipped until Metrics Explorer is available in Serverless.
-test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
+test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, inventoryPage, observabilityPage, page }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Metrics Explorer.`);
     await observabilityPage.clickMetricsExplorer();
-    await infrastructurePage.assertVisibilityMetricsCanvas();
+    await inventoryPage.assertVisibilityMetricsCanvas();
   });
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Aggregates by 95th Percentile.`);
-    await infrastructurePage.aggregateBy95thPercentile();
+    await inventoryPage.aggregateBy95thPercentile();
     await page.waitForLoadState('networkidle');
   });
 
@@ -200,9 +175,9 @@ test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, infrastructu
 
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Selects "kubernetes.namespace" as "graph per" option. Searches for "kube-system".`);
-    await infrastructurePage.graphPerKubernetesNamespace();
+    await inventoryPage.graphPerKubernetesNamespace();
     await page.waitForLoadState('networkidle');
-    await infrastructurePage.filterByKubesystemNamespace();
-    await infrastructurePage.assertVisibilityMetricsCanvas();
+    await inventoryPage.filterByKubesystemNamespace();
+    await inventoryPage.assertVisibilityMetricsCanvas();
   });
 });

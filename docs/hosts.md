@@ -1,7 +1,5 @@
 ## How to run Hosts performance tests
 
-### Serverless
-
 Create .env file in the root directory with the following environmental variables:
 
 ```
@@ -14,7 +12,15 @@ TIME_VALUE = 15
 HOSTS_DIR = ../test-reports/hosts
 ```
 
-Running tests:
+### Running tests
+
+#### Stateful:
+
+```
+npx playwright test hosts.stateful.spec.ts --project stateful --headed --reporter=line --workers 1
+```
+
+#### Serverless:
 
 ```
 npx playwright test hosts.serverless.spec.ts --project serverless --headed --reporter=line --workers 1

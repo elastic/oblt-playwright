@@ -24,6 +24,7 @@ export default class InventoryPage {
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutInfraAssetDetailsCloseButton = () => this.page.locator('xpath=//div[@data-component-name="infraAssetDetailsFlyout"]//button[@data-test-subj="euiFlyoutCloseButton"]');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
+    private readonly arrowDown = () => this.page.keyboard.press('ArrowDown');
 
     public async clickDismiss() {
         await this.dismiss().click();
@@ -86,7 +87,7 @@ export default class InventoryPage {
 
     public async assertVisibilityVisualization(title: string) {
         if (await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
-        await this.page.keyboard.press('ArrowDown');
+        await this.arrowDown();
         }
         const startTime = performance.now();
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();

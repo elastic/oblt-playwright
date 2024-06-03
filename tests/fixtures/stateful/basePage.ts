@@ -1,11 +1,11 @@
 import {test as base} from "@playwright/test";
-// import AlertsPage from "../../stateful/pom/pages/alerts.page";
 import DashboardPage from "../../stateful/pom/pages/dashboard.page";
 import DatasetsPage from "../../stateful/pom/pages/datasets.page";
 import DatePicker from "../../stateful/pom/components/date_picker.component";
 import DependenciesPage from "../../stateful/pom/pages/dependencies.page";
 import DiscoverPage from "../../stateful/pom/pages/discover.page";
-import InfrastructurePage from "../../stateful/pom/pages/infrastructure.page";
+import HostsPage from "../../stateful/pom/pages/hosts.page";
+import InventoryPage from "../../stateful/pom/pages/inventory.page";
 import LandingPage from "../../stateful/pom/pages/landing.page";
 import LogsExplorerPage from "../../stateful/pom/pages/logs_explorer.page";
 import ObservabilityPage from "../../stateful/pom/pages/observability.page";
@@ -14,65 +14,65 @@ import TracesPage from "../../stateful/pom/pages/traces.page";
 
 
 export const test = base.extend<{
-    alertsPage: AlertsPage, 
     dashboardPage: DashboardPage, 
     datasetsPage: DatasetsPage, 
     datePicker: DatePicker, 
     dependenciesPage: DependenciesPage, 
-    discoverPage: DiscoverPage, 
-    infrastructurePage: InfrastructurePage, 
+    discoverPage: DiscoverPage,
+    hostsPage: HostsPage, 
+    inventoryPage: InventoryPage, 
     landingPage: LandingPage, 
     logsExplorerPage: LogsExplorerPage, 
     observabilityPage: ObservabilityPage, 
     servicesPage: ServicesPage, 
     tracesPage: TracesPage
     }>
-({
-    alertsPage: async({page}, use) => {
-        await use(new AlertsPage(page));
-    },
-    
-    dashboardPage: async({page}, use) => {
-        await use(new DashboardPage(page));
-    },
+    ({
+        dashboardPage: async({page}, use) => {
+            await use(new DashboardPage(page));
+        },
 
-    datasetsPage: async({page}, use) => {
-        await use(new DatasetsPage(page));
-    },
+        datasetsPage: async({page}, use) => {
+            await use(new DatasetsPage(page));
+        },
 
-    datePicker: async({page}, use) => {
-        await use(new DatePicker(page));
-    },
+        datePicker: async({page}, use) => {
+            await use(new DatePicker(page));
+        },
 
-    dependenciesPage: async({page}, use) => {
-        await use(new DependenciesPage(page));
-    },
+        dependenciesPage: async({page}, use) => {
+            await use(new DependenciesPage(page));
+        },
 
-    discoverPage: async({page}, use) => {
-        await use(new DiscoverPage(page));
-    },
-    
-    infrastructurePage: async({page}, use) => {
-        await use(new InfrastructurePage(page));
-    },
-    
-    landingPage: async({page}, use) => {
-        await use(new LandingPage(page));
-    },
+        discoverPage: async({page}, use) => {
+            await use(new DiscoverPage(page));
+        },
 
-    logsExplorerPage: async({page}, use) => {
-        await use(new LogsExplorerPage(page));
-    },
+        hostsPage: async({page}, use) => {
+            await use(new HostsPage(page));
+        },
+        
+        inventoryPage: async({page}, use) => {
+            await use(new InventoryPage(page));
+        },
+        
+        landingPage: async({page}, use) => {
+            await use(new LandingPage(page));
+        },
 
-    observabilityPage: async({page}, use) => {
-        await use(new ObservabilityPage(page));
-    },
+        logsExplorerPage: async({page}, use) => {
+            await use(new LogsExplorerPage(page));
+        },
 
-    servicesPage: async({page}, use) => {
-        await use(new ServicesPage(page));
-    },
+        observabilityPage: async({page}, use) => {
+            await use(new ObservabilityPage(page));
+        },
 
-    tracesPage: async({page}, use) => {
-        await use(new TracesPage(page));
-    }
-});
+        servicesPage: async({page}, use) => {
+            await use(new ServicesPage(page));
+        },
+
+        tracesPage: async({page}, use) => {
+            await use(new TracesPage(page));
+        }
+    });

@@ -1,4 +1,4 @@
-import { test } from '../fixtures/serverless/basePage';
+import { test } from '../fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
 const apiKey = process.env.API_KEY;
 const fs = require('fs');
@@ -9,11 +9,11 @@ function writeFileReport(testStartTime, testInfo, asyncResults) {
     const resultsObj = asyncResults.reduce((acc, obj) => {
         return { ...acc, ...obj };
     }, {});
-    const fileName = `[serverless]_${testStartTime}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+    const fileName = `[stateful]_${testStartTime}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
     const outputPath = path.join(outputDirectory, fileName);
     const reportData = {
         name: testInfo.title,
-        deployment: "serverless",
+        deployment: "stateful",
         date: testStartTime,
         time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
         measurements: resultsObj
@@ -56,10 +56,10 @@ test.beforeAll('Check node data', async ({ request }) => {
   }
 });
 
-test.beforeEach(async ({ landingPage }) => {
+test.beforeEach(async ({ landingPage, observabilityPage }) => {
   await landingPage.goto();
-  await landingPage.clickInfrastructure();
-  await landingPage.clickHosts();
+  await landingPage.clickObservabilitySolutionLink();
+  await observabilityPage.clickHosts();
 });
 
 test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) => {
@@ -209,6 +209,30 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
             hostsPage.assertVisibilityVisualizationMetricsTab(nodeMemoryCapacity),
             hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
             hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
+        ]);
+        writeFileReport(testStartTime, testInfo, asyncResults);
+    });
+});
+
+test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+    await test.step('step01', async () => {
+        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
+        await hostsPage.clickTableCellHosts();
+        await hostsPage.openHostsProfilingTab();
+    });
+
+    await test.step('step02', async () => {
+        const testStartTime = Date.now();
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await datePicker.assertVisibilityDatePickerHostsProfiling();
+        await datePicker.clickDatePickerHostsProfiling();
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+        await datePicker.clickApplyButton();
+        await page.evaluate("document.body.style.zoom=0.25");
+
+        const asyncResults = await Promise.all([
+            hostsPage.assertVisibilityProfilingFlamegraph()
         ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
