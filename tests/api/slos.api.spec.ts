@@ -1,5 +1,17 @@
 import {test, expect} from '@playwright/test';
 
+async function teardown(request, sloName, sloId) {
+  console.log(`Deleting SLO "${sloName}"...`);
+  let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
+      data: {
+      }
+  });
+  expect.soft(deleteResponse.status()).toBe(204);
+  if (deleteResponse.status() == 204) {
+    console.log(`SLO "${sloName}" has been deleted.`);
+  }
+};
+
 test('sli.apm.transactionDuration', async({request}) => {
   test.setTimeout(600000);
   const sloName = "[Playwright Test] APM latency";
@@ -8,18 +20,6 @@ test('sli.apm.transactionDuration', async({request}) => {
   let sloId;
   let latestSliTimestampISO;
   let latestSliTimestampMillis;
-
-  async function teardown() {
-    console.log(`Deleting SLO "${sloName}"...`);
-    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
-        data: {
-        }
-    });
-    expect.soft(deleteResponse.status()).toBe(204);
-    if (deleteResponse.status() == 204) {
-      console.log(`SLO "${sloName}" has been deleted.`);
-    }
-  }
 
   const apmTransactionDuration = await test.step('Create SLO [sli.apmTransactionDuration].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {
@@ -51,8 +51,7 @@ test('sli.apm.transactionDuration', async({request}) => {
     if (sloCreateResponse.status() >= 200 && sloCreateResponse.status() < 300) {
         console.log("SLO", `"${sloName}"`, "has been created.")
     }
-    const responseBody = JSON.parse(await sloCreateResponse.text());
-    return responseBody;
+    return JSON.parse(await sloCreateResponse.text());
   });
   sloId = apmTransactionDuration.id;
   console.log('slo.id:', sloId);
@@ -150,7 +149,7 @@ test('sli.apm.transactionDuration', async({request}) => {
         }).toBeGreaterThan(testStartTime);
       } catch (error) {
         console.warn('Test failed. Continuing with the teardown...');
-        await teardown();
+        await teardown(request, sloName, sloId);
       }
   });
   console.log('The last @timestamp of the source data:', latestSliTimestampISO);
@@ -229,8 +228,7 @@ test('sli.apm.transactionDuration', async({request}) => {
             let hitsArray = responseBody.response.hits.hits;
             if (Array.isArray(hitsArray) && hitsArray.length > 0) {
               const sliTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
-              const timestampMillis = Date.parse(sliTimestamp);
-              return timestampMillis;
+              return Date.parse(sliTimestamp);
             }
           }, {
             message: 'Waiting for the next document in the ".slo-observability.sli-v3*" index.',
@@ -239,7 +237,7 @@ test('sli.apm.transactionDuration', async({request}) => {
           }).toEqual(latestSliTimestampMillis);
         } catch (error) {
           console.warn('Test failed. Continuing with the teardown...');
-          await teardown();
+          await teardown(request, sloName, sloId);;
         }
       });
   }
@@ -325,8 +323,7 @@ test('sli.apm.transactionDuration', async({request}) => {
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             const sliTimestampSummary = responseBody.response.hits.hits[0].fields["latestSliTimestamp"];
-            const timestampMillis = Date.parse(sliTimestampSummary);
-            return timestampMillis;
+            return Date.parse(sliTimestampSummary);
           }
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
@@ -334,21 +331,9 @@ test('sli.apm.transactionDuration', async({request}) => {
           timeout: 600000,
         }).toEqual(latestSliTimestampMillis)
       });
-    }
-
+    };
   await Promise.all([sli(), sloSummary()]);
-
-  await test.step('Teardown.', async () => {
-    console.log(`Deleting SLO "${sloName}"...`);
-    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
-        data: {
-        }
-    });
-    expect.soft(deleteResponse.status()).toBe(204);
-    if (deleteResponse.status() == 204) {
-      console.log(`SLO "${sloName}" has been deleted.`);
-    }
-    });
+  await teardown(request, sloName, sloId);
 });
 
 test('sli.apm.transactionErrorRate', async({request}) => {
@@ -359,18 +344,6 @@ test('sli.apm.transactionErrorRate', async({request}) => {
   let sloId;
   let latestSliTimestampISO;
   let latestSliTimestampMillis;
-
-  async function teardown() {
-    console.log(`Deleting SLO "${sloName}"...`);
-    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
-        data: {
-        }
-    });
-    expect.soft(deleteResponse.status()).toBe(204);
-    if (deleteResponse.status() == 204) {
-      console.log(`SLO "${sloName}" has been deleted.`);
-    }
-  }
 
   const apmTransactionErrorRate = await test.step('Create SLO [sli.apm.transactionErrorRate].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {
@@ -401,8 +374,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
     if (sloCreateResponse.status() >= 200 && sloCreateResponse.status() < 300) {
         console.log("SLO", `"${sloName}"`, "has been created.")
     }
-    const responseBody = JSON.parse(await sloCreateResponse.text());
-    return responseBody;
+    return JSON.parse(await sloCreateResponse.text());
   });
   sloId = apmTransactionErrorRate.id;
   console.log('slo.id:', sloId);
@@ -500,7 +472,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
         }).toBeGreaterThan(testStartTime);
       } catch (error) {
         console.warn('Test failed. Continuing with the teardown...');
-        await teardown();
+        await teardown(request, sloName, sloId);
       }
     });
   console.log('The last @timestamp of the source data:', latestSliTimestampISO);
@@ -579,8 +551,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
             let hitsArray = responseBody.response.hits.hits;
             if (Array.isArray(hitsArray) && hitsArray.length > 0) {
               const sliTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
-              const timestampMillis = Date.parse(sliTimestamp);
-              return timestampMillis;
+              return Date.parse(sliTimestamp);
             }
           }, {
             message: 'Waiting for the next document in the ".slo-observability.sli-v3*" index.',
@@ -589,10 +560,10 @@ test('sli.apm.transactionErrorRate', async({request}) => {
           }).toEqual(latestSliTimestampMillis);
         } catch (error) {
           console.warn('Test failed. Continuing with the teardown...');
-          await teardown();
+          await teardown(request, sloName, sloId);
         }
       });
-  }
+    }
 
   const sloSummary = async () => {  
     await test.step('From source to summary.', async () => {
@@ -675,8 +646,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             const sliTimestampSummary = responseBody.response.hits.hits[0].fields["latestSliTimestamp"];
-            const timestampMillis = Date.parse(sliTimestampSummary);
-            return timestampMillis;
+            return Date.parse(sliTimestampSummary);
           }
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
@@ -684,21 +654,9 @@ test('sli.apm.transactionErrorRate', async({request}) => {
           timeout: 600000,
         }).toEqual(latestSliTimestampMillis)
       });
-  }
-  
+    };
   await Promise.all([sli(), sloSummary()]);
-
-  await test.step('Teardown.', async () => {
-    console.log(`Deleting SLO "${sloName}"...`);
-    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
-        data: {
-        }
-    });
-    expect.soft(deleteResponse.status()).toBe(204);
-    if (deleteResponse.status() == 204) {
-      console.log(`SLO "${sloName}" has been deleted.`);
-    }
-    });
+  await teardown(request, sloName, sloId);
 });
 
 test.skip('sli.histogram.custom', async({request}) => {
@@ -709,16 +667,6 @@ test.skip('sli.histogram.custom', async({request}) => {
   let sloId;
   let latestSliTimestampISO;
   let latestSliTimestampMillis;
-
-  async function teardown() {
-    console.log(`Deleting SLO "${sloName}"...`);
-    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
-        data: {
-        }
-    });
-    expect.soft(deleteResponse.status()).toBe(204);
-    console.log(`SLO "${sloName}" has been deleted.`);
-  }
   
   const histogramMetric = await test.step('Create SLO [sli.histogram.custom].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {
@@ -727,11 +675,10 @@ test.skip('sli.histogram.custom', async({request}) => {
             "description":"",
             "indicator":{
                 "type":
-                    "sli.histogram.custom",
+                    "sli.kql.custom",
                     "params":{
                         "filter":"",
-                        "good":{"field":"transaction.duration.histogram","aggregation":"value_count","filter":""},
-			                  "total":{"field":"transaction.duration.histogram","aggregation":"value_count","filter":""},
+                        "good":"transaction.duration.us >= 900000",
                         "index":"traces-apm*,apm-*,logs-apm*,apm-*,metrics-apm*,apm-*",
                         "timestampField":"@timestamp"
                         }
@@ -741,15 +688,14 @@ test.skip('sli.histogram.custom', async({request}) => {
                 "duration":"30d",
                 "type":"rolling"
             },
-            "objective":{"target":0.99}
+            "objective":{"target":0.09}
         }
     })  
     expect(sloCreateResponse.status()).toBe(200);
     if (sloCreateResponse.status() >= 200 && sloCreateResponse.status() < 300) {
         console.log("SLO", `"${sloName}"`, "has been created.")
     }
-    const responseBody = JSON.parse(await sloCreateResponse.text());
-    return responseBody;
+    return JSON.parse(await sloCreateResponse.text());
   });
   sloId = histogramMetric.id;
   console.log('slo.id:', sloId);
@@ -842,7 +788,7 @@ test.skip('sli.histogram.custom', async({request}) => {
         }).toBeGreaterThan(testStartTime);
       } catch (error) {
         console.warn('Test failed. Continuing with the teardown...');
-        await teardown();
+        await teardown(request, sloName, sloId);
       }
     });
   console.log('The last @timestamp of the source data:', latestSliTimestampISO);
@@ -921,8 +867,7 @@ test.skip('sli.histogram.custom', async({request}) => {
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             const sliTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
-            let timestampMillis = Date.parse(sliTimestamp);
-            return timestampMillis;
+            return Date.parse(sliTimestamp);
           }
           }, {
             message: 'Waiting for the next document in ".slo-observability.sli-v3*" indices.',
@@ -931,7 +876,7 @@ test.skip('sli.histogram.custom', async({request}) => {
           }).toEqual(latestSliTimestampMillis)
         } catch (error) {
           console.warn('Test failed. Continuing with the teardown...');
-          await teardown();
+          await teardown(request, sloName, sloId);
         }
     });
   }
@@ -1017,8 +962,7 @@ test.skip('sli.histogram.custom', async({request}) => {
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             const sliTimestampSummary = responseBody.response.hits.hits[0].fields["latestSliTimestamp"];
-            const timestampMillis = Date.parse(sliTimestampSummary);
-            return timestampMillis;
+            return Date.parse(sliTimestampSummary);
           }
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
@@ -1026,19 +970,7 @@ test.skip('sli.histogram.custom', async({request}) => {
           timeout: 600000,
         }).toEqual(latestSliTimestampMillis)
       });
-  }
-  
+    };
   await Promise.all([sli(), sloSummary()]);
-
-  await test.step('Teardown.', async () => {
-    console.log(`Deleting SLO "${sloName}"...`);
-    let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
-        data: {
-        }
-    });
-    expect(deleteResponse.status()).toBe(204);
-    if (deleteResponse.status() == 204) {
-      console.log(`SLO "${sloName}" has been deleted.`);
-    }
-    });
+  await teardown(request, sloName, sloId);
 })
