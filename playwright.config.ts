@@ -118,7 +118,7 @@ export default defineConfig({
       testMatch: '**\/*.serverless.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: {width: 1920, height: 1080},
+        viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
         launchOptions: {
           logger: {

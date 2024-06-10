@@ -160,6 +160,30 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
     });
 });
 
+test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+    await test.step('step01', async () => {
+        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metadata tab.`);
+        await hostsPage.clickTableCellHosts();
+        await hostsPage.openHostsMetadataTab();
+    });
+
+    await test.step('step02', async () => {
+        const testStartTime = Date.now();
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await datePicker.assertVisibilityDatePicker();
+        await datePicker.clickDatePicker();
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+        await datePicker.clickApplyButton();
+        await page.reload();
+
+        const asyncResults = await Promise.all([
+            hostsPage.assertVisibilityHostsMetadataTable()
+        ]);
+        writeFileReport(testStartTime, testInfo, asyncResults);
+    });
+});
+
 test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, page }, testInfo) => {
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
@@ -214,30 +238,6 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
     });
 });
 
-test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, page }, testInfo) => {
-    await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metadata tab.`);
-        await hostsPage.clickTableCellHosts();
-        await hostsPage.openHostsMetadataTab();
-    });
-
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
-        await page.reload();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityHostsMetadataTable()
-        ]);
-        writeFileReport(testStartTime, testInfo, asyncResults);
-    });
-});
-
 test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, page }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
@@ -253,7 +253,7 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        await page.evaluate("document.body.style.zoom=0.25");
+        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityProfilingFlamegraph()
