@@ -60,7 +60,7 @@ test('sli.apm.transactionDuration', async({request}) => {
     console.log("Waiting for the next document in the source index...");
     try {
       await expect.poll(async () => {
-        latestSliTimestampMillis = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
+        let sourceResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
               data: {
                   "sort": [
                     {
@@ -135,7 +135,7 @@ test('sli.apm.transactionDuration', async({request}) => {
                   }
                 }
           });
-          const responseBody = await latestSliTimestampMillis.json();
+          const responseBody = await sourceResponse.json();
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             latestSliTimestampISO = responseBody.response.hits.hits[0].fields["@timestamp"];
@@ -227,8 +227,7 @@ test('sli.apm.transactionDuration', async({request}) => {
             const responseBody = JSON.parse(await sliResponseBody.text());
             let hitsArray = responseBody.response.hits.hits;
             if (Array.isArray(hitsArray) && hitsArray.length > 0) {
-              const sliTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
-              return Date.parse(sliTimestamp);
+              return Date.parse(responseBody.response.hits.hits[0].fields["@timestamp"]);
             }
           }, {
             message: 'Waiting for the next document in the ".slo-observability.sli-v3*" index.',
@@ -322,8 +321,7 @@ test('sli.apm.transactionDuration', async({request}) => {
           const responseBody = JSON.parse(await sloSummaryResponseBody.text());
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
-            const sliTimestampSummary = responseBody.response.hits.hits[0].fields["latestSliTimestamp"];
-            return Date.parse(sliTimestampSummary);
+            return Date.parse(responseBody.response.hits.hits[0].fields["latestSliTimestamp"]);
           }
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
@@ -383,7 +381,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
     console.log("Waiting for the next document in the source index...");
     try {
       await expect.poll(async () => {
-        latestSliTimestampMillis = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
+        let sourceResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
               data: {
                   "sort": [
                     {
@@ -458,7 +456,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
                   }
                 }
           });
-          const responseBody = await latestSliTimestampMillis.json();
+          const responseBody = await sourceResponse.json();
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             latestSliTimestampISO = responseBody.response.hits.hits[0].fields["@timestamp"];
@@ -550,8 +548,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
             const responseBody = JSON.parse(await sliResponseBody.text());
             let hitsArray = responseBody.response.hits.hits;
             if (Array.isArray(hitsArray) && hitsArray.length > 0) {
-              const sliTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
-              return Date.parse(sliTimestamp);
+              return Date.parse(responseBody.response.hits.hits[0].fields["@timestamp"]);
             }
           }, {
             message: 'Waiting for the next document in the ".slo-observability.sli-v3*" index.',
@@ -645,8 +642,7 @@ test('sli.apm.transactionErrorRate', async({request}) => {
           const responseBody = JSON.parse(await sloSummaryResponseBody.text());
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
-            const sliTimestampSummary = responseBody.response.hits.hits[0].fields["latestSliTimestamp"];
-            return Date.parse(sliTimestampSummary);
+            return Date.parse(responseBody.response.hits.hits[0].fields["latestSliTimestamp"]);
           }
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
@@ -659,16 +655,16 @@ test('sli.apm.transactionErrorRate', async({request}) => {
   await teardown(request, sloName, sloId);
 });
 
-test.skip('sli.histogram.custom', async({request}) => {
+test('sli.kql.custom', async({request}) => {
   test.setTimeout(600000);
-  const sloName = "[Playwright Test] Histogram metric";
+  const sloName = "[Playwright Test] Custom query";
   const testStartTime = Date.now();
   let sloCreateResponse;
   let sloId;
   let latestSliTimestampISO;
   let latestSliTimestampMillis;
   
-  const histogramMetric = await test.step('Create SLO [sli.histogram.custom].', async () => {
+  const histogramMetric = await test.step('Create SLO [sli.kql.custom].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {
         data: {
             "name": sloName,
@@ -678,7 +674,8 @@ test.skip('sli.histogram.custom', async({request}) => {
                     "sli.kql.custom",
                     "params":{
                         "filter":"",
-                        "good":"transaction.duration.us >= 900000",
+                        "good":"transaction.duration.us<= 10000000",
+                        "total":"",
                         "index":"traces-apm*,apm-*,logs-apm*,apm-*,metrics-apm*,apm-*",
                         "timestampField":"@timestamp"
                         }
@@ -688,7 +685,7 @@ test.skip('sli.histogram.custom', async({request}) => {
                 "duration":"30d",
                 "type":"rolling"
             },
-            "objective":{"target":0.09}
+            "objective":{"target":0.17}
         }
     })  
     expect(sloCreateResponse.status()).toBe(200);
@@ -704,7 +701,7 @@ test.skip('sli.histogram.custom', async({request}) => {
     console.log("Waiting for the next document in the source index...");
     try {
       await expect.poll(async () => {
-        let sourceResponseBody = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
+        let sourceResponse = await request.post(`${process.env.ELASTICSEARCH_HOST}/metrics-*/_async_search`, {
               data: {
                   "sort": [
                     {
@@ -774,7 +771,7 @@ test.skip('sli.histogram.custom', async({request}) => {
                   }
                 }
           });
-          const responseBody = await sourceResponseBody.json();
+          const responseBody = await sourceResponse.json();
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
             latestSliTimestampISO = responseBody.response.hits.hits[0].fields["@timestamp"];
@@ -866,8 +863,7 @@ test.skip('sli.histogram.custom', async({request}) => {
           const responseBody = JSON.parse(await sliResponseBody.text());
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
-            const sliTimestamp = responseBody.response.hits.hits[0].fields["@timestamp"];
-            return Date.parse(sliTimestamp);
+            return Date.parse(responseBody.response.hits.hits[0].fields["@timestamp"]);
           }
           }, {
             message: 'Waiting for the next document in ".slo-observability.sli-v3*" indices.',
@@ -961,13 +957,12 @@ test.skip('sli.histogram.custom', async({request}) => {
           const responseBody = JSON.parse(await sloSummaryResponseBody.text());
           let hitsArray = responseBody.response.hits.hits;
           if (Array.isArray(hitsArray) && hitsArray.length > 0) {
-            const sliTimestampSummary = responseBody.response.hits.hits[0].fields["latestSliTimestamp"];
-            return Date.parse(sliTimestampSummary);
+            return Date.parse(responseBody.response.hits.hits[0].fields["latestSliTimestamp"]);
           }
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
           intervals: [1_000],
-          timeout: 600000,
+          timeout: 6000000,
         }).toEqual(latestSliTimestampMillis)
       });
     };
