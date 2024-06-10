@@ -9,6 +9,8 @@ export default class HostsPage {
 
     private readonly hostsNumber = () => this.page.locator('xpath=//div[@data-test-subj="hostsViewKPI-hostsCount"]//p[@class="echMetricText__value"]');
     private readonly hostsTable = () => this.page.getByTestId('hostsView-table-loaded');
+    private readonly hostsMetadataTab = () => this.page.getByTestId('infraAssetDetailsMetadataTab');
+    private readonly hostsMetadataTable = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsMetadataTable"]//tbody[@class="css-0"]');
     private readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
     private readonly hostsProfilingTab = () => this.page.getByTestId('infraAssetDetailsProfilingTab');
     private readonly profilingTabFlamegraph = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsProfilingTabContent"]//div[contains(@class, "echChartContent")]');
@@ -24,6 +26,10 @@ export default class HostsPage {
     
     public async setHostsLimit500() {
         await this.hostsLimit500().click();
+        }
+
+    public async openHostsMetadataTab() {
+        await this.hostsMetadataTab().click();
         }
 
     public async openHostsMetricsTab() {
@@ -53,6 +59,15 @@ export default class HostsPage {
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {"Host Names and Metrics": elapsedTime};
+        return result;
+        }
+
+    public async assertVisibilityHostsMetadataTable() {
+        const startTime = performance.now();
+        await expect(this.hostsMetadataTable(), 'Metadata table should be visible').toBeVisible();
+        const endTime = performance.now();
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Metadata table": elapsedTime};
         return result;
         }
 
