@@ -962,7 +962,7 @@ test('sli.kql.custom', async({request}) => {
         }, {
           message: 'Waiting for the update of the ".slo-observability.summary-v3.2" index.',
           intervals: [1_000],
-          timeout: 6000000,
+          timeout: 600000,
         }).toEqual(latestSliTimestampMillis)
       });
     };

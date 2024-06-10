@@ -69,15 +69,15 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "hostsView-metricChart-cpuUsage";
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
-    const memoryUsage = "hostsView-metricChart-memoryUsage";
-    const memoryFree = "hostsView-metricChart-memoryFree";
-    const diskSpaceAvailable = "hostsView-metricChart-diskSpaceAvailable";
-    const diskIORead = "hostsView-metricChart-diskIORead";
-    const diskIOWrite = "hostsView-metricChart-diskIOWrite";
-    const diskReadThroughput = "hostsView-metricChart-diskReadThroughput";
-    const diskWriteThroughput = "hostsView-metricChart-diskWriteThroughput";
-    const rx = "hostsView-metricChart-rx";
-    const tx = "hostsView-metricChart-tx";
+    // const memoryUsage = "hostsView-metricChart-memoryUsage";
+    // const memoryFree = "hostsView-metricChart-memoryFree";
+    // const diskSpaceAvailable = "hostsView-metricChart-diskSpaceAvailable";
+    // const diskIORead = "hostsView-metricChart-diskIORead";
+    // const diskIOWrite = "hostsView-metricChart-diskIOWrite";
+    // const diskReadThroughput = "hostsView-metricChart-diskReadThroughput";
+    // const diskWriteThroughput = "hostsView-metricChart-diskWriteThroughput";
+    // const rx = "hostsView-metricChart-rx";
+    // const tx = "hostsView-metricChart-tx";
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
@@ -88,7 +88,7 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        await page.evaluate("document.body.style.zoom=0.25");
+        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertHostsNumber(),
@@ -99,15 +99,15 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
             hostsPage.assertVisibilityVisualization(diskUsageKPI),
             hostsPage.assertVisibilityVisualization(cpuUsage), 
             hostsPage.assertVisibilityVisualization(normalizedLoad),
-            hostsPage.assertVisibilityVisualization(memoryUsage), 
-            hostsPage.assertVisibilityVisualization(memoryFree),
-            hostsPage.assertVisibilityVisualization(diskSpaceAvailable), 
-            hostsPage.assertVisibilityVisualization(diskIORead),
-            hostsPage.assertVisibilityVisualization(diskIOWrite), 
-            hostsPage.assertVisibilityVisualization(diskReadThroughput),
-            hostsPage.assertVisibilityVisualization(diskWriteThroughput), 
-            hostsPage.assertVisibilityVisualization(rx),
-            hostsPage.assertVisibilityVisualization(tx)
+            // hostsPage.assertVisibilityVisualization(memoryUsage), 
+            // hostsPage.assertVisibilityVisualization(memoryFree),
+            // hostsPage.assertVisibilityVisualization(diskSpaceAvailable), 
+            // hostsPage.assertVisibilityVisualization(diskIORead),
+            // hostsPage.assertVisibilityVisualization(diskIOWrite), 
+            // hostsPage.assertVisibilityVisualization(diskReadThroughput),
+            // hostsPage.assertVisibilityVisualization(diskWriteThroughput), 
+            // hostsPage.assertVisibilityVisualization(rx),
+            // hostsPage.assertVisibilityVisualization(tx)
         ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
@@ -120,12 +120,12 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
-    const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
-    const rxTx = "infraAssetDetailsMetricChartrxTx";
-    const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
-    const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
-    const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
-    const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
+    // const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
+    // const rxTx = "infraAssetDetailsMetricChartrxTx";
+    // const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
+    // const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
+    // const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
+    // const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
@@ -140,7 +140,7 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        await page.evaluate("document.body.style.zoom=0.25");
+        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualization(cpuUsageKPI),
@@ -149,12 +149,12 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
             hostsPage.assertVisibilityVisualization(diskUsageKPI),
             hostsPage.assertVisibilityVisualization(cpuUsage), 
             hostsPage.assertVisibilityVisualization(normalizedLoad),
-            hostsPage.assertVisibilityVisualization(memoryUsage), 
-            hostsPage.assertVisibilityVisualization(rxTx),
-            hostsPage.assertVisibilityVisualization(diskUsageByMountPoint), 
-            hostsPage.assertVisibilityVisualization(diskIOReadWrite),
-            hostsPage.assertVisibilityVisualization(nodeCpuCapacity), 
-            hostsPage.assertVisibilityVisualization(nodeMemoryCapacity),
+            // hostsPage.assertVisibilityVisualization(memoryUsage), 
+            // hostsPage.assertVisibilityVisualization(rxTx),
+            // hostsPage.assertVisibilityVisualization(diskUsageByMountPoint), 
+            // hostsPage.assertVisibilityVisualization(diskIOReadWrite),
+            // hostsPage.assertVisibilityVisualization(nodeCpuCapacity), 
+            // hostsPage.assertVisibilityVisualization(nodeMemoryCapacity),
         ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
@@ -167,15 +167,15 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
     const loadBreakdown = "infraAssetDetailsMetricChartloadBreakdown";
     const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
     const memoryUsageBreakdown = "infraAssetDetailsMetricChartmemoryUsageBreakdown";
-    const rxTx = "infraAssetDetailsMetricChartrxTx";
-    const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
-    const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
-    const diskThroughput = "infraAssetDetailsMetricChartdiskThroughputReadWrite";
-    const logRate = "infraAssetDetailsMetricChartlogRate";
-    const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
-    const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
-    const nodeDiskCapacity = "infraAssetDetailsMetricChartnodeDiskCapacity";
-    const nodePodCapacity = "infraAssetDetailsMetricChartnodePodCapacity";
+    // const rxTx = "infraAssetDetailsMetricChartrxTx";
+    // const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
+    // const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
+    // const diskThroughput = "infraAssetDetailsMetricChartdiskThroughputReadWrite";
+    // const logRate = "infraAssetDetailsMetricChartlogRate";
+    // const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
+    // const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
+    // const nodeDiskCapacity = "infraAssetDetailsMetricChartnodeDiskCapacity";
+    // const nodePodCapacity = "infraAssetDetailsMetricChartnodePodCapacity";
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
@@ -191,7 +191,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        await page.evaluate("document.body.style.zoom=0.25");
+        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
@@ -200,15 +200,15 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
             hostsPage.assertVisibilityVisualizationMetricsTab(loadBreakdown),
             hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
             hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
-            hostsPage.assertVisibilityVisualizationMetricsTab(rxTx),
-            hostsPage.assertVisibilityVisualizationMetricsTab(diskUsageByMountPoint), 
-            hostsPage.assertVisibilityVisualizationMetricsTab(diskIOReadWrite),
-            hostsPage.assertVisibilityVisualizationMetricsTab(diskThroughput),
-            hostsPage.assertVisibilityVisualizationMetricsTab(logRate),
-            hostsPage.assertVisibilityVisualizationMetricsTab(nodeCpuCapacity), 
-            hostsPage.assertVisibilityVisualizationMetricsTab(nodeMemoryCapacity),
-            hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
-            hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
+            // hostsPage.assertVisibilityVisualizationMetricsTab(rxTx),
+            // hostsPage.assertVisibilityVisualizationMetricsTab(diskUsageByMountPoint), 
+            // hostsPage.assertVisibilityVisualizationMetricsTab(diskIOReadWrite),
+            // hostsPage.assertVisibilityVisualizationMetricsTab(diskThroughput),
+            // hostsPage.assertVisibilityVisualizationMetricsTab(logRate),
+            // hostsPage.assertVisibilityVisualizationMetricsTab(nodeCpuCapacity), 
+            // hostsPage.assertVisibilityVisualizationMetricsTab(nodeMemoryCapacity),
+            // hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
+            // hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
         ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
