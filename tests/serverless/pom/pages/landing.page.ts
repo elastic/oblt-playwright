@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class LandingPage {
     page: Page;
@@ -11,6 +12,7 @@ export default class LandingPage {
         await this.page.goto('/');
     }
 
+    readonly spaceSelector = () => this.page.locator('xpath=//h1[contains(text(),"Select your space")]');
     private readonly discover = () => this.page.locator('xpath=//a[@id="observability-log-explorer"]');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');

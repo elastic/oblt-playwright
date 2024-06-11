@@ -1,4 +1,5 @@
 import { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class LandingPage {
     page: Page;
@@ -11,6 +12,7 @@ export default class LandingPage {
         await this.page.goto('/');
     }
 
+    readonly spaceSelector = () => this.page.locator('xpath=//h1[contains(text(),"Select your space")]');
     private readonly toggleNavButton = () => this.page.getByTestId('toggleNavButton');
     private readonly homeLink = () => this.page.getByTestId('homeLink');
     private readonly discover = () => this.page.locator('xpath=//span[@title="Discover"]');
@@ -21,7 +23,6 @@ export default class LandingPage {
     private readonly alerts = () => this.page.getByTestId('observability-nav-observability-overview-alerts');
     private readonly infrastructure = () => this.page.getByRole('link', { name: 'Infrastructure' });
     private readonly stackManagement = () => this.page.locator('xpath=//span[@title="Stack Management"]');
-
 
     public async clicktoggleNavButton() {
         await this.toggleNavButton().click();

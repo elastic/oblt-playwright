@@ -1,4 +1,4 @@
-import { test as ess_auth } from "@playwright/test";
+import { test as ess_auth, expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 import { waitForOneOf } from "../src/types.ts";
 
@@ -11,13 +11,20 @@ ess_auth('Authentication', async ({page}) => {
   await page.getByLabel('Password', { exact: true }).fill(process.env.KIBANA_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
 
-  const [ index, locator ] = await waitForOneOf([
+  const [ index ] = await waitForOneOf([
     page.locator('xpath=//a[@aria-label="Elastic home"]'),
+    page.locator('xpath=//h1[contains(text(),"Select your space")]'),
     page.locator('xpath=//div[@data-test-subj="loginErrorMessage"]'),
   ]);
-  console.log([ index, locator ]);
+
+  const spaceSelector = index === 1;
   const isAuthenticated = index === 0;
+
   if (isAuthenticated) {
+    await page.context().storageState({path: STORAGE_STATE});
+  } else if (spaceSelector) {
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
     await page.context().storageState({path: STORAGE_STATE});
   } else {
     console.log('Username or password is incorrect.');

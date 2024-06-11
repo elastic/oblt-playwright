@@ -1,83 +1,100 @@
 import { test } from '../fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
+
 const apiKey = process.env.API_KEY;
+const outputDirectory = process.env.HOSTS_DIR;
 const fs = require('fs');
 const path = require('path');
-const outputDirectory = process.env.HOSTS_DIR;
+let versionNumber: string;
+let cluster_name: string;
+let cluster_uuid: string;
+let build_hash: string;
 
 function writeFileReport(testStartTime, testInfo, asyncResults) {
     const resultsObj = asyncResults.reduce((acc, obj) => {
         return { ...acc, ...obj };
     }, {});
-    const fileName = `[stateful]_${testStartTime}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+    const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}.json`;
     const outputPath = path.join(outputDirectory, fileName);
     const reportData = {
         name: testInfo.title,
         deployment: "stateful",
+        cluster_name: cluster_name,
+        cluster_uuid: cluster_uuid,
+        version: versionNumber,
+        build_hash: build_hash,
         date: testStartTime,
         time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
         measurements: resultsObj
-    };        
+        };        
     fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
-    console.log(reportData);
-}
+    };
 
-test.beforeAll('Check node data', async ({ request }) => {
-  console.log(`... checking node data.`);
-  const currentTime = Date.now();
-  const rangeTime = currentTime - 1200000;
+test.beforeAll('Check data', async ({ request }) => {
+    let a = await request.get(`${process.env.ELASTICSEARCH_HOST}`, {
+        headers: {
+            "accept": "*/*",
+            "Authorization": apiKey,
+            "kbn-xsrf": "reporting",
+            }
+        }
+    )
+    expect(a.status()).toBe(200);
+    const jsonClusterData = JSON.parse(await a.text());
+    versionNumber = jsonClusterData.version.number;
+    cluster_name = jsonClusterData.cluster_name;
+    cluster_uuid = jsonClusterData.cluster_uuid;
+    build_hash = jsonClusterData.version.build_hash;
 
-  let response = await request.post('api/metrics/snapshot', {
-    headers: {
-        "accept": "application/json",
-        "Authorization": apiKey,
-        "Content-Type": "application/json;charset=UTF-8",
-        "kbn-xsrf": "true",          
-        "x-elastic-internal-origin": "kibana"
-    },
-    data: {
-        "filterQuery":"",
-        "metrics":[{"type":"cpu"}],
-        "nodeType":"host","sourceId":"default",
-        "accountId":"",
-        "region":"",
-        "groupBy":[],
-        "timerange":{"interval":"1m","to":currentTime,"from":rangeTime,"lookbackSize":5},
-        "includeTimeseries":true,
-        "dropPartialBuckets":true
-      }
-  })
-  expect(response.status()).toBe(200);
-  const jsonData = JSON.parse(await response.text());
-  const nodesArr = jsonData.nodes;
-  expect(nodesArr, 'The number of available nodes in the Inventory should not be less than 1.').not.toHaveLength(0);
-  if (response.status() == 200) {
-    console.log(`✓ Node data is checked.`);
-  }
+    console.log(`... checking node data.`);
+    const currentTime = Date.now();
+    const rangeTime = currentTime - 1200000;
+    let b = await request.post('api/metrics/snapshot', {
+        headers: {
+            "accept": "application/json",
+            "Authorization": apiKey,
+            "Content-Type": "application/json;charset=UTF-8",
+            "kbn-xsrf": "true",          
+            "x-elastic-internal-origin": "kibana"
+        },
+        data: {
+            "filterQuery":"",
+            "metrics":[{"type":"cpu"}],
+            "nodeType":"host","sourceId":"default",
+            "accountId":"",
+            "region":"",
+            "groupBy":[],
+            "timerange":{"interval":"1m","to":currentTime,"from":rangeTime,"lookbackSize":5},
+            "includeTimeseries":true,
+            "dropPartialBuckets":true
+        }
+    });
+    expect(b.status()).toBe(200);
+    const jsonDataNode = JSON.parse(await b.text());
+    const nodesArr = jsonDataNode.nodes;
+    expect(nodesArr, 'The number of available nodes in the Inventory should not be less than 1.').not.toHaveLength(0);
+    if (b.status() == 200) {
+        console.log(`✓ Node data is checked.`);
+    }
 });
 
-test.beforeEach(async ({ landingPage, observabilityPage }) => {
-  await landingPage.goto();
-  await landingPage.clickObservabilitySolutionLink();
-  await observabilityPage.clickHosts();
+test.beforeEach(async ({ landingPage, observabilityPage, page }) => {
+    await landingPage.goto();
+    if (landingPage.spaceSelector()) {
+        await page.locator('xpath=//a[contains(text(),"Default")]').click();
+        await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+    };
+    await landingPage.clickObservabilitySolutionLink();
+    await observabilityPage.clickHosts();
 });
 
-test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Landing page', async ({ datePicker, hostsPage }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "hostsView-metricChart-cpuUsage";
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
-    // const memoryUsage = "hostsView-metricChart-memoryUsage";
-    // const memoryFree = "hostsView-metricChart-memoryFree";
-    // const diskSpaceAvailable = "hostsView-metricChart-diskSpaceAvailable";
-    // const diskIORead = "hostsView-metricChart-diskIORead";
-    // const diskIOWrite = "hostsView-metricChart-diskIOWrite";
-    // const diskReadThroughput = "hostsView-metricChart-diskReadThroughput";
-    // const diskWriteThroughput = "hostsView-metricChart-diskWriteThroughput";
-    // const rx = "hostsView-metricChart-rx";
-    // const tx = "hostsView-metricChart-tx";
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
@@ -88,7 +105,6 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertHostsNumber(),
@@ -99,33 +115,18 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage, page }, testInfo) =
             hostsPage.assertVisibilityVisualization(diskUsageKPI),
             hostsPage.assertVisibilityVisualization(cpuUsage), 
             hostsPage.assertVisibilityVisualization(normalizedLoad),
-            // hostsPage.assertVisibilityVisualization(memoryUsage), 
-            // hostsPage.assertVisibilityVisualization(memoryFree),
-            // hostsPage.assertVisibilityVisualization(diskSpaceAvailable), 
-            // hostsPage.assertVisibilityVisualization(diskIORead),
-            // hostsPage.assertVisibilityVisualization(diskIOWrite), 
-            // hostsPage.assertVisibilityVisualization(diskReadThroughput),
-            // hostsPage.assertVisibilityVisualization(diskWriteThroughput), 
-            // hostsPage.assertVisibilityVisualization(rx),
-            // hostsPage.assertVisibilityVisualization(tx)
-        ]);
+            ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
 
-test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page', async ({ datePicker, hostsPage }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
-    // const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
-    // const rxTx = "infraAssetDetailsMetricChartrxTx";
-    // const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
-    // const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
-    // const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
-    // const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
@@ -140,7 +141,6 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualization(cpuUsageKPI),
@@ -149,13 +149,7 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage, page }, testInfo
             hostsPage.assertVisibilityVisualization(diskUsageKPI),
             hostsPage.assertVisibilityVisualization(cpuUsage), 
             hostsPage.assertVisibilityVisualization(normalizedLoad),
-            // hostsPage.assertVisibilityVisualization(memoryUsage), 
-            // hostsPage.assertVisibilityVisualization(rxTx),
-            // hostsPage.assertVisibilityVisualization(diskUsageByMountPoint), 
-            // hostsPage.assertVisibilityVisualization(diskIOReadWrite),
-            // hostsPage.assertVisibilityVisualization(nodeCpuCapacity), 
-            // hostsPage.assertVisibilityVisualization(nodeMemoryCapacity),
-        ]);
+            ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
@@ -179,7 +173,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, p
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityHostsMetadataTable()
-        ]);
+            ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
@@ -191,15 +185,6 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
     const loadBreakdown = "infraAssetDetailsMetricChartloadBreakdown";
     const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
     const memoryUsageBreakdown = "infraAssetDetailsMetricChartmemoryUsageBreakdown";
-    // const rxTx = "infraAssetDetailsMetricChartrxTx";
-    // const diskUsageByMountPoint = "infraAssetDetailsMetricChartdiskUsageByMountPoint";
-    // const diskIOReadWrite = "infraAssetDetailsMetricChartdiskIOReadWrite";
-    // const diskThroughput = "infraAssetDetailsMetricChartdiskThroughputReadWrite";
-    // const logRate = "infraAssetDetailsMetricChartlogRate";
-    // const nodeCpuCapacity = "infraAssetDetailsMetricChartnodeCpuCapacity";
-    // const nodeMemoryCapacity = "infraAssetDetailsMetricChartnodeMemoryCapacity";
-    // const nodeDiskCapacity = "infraAssetDetailsMetricChartnodeDiskCapacity";
-    // const nodePodCapacity = "infraAssetDetailsMetricChartnodePodCapacity";
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
@@ -215,7 +200,6 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
@@ -224,21 +208,12 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, pa
             hostsPage.assertVisibilityVisualizationMetricsTab(loadBreakdown),
             hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
             hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
-            // hostsPage.assertVisibilityVisualizationMetricsTab(rxTx),
-            // hostsPage.assertVisibilityVisualizationMetricsTab(diskUsageByMountPoint), 
-            // hostsPage.assertVisibilityVisualizationMetricsTab(diskIOReadWrite),
-            // hostsPage.assertVisibilityVisualizationMetricsTab(diskThroughput),
-            // hostsPage.assertVisibilityVisualizationMetricsTab(logRate),
-            // hostsPage.assertVisibilityVisualizationMetricsTab(nodeCpuCapacity), 
-            // hostsPage.assertVisibilityVisualizationMetricsTab(nodeMemoryCapacity),
-            // hostsPage.assertVisibilityVisualizationMetricsTab(nodeDiskCapacity),
-            // hostsPage.assertVisibilityVisualizationMetricsTab(nodePodCapacity)
-        ]);
+            ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
 
-test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
         await hostsPage.clickTableCellHosts();
@@ -253,11 +228,10 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
         await datePicker.fillTimeValue(process.env.TIME_VALUE);
         await datePicker.selectTimeUnit(process.env.TIME_UNIT);
         await datePicker.clickApplyButton();
-        // await page.evaluate("document.body.style.zoom=0.25");
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityProfilingFlamegraph()
-        ]);
+            ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });

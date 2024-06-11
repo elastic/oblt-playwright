@@ -33,7 +33,7 @@ export default defineConfig({
     testIdAttribute: 'data-test-subj',
     video: {
       mode: 'off',
-      size: {width: 1920, height: 1080}},
+      size: {width: 1920, height: 1200}},
     
     permissions: ["clipboard-read"],
   },
@@ -101,7 +101,7 @@ export default defineConfig({
       testMatch: '**\/*.stateful.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: {width: 1920, height: 1080},
+        viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
         launchOptions: {
           logger: {
