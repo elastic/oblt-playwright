@@ -20,8 +20,12 @@ test.beforeAll('Check APM data', async ({request}) => {
   console.log(`✓ APM data is checked.`);
 });
 
-test.beforeEach(async ({ landingPage }) => {
+test.beforeEach(async ({ landingPage, page }) => {
   await landingPage.goto();
+  if (await landingPage.spaceSelector().isVisible()) {
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
+  };
   await landingPage.clickApplications();
 });
 

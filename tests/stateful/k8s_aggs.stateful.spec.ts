@@ -1,4 +1,5 @@
-import { test, expect } from '@playwright/test';
+import { test } from '../../tests/fixtures/stateful/basePage';
+import { expect } from "@playwright/test";
 
 test.beforeAll(async ({ page }) => {
   // Navigates to Observability > Stack Management > Saved Objects.
@@ -15,8 +16,12 @@ test.beforeAll(async ({ page }) => {
   await page.getByTestId('importSavedObjectsDoneBtn').click();
 });
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ landingPage, page }) => {
   await page.goto('/');
+  if (landingPage.spaceSelector()) {
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+  };
   await page.locator('xpath=//a[contains(text(),"Analytics")]').click();
   await page.locator('xpath=//a[contains(text(),"Dashboard")]').click();
 });

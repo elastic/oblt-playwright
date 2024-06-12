@@ -15,7 +15,12 @@ test.beforeAll(async ({ page }) => {
   await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
 });
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ landingPage, page }) => {
+  await page.goto('/');
+  if (landingPage.spaceSelector()) {
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+  };
   await page.goto('/app/dashboards');
 });
 

@@ -34,8 +34,12 @@ test.beforeAll('Check node data', async ({request}) => {
   console.log(`✓ Node data is checked.`);
 });
 
-test.beforeEach(async ({ landingPage }) => {
+test.beforeEach(async ({ landingPage, page }) => {
   await landingPage.goto();
+  if (landingPage.spaceSelector()) {
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+  };
   await landingPage.clickObservabilitySolutionLink();
 });
 
@@ -92,7 +96,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   });
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, observabilityPage, page }, testInfo) => {
+test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabilityPage, page }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
@@ -105,9 +109,9 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Clicks on any displayed host to open the detailed view.`);
-    await infrastructurePage.clickDismiss();
-    await infrastructurePage.sortByMetricValue();
-    await infrastructurePage.clickNodeWaffleContainer();
+    await inventoryPage.clickDismiss();
+    await inventoryPage.sortByMetricValue();
+    await inventoryPage.clickNodeWaffleContainer();
   });
   
   await test.step('step03', async () => {
@@ -121,24 +125,24 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
       await datePicker.clickApplyButton();
     }
     await page.waitForLoadState('networkidle');
-    await infrastructurePage.assertVisibilityVisualization(cpuUsage);
-    await infrastructurePage.assertVisibilityVisualization(memoryUsage);
+    await inventoryPage.assertVisibilityVisualization(cpuUsage);
+    await inventoryPage.assertVisibilityVisualization(memoryUsage);
   });
 
   await test.step('step04', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Returns back to Observability > Infrastructure > Inventory. Selects "Pods" as "Show" option.`);
-    await infrastructurePage.closeInfraAssetDetailsFlyout();
-    await infrastructurePage.switchInventoryToPodsView();
+    await inventoryPage.closeInfraAssetDetailsFlyout();
+    await inventoryPage.switchInventoryToPodsView();
     await page.waitForLoadState('networkidle');
   });
 
   await test.step('step05', async () => {
     console.log(`\n[${testInfo.title}] Step 05 - Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.`);
-    await infrastructurePage.sortByMetricValue();
-    await infrastructurePage.switchToTableView();
+    await inventoryPage.sortByMetricValue();
+    await inventoryPage.switchToTableView();
     await page.waitForLoadState('networkidle');
-    await infrastructurePage.clickTableCell();
-    await infrastructurePage.clickPopoverK8sMetrics();
+    await inventoryPage.clickTableCell();
+    await inventoryPage.clickPopoverK8sMetrics();
   });
 
   await test.step('step06', async () => {
@@ -146,8 +150,8 @@ test('Infrastructure - Inventory', async ({ datePicker, infrastructurePage, obse
     await datePicker.assertVisibilityDatePicker();
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
-    await infrastructurePage.assertVisibilityPodVisualization(podCpuUsage);
-    await infrastructurePage.assertVisibilityPodVisualization(podMemoryUsage);
+    await inventoryPage.assertVisibilityPodVisualization(podCpuUsage);
+    await inventoryPage.assertVisibilityPodVisualization(podMemoryUsage);
   });
 });
 

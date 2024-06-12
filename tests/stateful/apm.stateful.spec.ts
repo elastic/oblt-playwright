@@ -20,8 +20,12 @@ test.beforeAll('Check APM data', async ({request}) => {
   console.log(`✓ APM data is checked.`);
 });
 
-test.beforeEach(async ({ landingPage }) => {
+test.beforeEach(async ({ landingPage, page }) => {
   await landingPage.goto();
+  if (landingPage.spaceSelector()) {
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+  };
   await landingPage.clickObservabilitySolutionLink();
 });
 
