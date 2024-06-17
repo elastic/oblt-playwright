@@ -17,7 +17,9 @@ test.beforeAll('Check APM data', async ({request}) => {
   expect(response.status()).toBe(200);
   const body = await response.text();
   expect(body, 'Availability of APM data').toContain("true");
-  console.log(`✓ APM data is checked.`);
+  if (response.status() == 200) {
+    console.log(`✓ APM data is checked.`);
+  };
 });
 
 test.beforeEach(async ({ landingPage, page }) => {

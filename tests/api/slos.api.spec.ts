@@ -1,25 +1,46 @@
 import {test, expect} from '@playwright/test';
+let apiKey = process.env.API_KEY;
 
-async function teardown(request, sloName, sloId) {
+async function teardown(request: any, sloName: string, sloId: string) {
   console.log(`Deleting SLO "${sloName}"...`);
-  let deleteResponse = await request.delete(`api/observability/slos/${sloId}`, {
+  let deleteResponse: any = await request.delete(`api/observability/slos/${sloId}`, {
       data: {
       }
   });
   expect.soft(deleteResponse.status()).toBe(204);
   if (deleteResponse.status() == 204) {
     console.log(`SLO "${sloName}" has been deleted.`);
-  }
+  };
 };
+
+test.beforeAll('Check APM data', async ({ request }) => {
+  console.log(`... checking APM data.`);
+  let response = await request.get('internal/apm/has_data', {
+      headers: {
+        "accept": "application/json",
+        "Authorization": apiKey,
+        "Content-Type": "application/json;charset=UTF-8",
+        "kbn-xsrf": "true",          
+        "x-elastic-internal-origin": "kibana"
+      },
+      data: {}
+  })
+  expect(response.status()).toBe(200);
+  const body = await response.text();
+  expect(body, 'Availability of APM data').toContain("true");
+  if (response.status() == 200) {
+    console.log(`✓ APM data is checked.`);
+  }
+});
 
 test('sli.apm.transactionDuration', async({request}) => {
   test.setTimeout(600000);
   const sloName = "[Playwright Test] APM latency";
   const testStartTime = Date.now();
-  let sloCreateResponse;
-  let sloId;
-  let latestSliTimestampISO;
-  let latestSliTimestampMillis;
+  let sloCreateResponse: any;
+  let sloId: string;
+  let latestSliTimestampISO!: string;
+  let latestSliTimestampMillis: number;
 
   const apmTransactionDuration = await test.step('Create SLO [sli.apmTransactionDuration].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {
@@ -338,10 +359,10 @@ test('sli.apm.transactionErrorRate', async({request}) => {
   test.setTimeout(600000);
   const sloName = "[Playwright Test] APM availability";
   const testStartTime = Date.now();
-  let sloCreateResponse;
-  let sloId;
-  let latestSliTimestampISO;
-  let latestSliTimestampMillis;
+  let sloCreateResponse: any;
+  let sloId: string;
+  let latestSliTimestampISO!: string;
+  let latestSliTimestampMillis: number;
 
   const apmTransactionErrorRate = await test.step('Create SLO [sli.apm.transactionErrorRate].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {
@@ -659,10 +680,10 @@ test('sli.kql.custom', async({request}) => {
   test.setTimeout(600000);
   const sloName = "[Playwright Test] Custom query";
   const testStartTime = Date.now();
-  let sloCreateResponse;
-  let sloId;
-  let latestSliTimestampISO;
-  let latestSliTimestampMillis;
+  let sloCreateResponse: any;
+  let sloId: string;
+  let latestSliTimestampISO!: string;
+  let latestSliTimestampMillis: number;
   
   const histogramMetric = await test.step('Create SLO [sli.kql.custom].', async () => {
     sloCreateResponse = await request.post('/api/observability/slos', {

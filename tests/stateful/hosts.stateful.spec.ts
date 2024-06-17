@@ -40,11 +40,11 @@ test.beforeAll('Check data', async ({ request }) => {
         }
     )
     expect(a.status()).toBe(200);
-    const jsonClusterData = JSON.parse(await a.text());
-    versionNumber = jsonClusterData.version.number;
-    cluster_name = jsonClusterData.cluster_name;
-    cluster_uuid = jsonClusterData.cluster_uuid;
-    build_hash = jsonClusterData.version.build_hash;
+    const jsonDataCluster = JSON.parse(await a.text());
+    versionNumber = jsonDataCluster.version.number;
+    cluster_name = jsonDataCluster.cluster_name;
+    cluster_uuid = jsonDataCluster.cluster_uuid;
+    build_hash = jsonDataCluster.version.build_hash;
 
     console.log(`... checking node data.`);
     const currentTime = Date.now();

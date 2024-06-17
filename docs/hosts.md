@@ -6,6 +6,7 @@ Create .env file in the root directory with the following environmental variable
 KIBANA_HOST = 
 KIBANA_USERNAME = 
 KIBANA_PASSWORD = 
+ELASTICSEARCH_HOST =
 API_KEY = 'ApiKey ...'
 TIME_UNIT = 'Minutes'
 TIME_VALUE = 15
