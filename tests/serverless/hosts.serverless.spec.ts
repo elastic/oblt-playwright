@@ -1,5 +1,6 @@
 import { test } from '../fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
+import { waitForOneOf } from "../../src/types.ts";
 
 const apiKey = process.env.API_KEY;
 const outputDirectory = process.env.HOSTS_DIR;
@@ -81,10 +82,15 @@ test.beforeAll('Check data', async ({ request }) => {
 
 test.beforeEach(async ({ landingPage, page }) => {
     await landingPage.goto();
-    if (await landingPage.spaceSelector().isVisible()) {
+    const [ index ] = await waitForOneOf([
+        page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
+        landingPage.spaceSelector(),
+        ]);
+      const spaceSelector = index === 1;
+      if (spaceSelector) {
         await page.locator('xpath=//a[contains(text(),"Default")]').click();
         await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
-    };
+        };
     await landingPage.clickInfrastructure();
     await landingPage.clickHosts();
 });
@@ -99,7 +105,7 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage }, testInfo) => {
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await hostsPage.setHostsLimit500();
         await datePicker.assertVisibilityDatePicker();
         await datePicker.clickDatePicker();
@@ -116,6 +122,45 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage }, testInfo) => {
             hostsPage.assertVisibilityVisualization(diskUsageKPI),
             hostsPage.assertVisibilityVisualization(cpuUsage), 
             hostsPage.assertVisibilityVisualization(normalizedLoad),
+            ]);
+        writeFileReport(testStartTime, testInfo, asyncResults);
+    });
+});
+
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage }, testInfo) => {    
+    await test.step('step01', async () => {
+        const testStartTime = Date.now();
+        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await hostsPage.setHostsLimit500();
+        await datePicker.assertVisibilityDatePicker();
+        await datePicker.clickDatePicker();
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+        await datePicker.clickApplyButton();
+        await hostsPage.clickLogsTab();
+
+        const asyncResults = await Promise.all([
+            hostsPage.assertVisibilityLogStream()
+            ]);
+        writeFileReport(testStartTime, testInfo, asyncResults);
+    });
+});
+
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage }, testInfo) => {    
+    await test.step('step01', async () => {
+        const testStartTime = Date.now();
+        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await hostsPage.setHostsLimit500();
+        await datePicker.assertVisibilityDatePicker();
+        await datePicker.clickDatePicker();
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+        await datePicker.clickApplyButton();
+        await hostsPage.clickAlertsTab();
+
+        const asyncResults = await Promise.all([
+            hostsPage.assertVisibilityAlertsChart(),
+            hostsPage.assertVisibilityAlertsTable()
             ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
@@ -209,6 +254,53 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage }, 
             hostsPage.assertVisibilityVisualizationMetricsTab(loadBreakdown),
             hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
             hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
+            ]);
+        writeFileReport(testStartTime, testInfo, asyncResults);
+    });
+});
+
+test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+    await test.step('step01', async () => {
+        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Processes tab.`);
+        await hostsPage.clickTableCellHosts();
+        await hostsPage.openHostsProcessesTab();
+    });
+
+    await test.step('step02', async () => {
+        const testStartTime = Date.now();
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await datePicker.assertVisibilityDatePicker();
+        await datePicker.clickDatePicker();
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+        await datePicker.clickApplyButton();
+        await page.reload();
+
+        const asyncResults = await Promise.all([
+            hostsPage.assertVisibilityHostsProcessesTable()
+            ]);
+        writeFileReport(testStartTime, testInfo, asyncResults);
+    });
+});
+
+test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage }, testInfo) => {
+    await test.step('step01', async () => {
+        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Logs tab.`);
+        await hostsPage.clickTableCellHosts();
+        await hostsPage.openHostsLogsTab();
+    });
+
+    await test.step('step02', async () => {
+        const testStartTime = Date.now();
+        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await datePicker.assertVisibilityDatePicker();
+        await datePicker.clickDatePicker();
+        await datePicker.fillTimeValue(process.env.TIME_VALUE);
+        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+        await datePicker.clickApplyButton();
+
+        const asyncResults = await Promise.all([
+            hostsPage.assertVisibilityHostsLogsTabStream()
             ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });

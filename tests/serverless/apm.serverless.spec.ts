@@ -1,5 +1,6 @@
 import {test} from '../../tests/fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
+import { waitForOneOf } from "../../src/types.ts";
 let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check APM data', async ({request}) => {
@@ -24,10 +25,15 @@ test.beforeAll('Check APM data', async ({request}) => {
 
 test.beforeEach(async ({ landingPage, page }) => {
   await landingPage.goto();
-  if (await landingPage.spaceSelector().isVisible()) {
+  const [ index ] = await waitForOneOf([
+    page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
+    landingPage.spaceSelector(),
+    ]);
+  const spaceSelector = index === 1;
+  if (spaceSelector) {
     await page.locator('xpath=//a[contains(text(),"Default")]').click();
     await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
-  };
+    };
   await landingPage.clickApplications();
 });
 

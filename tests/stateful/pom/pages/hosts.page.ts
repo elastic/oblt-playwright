@@ -9,12 +9,23 @@ export default class HostsPage {
 
     private readonly hostsNumber = () => this.page.locator('xpath=//div[@data-test-subj="hostsViewKPI-hostsCount"]//p[@class="echMetricText__value"]');
     private readonly hostsTable = () => this.page.getByTestId('hostsView-table-loaded');
+    private readonly logsTab = () => this.page.getByTestId('hostsView-tabs-logs');
+    private readonly logStream = () => this.page.getByTestId('logStream');
+    private readonly logStreamNoMessages = () => this.page.locator('xpath=//h2[contains(text(),"There are no log messages to display.")]');
+    private readonly alertsTab = () => this.page.getByTestId('hostsView-tabs-alerts');
+    private readonly alertsChart = () => this.page.locator('xpath=//div[@data-test-subj="alertSummaryWidgetFullSizeChartContainer"]//div[contains(@class, "echChartContent")]');
+    private readonly alertsTable = () => this.page.getByTestId('alertsTable');
     private readonly hostsMetadataTab = () => this.page.getByTestId('infraAssetDetailsMetadataTab');
     private readonly hostsMetadataTable = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsMetadataTable"]//tbody[@class="css-0"]');
     private readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
+    private readonly hostsProcessesTab = () => this.page.getByTestId('infraAssetDetailsProcessesTab');
+    private readonly hostsProcessesNotFound = () => this.page.locator('xpath=//strong[contains(text(),"No processes found")]');
+    private readonly hostsProcessesTabTable = () => this.page.locator('xpath=//table[@data-test-subj="infraAssetDetailsProcessesTable"]');
     private readonly hostsProfilingTab = () => this.page.getByTestId('infraAssetDetailsProfilingTab');
     private readonly profilingTabFlamegraph = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsProfilingTabContent"]//div[contains(@class, "echChartContent")]');
     private readonly profilingTabFlamegraphProgressBar = () => this.page.locator('xpath=//div[@aria-labelledby="flamegraph"]//span[@role="progressbar"]');
+    private readonly hostsLogsTab = () => this.page.getByTestId('infraAssetDetailsLogsTab');
+    private readonly hostsLogsTabStream = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsLogsTabContent"]//div[@data-test-subj="logStream"]');
     private readonly hostsLimit500 = () => this.page.getByTestId('hostsViewLimitSelection500Button');
     private readonly hostsLogs = () => this.page.getByTestId('hostsView-tabs-logs');
     private readonly tableCellHosts = () => this.page.locator('xpath=//tbody//tr[1]//td//span[contains(@class, "euiTableCellContent__text")]');
@@ -28,6 +39,14 @@ export default class HostsPage {
         await this.hostsLimit500().click();
         }
 
+    public async clickLogsTab() {
+        await this.logsTab().click();
+        }
+
+    public async clickAlertsTab() {
+        await this.alertsTab().click();
+        }
+
     public async openHostsMetadataTab() {
         await this.hostsMetadataTab().click();
         }
@@ -36,8 +55,16 @@ export default class HostsPage {
         await this.hostsMetricsTab().click();
         }
 
+    public async openHostsProcessesTab() {
+        await this.hostsProcessesTab().click();
+        }
+
     public async openHostsProfilingTab() {
         await this.hostsProfilingTab().click();
+        }
+
+    public async openHostsLogsTab() {
+        await this.hostsLogsTab().click();
         }
 
     public async openHostsLogs() {
@@ -62,12 +89,54 @@ export default class HostsPage {
         return result;
         }
 
+    public async assertVisibilityLogStream() {
+        const startTime = performance.now();
+        await Promise.all([
+            expect(this.logStream(), 'Log stream should be visible').toBeVisible(),
+            expect(this.logStreamNoMessages(), '"There are no log messages to display." message should be hidden').not.toBeVisible()
+            ]);
+        const endTime = performance.now();
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Log stream": elapsedTime};
+        return result;
+        }
+
+    public async assertVisibilityAlertsChart() {
+        const startTime = performance.now();
+        await expect(this.alertsChart(), 'Alerts chart should be visible').toBeVisible();
+        const endTime = performance.now();
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Alerts chart": elapsedTime};
+        return result;
+        }
+
+    public async assertVisibilityAlertsTable() {
+        const startTime = performance.now();
+        await expect(this.alertsTable(), 'Alerts table should be visible').toBeVisible();
+        const endTime = performance.now();
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Alerts table": elapsedTime};
+        return result;
+        }
+
     public async assertVisibilityHostsMetadataTable() {
         const startTime = performance.now();
         await expect(this.hostsMetadataTable(), 'Metadata table should be visible').toBeVisible();
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {"Metadata table": elapsedTime};
+        return result;
+        }
+
+    public async assertVisibilityHostsProcessesTable() {
+        const startTime = performance.now();
+        await Promise.all([
+            expect(this.hostsProcessesTabTable(), 'Processes table should be visible').toBeVisible(),
+            expect(this.hostsProcessesNotFound(), '"There are no log messages to display." message should be hidden').not.toBeVisible()
+            ]);
+        const endTime = performance.now();
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Processes table": elapsedTime};
         return result;
         }
 
@@ -104,6 +173,18 @@ export default class HostsPage {
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {'Universal Profiling Flamegraph': elapsedTime};
+        return result;
+        }
+
+    public async assertVisibilityHostsLogsTabStream() {
+        const startTime = performance.now();
+        await Promise.all([
+            expect(this.hostsLogsTabStream(), 'Log stream should be visible').toBeVisible(),
+            expect(this.logStreamNoMessages(), '"There are no log messages to display." message should be hidden').not.toBeVisible()
+            ]);
+        const endTime = performance.now();
+        const elapsedTime = (endTime - startTime) / 1000;
+        const result = {"Log stream": elapsedTime};
         return result;
         }
 }

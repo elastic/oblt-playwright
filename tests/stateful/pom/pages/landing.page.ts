@@ -62,5 +62,5 @@ export default class LandingPage {
 
     public async clickObservabilitySolutionLink() {
         await this.observabilitySolutionLink().click();
-        }
+    }
 }

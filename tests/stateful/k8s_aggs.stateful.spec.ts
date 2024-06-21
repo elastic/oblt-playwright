@@ -1,5 +1,6 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
+import { waitForOneOf } from "../../src/types.ts";
 
 test.beforeAll(async ({ page }) => {
   // Navigates to Observability > Stack Management > Saved Objects.
@@ -18,10 +19,15 @@ test.beforeAll(async ({ page }) => {
 
 test.beforeEach(async ({ landingPage, page }) => {
   await page.goto('/');
-  if (landingPage.spaceSelector()) {
-    await page.locator('xpath=//a[contains(text(),"Default")]').click();
-    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
-  };
+  const [ index ] = await waitForOneOf([
+    page.locator('xpath=//a[@aria-label="Elastic home"]'),
+    landingPage.spaceSelector(),
+    ]);
+  const spaceSelector = index === 1;
+  if (spaceSelector) {
+      await page.locator('xpath=//a[contains(text(),"Default")]').click();
+      await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+    };
   await page.locator('xpath=//a[contains(text(),"Analytics")]').click();
   await page.locator('xpath=//a[contains(text(),"Dashboard")]').click();
 });
