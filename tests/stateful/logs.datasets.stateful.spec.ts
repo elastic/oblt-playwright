@@ -14,7 +14,7 @@ test.beforeEach(async ({ landingPage, page }) => {
       await page.locator('xpath=//a[contains(text(),"Default")]').click();
       await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
     };
-  await page.goto('/app/observability-logs-explorer/dataset-quality');
+  await page.goto('/app/management/data/data_quality');
 });
 
 test('Logs Explorer - Datasets', async ({ datasetsPage }) => { 
