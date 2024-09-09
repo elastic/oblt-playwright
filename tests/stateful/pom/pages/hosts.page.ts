@@ -17,11 +17,11 @@ export default class HostsPage {
     private readonly alertsTable = () => this.page.getByTestId('alertsTable');
     private readonly hostsMetadataTab = () => this.page.getByTestId('infraAssetDetailsMetadataTab');
     private readonly hostsMetadataTable = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsMetadataTable"]//tbody[@class="css-0"]');
-    private readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
+    public readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
     private readonly hostsProcessesTab = () => this.page.getByTestId('infraAssetDetailsProcessesTab');
     private readonly hostsProcessesNotFound = () => this.page.locator('xpath=//strong[contains(text(),"No processes found")]');
     private readonly hostsProcessesTabTable = () => this.page.locator('xpath=//table[@data-test-subj="infraAssetDetailsProcessesTable"]');
-    private readonly hostsProfilingTab = () => this.page.getByTestId('infraAssetDetailsProfilingTab');
+    public readonly hostsProfilingTab = () => this.page.getByTestId('infraAssetDetailsProfilingTab');
     private readonly profilingTabFlamegraph = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsProfilingTabContent"]//div[contains(@class, "echChartContent")]');
     private readonly profilingTabFlamegraphProgressBar = () => this.page.locator('xpath=//div[@aria-labelledby="flamegraph"]//span[@role="progressbar"]');
     private readonly hostsLogsTab = () => this.page.getByTestId('infraAssetDetailsLogsTab');

@@ -19,15 +19,15 @@ test.beforeAll(async ({ page }) => {
 
 test.beforeEach(async ({ landingPage, page }) => {
   await page.goto('/');
-  const [ index ] = await waitForOneOf([
+  const [index] = await waitForOneOf([
     page.locator('xpath=//a[@aria-label="Elastic home"]'),
     landingPage.spaceSelector(),
-    ]);
+  ]);
   const spaceSelector = index === 1;
   if (spaceSelector) {
-      await page.locator('xpath=//a[contains(text(),"Default")]').click();
-      await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
-    };
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
+  };
   await page.locator('xpath=//a[contains(text(),"Analytics")]').click();
   await page.locator('xpath=//a[contains(text(),"Dashboard")]').click();
 });
@@ -51,8 +51,8 @@ test('Average container CPU core usage in ns', async ({ page }) => {
   await page.getByTestId('inspectorRequestDetailRequest').click();
   await page.getByTestId('inspectorRequestCopyClipboardButton').click();
   async function logQuery() {
-  let clipboardData = await page.evaluate("navigator.clipboard.readText()");
-  console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
+    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+    console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
   }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
@@ -110,7 +110,7 @@ test('Average container memory usage in bytes', async ({ page }) => {
   async function logQuery() {
     let clipboardData = await page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
+  }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
@@ -165,7 +165,7 @@ test('CPU usage per container of the total node cpu', async ({ page }) => {
   async function logQuery() {
     let clipboardData = await page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
+  }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
@@ -220,7 +220,7 @@ test('CPU usage per pod of the total node cpu', async ({ page }) => {
   async function logQuery() {
     let clipboardData = await page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
+  }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
@@ -275,7 +275,7 @@ test('Memory usage per container of the total node memory', async ({ page }) => 
   async function logQuery() {
     let clipboardData = await page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
+  }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
@@ -330,7 +330,7 @@ test('Memory usage per pod of the total node memory', async ({ page }) => {
   async function logQuery() {
     let clipboardData = await page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
+  }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
@@ -383,7 +383,7 @@ test('Percentile CPU Usage per container', async ({ page }) => {
   async function logQuery() {
     let clipboardData = await page.evaluate("navigator.clipboard.readText()");
     console.log('Elasticsearch query: ', '\n', clipboardData, '\n');
-    }
+  }
   logQuery();
   await page.getByTestId('euiFlyoutCloseButton').click();
 
