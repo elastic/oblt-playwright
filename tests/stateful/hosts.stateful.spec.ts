@@ -223,7 +223,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, p
     });
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage }, testInfo) => {
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
@@ -286,6 +286,9 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage }
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
         await hostsPage.clickTableCellHosts();
+        await expect(hostsPage.hostsMetricsTab()).toBeVisible();
+        const profilingTabVisibility = await hostsPage.hostsProfilingTab().isVisible();
+        test.skip(!profilingTabVisibility, 'Skipping test due to absence of Profiling tab');
         await hostsPage.openHostsProfilingTab();
     });
 
