@@ -76,8 +76,8 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit.`);
     await datePicker.clickDatePicker();
-    await datePicker.fillTimeValue('1');
-    await datePicker.selectTimeUnit('Hours');
+    await datePicker.fillTimeValue(process.env.TIME_VALUE);
+    await datePicker.selectTimeUnit(process.env.TIME_UNIT);
     await datePicker.clickApplyButton();
   });
 
@@ -122,14 +122,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
-    await datePicker.clickDatePicker();
-    if (await datePicker.assertSelectedDate()) {
-      await datePicker.selectDate();
-    } else {    
-      await datePicker.fillTimeValue('30');
-      await datePicker.selectTimeUnit('Days');
-      await datePicker.clickApplyButton();
-    }
+    await datePicker.setPeriod();
     await page.waitForLoadState('networkidle');
     await inventoryPage.assertVisibilityVisualization(cpuUsage);
     await inventoryPage.assertVisibilityVisualization(memoryUsage);
@@ -153,9 +146,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
 
   await test.step('step06', async () => {
     console.log(`\n[${testInfo.title}] Step 06 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.`);
-    await datePicker.assertVisibilityDatePicker();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await inventoryPage.assertVisibilityPodVisualization(podCpuUsage);
     await inventoryPage.assertVisibilityPodVisualization(podMemoryUsage);
   });
@@ -177,9 +168,7 @@ test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, inventoryPag
 
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected date picker option.`);
-    await datePicker.assertVisibilityDatePicker();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await page.waitForLoadState('networkidle');
   });
 

@@ -106,11 +106,7 @@ test('Hosts - Landing page', async ({ datePicker, hostsPage }, testInfo) => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await hostsPage.setHostsLimit500();
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
 
         const asyncResults = await Promise.all([
             hostsPage.assertHostsNumber(),
@@ -131,11 +127,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage }, testInfo) 
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await hostsPage.setHostsLimit500();
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
         await hostsPage.clickLogsTab();
 
         const asyncResults = await Promise.all([
@@ -150,11 +142,7 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage }, testInfo
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await hostsPage.setHostsLimit500();
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
         await hostsPage.clickAlertsTab();
 
         const asyncResults = await Promise.all([
@@ -181,11 +169,7 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage }, testInfo) => {
     await test.step('step02', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualization(cpuUsageKPI),
@@ -209,11 +193,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, p
     await test.step('step02', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
         await page.reload();
 
         const asyncResults = await Promise.all([
@@ -240,11 +220,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage }, 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
@@ -268,11 +244,7 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
         await page.reload();
 
         const asyncResults = await Promise.all([
@@ -296,10 +268,7 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage }
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.assertVisibilityDatePickerHostsProfiling();
-        await datePicker.clickDatePickerHostsProfiling();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityProfilingFlamegraph()
@@ -318,11 +287,7 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage }, tes
     await test.step('step02', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await datePicker.assertVisibilityDatePicker();
-        await datePicker.clickDatePicker();
-        await datePicker.fillTimeValue(process.env.TIME_VALUE);
-        await datePicker.selectTimeUnit(process.env.TIME_UNIT);
-        await datePicker.clickApplyButton();
+        await datePicker.setPeriod();
 
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityHostsLogsTabStream()

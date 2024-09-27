@@ -50,4 +50,11 @@ export default class DatePicker {
         const truthiness = await this.selectedDate().isVisible();
         return truthiness;
     }
+
+    public async setPeriod() {
+        await this.clickDatePicker();
+        await this.fillTimeValue(process.env.TIME_VALUE);
+        await this.selectTimeUnit(process.env.TIME_UNIT);
+        await this.clickApplyButton();
+    }
 }

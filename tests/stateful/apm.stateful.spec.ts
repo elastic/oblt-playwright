@@ -48,9 +48,7 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Filters data by selected date picker option. Selects opbeans-go.`);
     await observabilityPage.clickServices();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
-    await datePicker.assertSelectedDate();
+    await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
     await page.waitForLoadState('networkidle');
   });
@@ -83,8 +81,7 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
   
   await test.step('step05', async () => {
     console.log(`\n[${testInfo.title}] Step 05 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await page.waitForLoadState('networkidle');
     await logsExplorerPage.filterLogsByError();
     await logsExplorerPage.assertVisibilityDataGridRow();
@@ -104,8 +101,7 @@ test('APM - Traces', async ({ datePicker, observabilityPage, page, servicesPage,
     console.log(`\n[${testInfo.title}] Step 02 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
     await tracesPage.openExplorerTab();
     await page.waitForLoadState('networkidle');
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await page.waitForLoadState('networkidle');
     await tracesPage.filterBy('http.response.status_code : 502');
     await page.waitForLoadState('networkidle');
@@ -127,8 +123,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected date picker option.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await page.waitForLoadState('networkidle');
   });
 
