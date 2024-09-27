@@ -9,7 +9,7 @@ serverless_teardown('Delete dashboards', async ({page}) => {
   await page.locator('xpath=//a[contains(text(),"Saved Objects")]').click();
 
   // Deletes dashboards.
-  await page.getByTestId('savedObjectSearchBar').fill('Playwright Test');
+  await page.getByTestId('savedObjectSearchBar').fill('Playwright');
   await page.keyboard.press('Enter');
   await page.waitForLoadState('networkidle');
   await page.getByTestId('checkboxSelectAll').click();

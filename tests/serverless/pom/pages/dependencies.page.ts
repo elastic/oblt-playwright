@@ -8,11 +8,11 @@ export default class DependenciesPage {
     }
 
     private readonly dependenciesOperationsTab = () => this.page.getByRole('tab', { name: 'Operations' });
-    private readonly dependencyTableRow = () => this.page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[1]//a');
+    private readonly dependencyTableRow = () => this.page.locator('xpath=//tbody[@class="css-0"]//tr[1]//a[1]');
     private readonly timelineTransaction = () => this.page.locator('xpath=(//div[@type="transaction"])[1]//*[@color]');
     private readonly tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
     private readonly investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
-    private readonly investigateTraceLogsButton = () => this.page.getByRole('link', { name: 'Trace logs' });
+    private readonly investigateViewInDiscoverButton = () => this.page.getByRole('link', { name: 'View transaction in Discover' });
 
     public async clickTableRow() {
         await this.dependencyTableRow().click();
@@ -43,6 +43,6 @@ export default class DependenciesPage {
         }
 
     public async clickTraceLogsButton() {
-        await this.investigateTraceLogsButton().click();
+        await this.investigateViewInDiscoverButton().click();
         }
 }

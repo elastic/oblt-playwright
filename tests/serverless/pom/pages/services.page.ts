@@ -7,17 +7,22 @@ export default class ServicesPage {
         this.page = page;
     }
 
+    private readonly searchBar = () => this.page.getByTestId('apmUnifiedSearchBar');
+    private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
     private readonly opbeansGo = () => this.page.locator('xpath=//span[contains(text(),"opbeans-go")]');
     private readonly servicesTransactionsTab = () => this.page.getByTestId('transactionsTab');
-    private readonly mostImpactfulTransaction = () => this.page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow"][1]//td[@class="euiTableRowCell euiTableRowCell--middle"][1]//a');
+    private readonly mostImpactfulTransaction = () => this.page.locator('xpath=//div[@data-test-subj="transactionsGroupTable"]//tbody[@class="css-0"]//tr[1]//a[1]');
     private readonly failedTransactionCorrelationsTab = () => this.page.getByRole('tab', { name: 'Failed transaction correlations' });
-    private readonly filterByCorrelationValueButton = () => this.page.locator('xpath=//table[@class="euiTable css-0 euiTable--responsive"]//tbody[@class="css-0"]//tr[@class="euiTableRow euiTableRow-hasActions euiTableRow-isClickable"][1]//td[@class="euiTableRowCell euiTableRowCell--hasActions euiTableRowCell--middle"]//span[1]//button');
+    private readonly filterByCorrelationValueButton = () => this.page.locator('xpath=//div[@data-test-subj="apmCorrelationsTable"]//tbody[@class="css-0"]//tr[1]//td[4]//span[1]//button[1]');
     private readonly filterByFieldValueButton = () => this.page.getByRole('button', { name: 'Field value', exact: true });
     private readonly investigateButton = () => this.page.getByRole('button', { name: 'Investigate' });
     private readonly investigateHostLogsButton = () => this.page.getByRole('link', { name: 'Host logs' });
     private readonly errorDistributionChart = () => this.page.getByTestId('errorDistribution');
 
     public async selectServiceOpbeansGo() {
+        await this.searchBar().click();
+        await this.searchBar().fill(`service.name: "opbeans-go"`);
+        await this.querySubmitButton().click();
         await this.opbeansGo().click();
         }
 

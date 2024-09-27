@@ -95,10 +95,10 @@ import {test, expect} from '@playwright/test';
 // })
 
 test('Single page', async({request}) => {
-    for (let i = 0; i < 25; i++) {
+    for (let i = 0; i < 12; i++) {
         const ruleName = Math.random().toString(36).slice(2, 8);
-        const url = "https://www.elastic.co/";
-        const frequency = "10";
+        const url = "https://www.elastic.co";
+        const frequency = "3";
         let response = await request.post('/api/synthetics/monitors', {
             data: {
                 "type": "browser",
@@ -123,8 +123,8 @@ test('Single page', async({request}) => {
                 "name": ruleName,
                 "locations": [
                     {
-                        "id": "europe-west2-a",
-                        "label": "Europe - United Kingdom",
+                        "id": "us-west1-a",
+                        "label": "North America - US West",
                         "isServiceManaged": true
                     }
                 ],

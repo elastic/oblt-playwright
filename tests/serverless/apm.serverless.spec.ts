@@ -1,4 +1,4 @@
-import {test} from '../../tests/fixtures/serverless/basePage';
+import { test } from '../../tests/fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
 import { waitForOneOf } from "../../src/types.ts";
 let apiKey = process.env.API_KEY;
@@ -42,7 +42,7 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servicesPage }, testInfo) => {
   const throughput = "throughput";
 
   await test.step('step01', async () => {
@@ -52,7 +52,6 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
     await datePicker.selectDate();
     await datePicker.assertSelectedDate();
     await servicesPage.selectServiceOpbeansGo();
-    await page.waitForLoadState('networkidle');
   });
   
   await test.step('step02', async () => {
@@ -66,11 +65,9 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "Failed transaction correlations" tab. Filters the result by a particular field value.`);
     await servicesPage.openFailedTransactionCorrelationsTab();
-    await page.waitForLoadState('networkidle');
     await servicesPage.assertVisibilityCorrelationButton();
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
-    await page.waitForLoadState('networkidle');
   });
   
   await test.step('step04', async () => {
@@ -84,30 +81,23 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
     console.log(`\n[${testInfo.title}] Step 05 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
-    await page.waitForLoadState('networkidle');
     await logsExplorerPage.filterLogsByError();
-    await page.waitForLoadState('networkidle');
     await logsExplorerPage.expandLogsDataGridRow();
-    await page.waitForLoadState('networkidle');
   });
 });
 
-test('APM - Traces', async ({ datePicker, landingPage, page, servicesPage, tracesPage }, testInfo) => {
+test('APM - Traces', async ({ datePicker, landingPage, servicesPage, tracesPage }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces.`);
     await landingPage.clickTraces();
-    await page.waitForLoadState('networkidle');
   });
   
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
     await tracesPage.openExplorerTab();
-    await page.waitForLoadState('networkidle');
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
-    await page.waitForLoadState('networkidle');
-    await tracesPage.filterBy('http.response.status_code : 502');
-    await page.waitForLoadState('networkidle');
+    await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
   });
   
   await test.step('step03', async () => {
@@ -117,7 +107,7 @@ test('APM - Traces', async ({ datePicker, landingPage, page, servicesPage, trace
   });
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, logsExplorerPage, page }, testInfo) => {
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, logsExplorerPage }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies.`);
     await landingPage.clickDependencies();
@@ -128,7 +118,6 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
     console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected date picker option.`);
     await datePicker.clickDatePicker();
     await datePicker.selectDate();
-    await page.waitForLoadState('networkidle');
   });
 
   await test.step('step03', async () => {

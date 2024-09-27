@@ -8,14 +8,16 @@ export default class InventoryPage {
     }
     
     private readonly dismiss = () => this.page.locator('xpath=//span[contains(text(),"Dismiss")]');
+    private readonly metricDropdown = () => this.page.getByTestId('infraInventoryMetricDropdown');
+    private readonly metricMemoryUsage = () => this.page.locator('xpath=//div[@data-test-subj="infraInventoryMetricsContextMenu"]//span[contains(text(), "Memory usage")]');
     private readonly sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
     private readonly sortWaffleByValue = () => this.page.getByTestId('waffleSortByValue');
     private readonly nodesWaffleMap = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]');
-    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]');
+    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]//*[@data-test-subj="nodeContainer"][1]');
     private readonly inventorySwitcher = () => this.page.getByTestId('openInventorySwitcher');
     private readonly inventorySwitcherPods = () => this.page.getByTestId('goToPods');
     private readonly tableView = () => this.page.locator('xpath=//button[@title="Table view"]');
-    private readonly tableCell = () => this.page.locator('xpath=(//tbody//td)[1]//span[contains(@class, "euiTableCellContent__text")]');
+    private readonly tableCell = () => this.page.locator('xpath=(//tbody//th)[1]//span[contains(@class, "euiTableCellContent__text")]');
     private readonly popoverK8sMetrics = () => this.page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]');
     private readonly inspector = () => this.page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]');
     private readonly inspectorChooser = () => this.page.getByTestId('inspectorViewChooser');
@@ -33,6 +35,11 @@ export default class InventoryPage {
     public async sortByMetricValue() {
         await this.sortWaffleByDropdown().click();
         await this.sortWaffleByValue().click();
+        }
+
+    public async memoryUsage() {
+        await this.metricDropdown().click();
+        await this.metricMemoryUsage().click();
         }
 
     public async switchInventoryToPodsView() {

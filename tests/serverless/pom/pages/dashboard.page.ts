@@ -9,6 +9,7 @@ export default class DashboardPage {
 
     private readonly dashboardHeading = () => this.page.locator('xpath=//*[@id="dashboardListingHeading"]');
     private readonly dashboardTable = () => this.page.locator('xpath=//tbody[@class="css-0"]');
+    private readonly searchBox = () => this.page.getByTestId('tableListSearchBox');
     private readonly tags = () => this.page.locator('xpath=//span[@data-text="Tags"]');
     private readonly tagKubernetes = () => this.page.getByTestId('tag-searchbar-option-Kubernetes');
     private readonly visualizationOptions = () => this.page.getByTestId('embeddablePanelToggleMenuIcon');
@@ -25,6 +26,11 @@ export default class DashboardPage {
 
     public async assertVisibilityTable() {
         await expect(this.dashboardTable()).toBeVisible();
+        }
+
+    public async searchDashboard(input: string) {
+        await this.searchBox().click();
+        await this.searchBox().fill(input);
         }
 
     public async clickTags() {
@@ -61,11 +67,11 @@ export default class DashboardPage {
         }
 
     public async logRequestTime(name: string) {
-        console.log(name, " ", process.env.DATE_PICKER , "| Request time:", await this.page.locator('xpath=//span[contains(@class, "euiBadge__text")]').textContent());
+        console.log(name, "Last", process.env.TIME_VALUE, process.env.TIME_UNIT, "| Request time:", await this.page.locator('xpath=//span[contains(@class, "euiBadge__text")]').textContent());
         }
 
     public async logQueryTime(name: string) {
-        console.log(name, " ", process.env.DATE_PICKER , "| Query time:", await this.page.locator('xpath=//tr[@class="euiTableRow"][5]/td[2]//span[contains(@class, "euiTableCellContent__text")]').textContent());
+        console.log(name, "Last", process.env.TIME_VALUE, process.env.TIME_UNIT, "| Query time:", await this.page.locator('xpath=//tr[5]//td[2]//span[contains(@class, "euiTableCellContent__text")]').textContent());
         }
 
     public async assertVisibilityVisualization(title: string) {
@@ -74,5 +80,15 @@ export default class DashboardPage {
 
     public async kubernetesVisualizationOptions(title: string) {
         await this.page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
+        }
+
+    public async logVisualizationRequest(name: string) {
+        await this.clickOptions();
+        await this.openRequestsView();
+        await this.logRequestTime(name);
+        await this.logQueryTime(name);
+        await this.queryToClipboard();
+        await this.logQuery(name);
+        await this.closeFlyout();
         }
 }
