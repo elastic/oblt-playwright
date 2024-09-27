@@ -6,6 +6,7 @@ import HostsPage from "../../serverless/pom/pages/hosts.page";
 import InventoryPage from "../../serverless/pom/pages/inventory.page";
 import LandingPage from "../../serverless/pom/pages/landing.page";
 import LogsExplorerPage from "../../serverless/pom/pages/logs_explorer.page";
+import ManagementPage from "../../serverless/pom/pages/management.page";
 import ServicesPage from "../../serverless/pom/pages/services.page";
 import TracesPage from "../../serverless/pom/pages/traces.page";
 
@@ -18,6 +19,7 @@ export const test = base.extend<{
     inventoryPage: InventoryPage, 
     landingPage: LandingPage, 
     logsExplorerPage: LogsExplorerPage, 
+    managementPage: ManagementPage,
     servicesPage: ServicesPage, 
     tracesPage: TracesPage
     }>
@@ -48,6 +50,10 @@ export const test = base.extend<{
 
         logsExplorerPage: async({page}, use) => {
             await use(new LogsExplorerPage(page));
+        },
+
+        managementPage: async({page}, use) => {
+            await use(new ManagementPage(page));
         },
 
         servicesPage: async({page}, use) => {

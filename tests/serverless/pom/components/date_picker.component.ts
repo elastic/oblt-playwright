@@ -16,23 +16,36 @@ export default class DatePicker {
     public async assertVisibilityDatePicker() {
         await expect(this.datePicker()).toBeVisible();
     }
+    
     public async clickDatePicker() {
         await this.datePicker().click();
     }
+
     public async fillTimeValue(value: string) {
         await this.timeValue().fill(value);
     }
+
     public async selectTimeUnit(value: string) {
         await this.timeUnit().selectOption(value);
     }
+
     public async clickApplyButton() {
         await this.applyButton().click();
     }
+
     public async selectDate() {
         await this.selectedDate().click();
     }
+
     public async assertSelectedDate() {
         const truthiness = await this.selectedDate().isVisible();
         return truthiness;
     }
+
+    public async setPeriod() {
+        await this.clickDatePicker();
+        await this.fillTimeValue(process.env.TIME_VALUE);
+        await this.selectTimeUnit(process.env.TIME_UNIT);
+        await this.clickApplyButton();
+      }
 }
