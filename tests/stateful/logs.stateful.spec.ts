@@ -34,9 +34,8 @@ test('Logs Explorer', async ({datePicker, logsExplorerPage, observabilityPage, p
 
   // Step 03 - Filters data by selected date picker option.
   await test.step('step03', async () => {
-    await datePicker.assertVisibilityDatePicker();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    // await datePicker.assertVisibilityDatePicker();
+    await datePicker.setPeriod();
     await page.waitForLoadState('networkidle');
     await logsExplorerPage.assertVisibilityCanvas();
     await logsExplorerPage.assertVisibilityDataGridRow();
