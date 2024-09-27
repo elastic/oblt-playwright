@@ -1,10 +1,12 @@
-import { test as serverless_auth, expect } from "@playwright/test";
+import { test as serverless_auth } from './fixtures/serverless/basePage';
+import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 import { waitForOneOf } from "../src/types.ts";
 
 serverless_auth('Authentication', async ({page}) => {
   await page.goto(process.env.KIBANA_HOST);
   console.log(`...waiting for login page elements to appear.`);
+  await page.locator('xpath=//button[contains(text(), "Accept")]').click();
   await page.getByTestId('login-username').click();
   await page.getByTestId('login-username').fill(process.env.KIBANA_USERNAME);
   await page.getByTestId('login-password').click();
