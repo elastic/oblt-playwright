@@ -13,7 +13,7 @@ export default class LandingPage {
     }
 
     readonly spaceSelector = () => this.page.locator('xpath=//h1[contains(text(),"Select your space")]');
-    private readonly discover = () => this.page.locator('xpath=//a[@id="observability-log-explorer"]');
+    private readonly discover = () => this.page.locator('xpath=//a[@id="observability-logs-explorer"]');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
     private readonly applications = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm');

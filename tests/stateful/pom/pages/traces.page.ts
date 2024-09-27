@@ -27,7 +27,9 @@ export default class TracesPage {
     public async clickRelatedError() {
         if (await this.relatedError().isHidden()){
             await this.arrowDown();
-          } 
+          } else {
+            await this.page.goto('/app/apm/services/opbeans-go/errors');
+          }
           
           await expect.soft(this.relatedError() || this.relatedErrors()).toBeVisible();
         

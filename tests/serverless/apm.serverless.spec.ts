@@ -48,9 +48,7 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servi
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Filters data by selected date picker option. Selects opbeans-go.`);
     await landingPage.clickServices();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
-    await datePicker.assertSelectedDate();
+    await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
   });
   
@@ -79,8 +77,7 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servi
   
   await test.step('step05', async () => {
     console.log(`\n[${testInfo.title}] Step 05 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await logsExplorerPage.filterLogsByError();
     await logsExplorerPage.expandLogsDataGridRow();
   });
@@ -95,8 +92,7 @@ test('APM - Traces', async ({ datePicker, landingPage, servicesPage, tracesPage 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
     await tracesPage.openExplorerTab();
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
   });
   
@@ -116,8 +112,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected date picker option.`);
-    await datePicker.clickDatePicker();
-    await datePicker.selectDate();
+    await datePicker.setPeriod();
   });
 
   await test.step('step03', async () => {

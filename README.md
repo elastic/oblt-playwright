@@ -19,7 +19,6 @@ KIBANA_USERNAME =
 KIBANA_PASSWORD = 
 TIME_UNIT = 'Minutes'
 TIME_VALUE = 15
-DATE_PICKER = 'Last 24 hours'
 API_KEY = 'ApiKey ...'
 REPORT_FILE = ../test-results/results.json
 ```
@@ -30,15 +29,6 @@ To enable verbose logging, set the `DEBUG` environmental variable:
 ```
 DEBUG = "pw:api"
 ```
-
-#### Commonly used date picker options:
-
-- Last 15 minutes
-- Last 30 minutes
-- Last 1 hour
-- Last 24 hours
-- Last 7 days
-- Last 30 days
 
 ### Create alerting rules
 
