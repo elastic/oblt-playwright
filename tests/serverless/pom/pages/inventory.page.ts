@@ -26,7 +26,6 @@ export default class InventoryPage {
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutInfraAssetDetailsCloseButton = () => this.page.locator('xpath=//div[@data-component-name="infraAssetDetailsFlyout"]//button[@data-test-subj="euiFlyoutCloseButton"]');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
-    private readonly arrowDown = () => this.page.keyboard.press('ArrowDown');
 
     public async clickDismiss() {
         await this.dismiss().click();
@@ -93,11 +92,8 @@ export default class InventoryPage {
         }
 
     public async assertVisibilityVisualization(title: string) {
-        if (await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
-        await this.arrowDown();
-        }
         const startTime = performance.now();
-        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"][@data-render-complete="true"]`), `"${title}" visualization should be rendered`).toBeVisible();
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
@@ -105,6 +101,6 @@ export default class InventoryPage {
         }
 
     public async assertVisibilityPodVisualization(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-test-subj="infraMetricsPage"]//div[@id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@id="${title}"]//div[@class="echChartContent"]`), `"${title}" visualization should be rendered`).toBeVisible();
         }
 }

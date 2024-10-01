@@ -75,7 +75,7 @@ export default class DashboardPage {
         }
 
     public async assertVisibilityVisualization(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be visible').toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"][@data-render-complete="true"]`), 'visualization should be rendered').toBeVisible();
         }
 
     public async kubernetesVisualizationOptions(title: string) {
