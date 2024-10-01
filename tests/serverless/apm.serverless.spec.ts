@@ -117,10 +117,20 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
 
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Selects the dependency, then navigates to the "Operations" tab.`);
-    await dependenciesPage.clickTableRow();
-    await dependenciesPage.assertVisibilityTable();
-    await dependenciesPage.openOperationsTab();
-    await dependenciesPage.assertVisibilityTable();
+    const [ index ] = await waitForOneOf([
+      dependenciesPage.dependencyTableLoaded(),
+      dependenciesPage.dependencyTableNotLoaded()
+      ]);
+    const tableLoaded = index === 0;
+    if (tableLoaded) {
+        await dependenciesPage.clickTableRow();
+        await dependenciesPage.assertVisibilityTable();
+        await dependenciesPage.openOperationsTab();
+        await dependenciesPage.assertVisibilityTable();
+      } else {
+        console.log('Dependencies table not loaded.');
+        throw new Error('Test is failed due to an error when loading dependencies table.');
+      }
   });
 
   await test.step('step04', async () => {
