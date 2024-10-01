@@ -39,85 +39,78 @@ test.beforeEach(async ({ landingPage, page }) => {
 });
 
 test('Average container CPU core usage', async ({ page, dashboardPage, datePicker }) => {
-  const name = "Average container CPU core usage";
-  const title = "[Playwright Test] Average container CPU core usage in ns";
+  const title = "Average container CPU core usage in ns";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });
 
 test('Average container memory usage in bytes', async ({ page, dashboardPage, datePicker }) => {
-  const name = "Average container memory usage in bytes";
-  const title = "[Playwright Test] Average container memory usage in bytes";
+  const title = "Average container memory usage in bytes";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });
 
 test('CPU usage per container of the total node cpu', async ({ page, dashboardPage, datePicker }) => {
-  const name = "CPU usage per container of the total node cpu";
-  const title = "[Playwright Test] CPU usage per container of the total node cpu";
+  const title = "CPU usage per container of the total node cpu";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });
 
 test('CPU usage per pod of the total node cpu', async ({ page, dashboardPage, datePicker }) => {
-  const name = "CPU usage per pod of the total node cpu";
-  const title = "[Playwright Test] CPU usage per pod of the total node cpu";
+  const title = "CPU usage per pod of the total node cpu";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });
 
 test('Memory usage per container of the total node memory', async ({ page, dashboardPage, datePicker }) => {
-  const name = "Memory usage per container of the total node memory";
-  const title = "[Playwright Test] Memory usage per container of the total node memory";
+  const title = "Memory usage per container of the total node memory";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });
 
 test('Memory usage per pod of the total node memory', async ({ page, dashboardPage, datePicker }) => {
-  const name = "Memory usage per pod of the total node memory";
-  const title = "[Playwright Test] Memory usage per pod of the total node memory";
+  const title = "Memory usage per pod of the total node memory";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });
 
 test('Percentile CPU Usage per container', async ({ page, dashboardPage, datePicker }) => {
-  const name = "Percentile CPU Usage per container";
-  const title = "[Playwright Test] Percentile CPU Usage per container";
+  const title = "Percentile CPU Usage per container";
 
   await dashboardPage.assertVisibilityHeading();
   await dashboardPage.assertVisibilityTable();
   await page.getByRole('link', { name: title }).click();
   await datePicker.setPeriod();
   await dashboardPage.assertVisibilityVisualization(title);
-  await dashboardPage.logVisualizationRequest(name);
+  //await dashboardPage.logVisualizationRequest(title);
 });

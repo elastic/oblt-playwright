@@ -17,7 +17,7 @@ test.beforeEach(async ({ landingPage, logsExplorerPage, page }) => {
   await logsExplorerPage.clickLogsExplorerTab();
 });
 
-test.skip('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsExplorerPage, page}) => {
+test.skip('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsExplorerPage}) => {
   await test.step('step01', async () => {
     await logsExplorerPage.filterByKubernetesContainer();
     await logsExplorerPage.assertVisibilityCanvas();
@@ -32,7 +32,7 @@ test.skip('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsE
   });
 });
 
-test('Logs Explorer - All logs', async ({datePicker, logsExplorerPage, page}) => {
+test('Logs Explorer - All logs', async ({datePicker, logsExplorerPage}) => {
   await test.step('step01', async () => {
     await datePicker.setPeriod();
     await logsExplorerPage.assertChartIsRendered();
@@ -41,7 +41,7 @@ test('Logs Explorer - All logs', async ({datePicker, logsExplorerPage, page}) =>
   });
 });
 
-test('Logs Explorer - Field Statistics', async ({datePicker, logsExplorerPage, page}) => { 
+test('Logs Explorer - Field Statistics', async ({datePicker, logsExplorerPage}) => { 
   await test.step('step01', async () => {
     await datePicker.setPeriod();
     await logsExplorerPage.assertChartIsRendered();
@@ -55,7 +55,7 @@ test('Logs Explorer - Field Statistics', async ({datePicker, logsExplorerPage, p
   });
 });
 
-test('Logs Explorer - Patterns', async ({datePicker, logsExplorerPage, page}) => { 
+test('Logs Explorer - Patterns', async ({datePicker, logsExplorerPage}) => { 
   await test.step('step01', async () => {
     await datePicker.setPeriod();
     await logsExplorerPage.assertChartIsRendered();
@@ -65,10 +65,21 @@ test('Logs Explorer - Patterns', async ({datePicker, logsExplorerPage, page}) =>
 
   await test.step('step02', async () => {
     await logsExplorerPage.clickPatternsTab();
-    await logsExplorerPage.assertVisibilityPatternsRowToggle();
-    await logsExplorerPage.clickFilterPatternButton();
-    await logsExplorerPage.assertChartIsRendered();
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
+    const [ index ] = await waitForOneOf([
+      logsExplorerPage.logPatternsRowToggle(),
+      logsExplorerPage.patternsNotLoaded()
+      ]);
+    const patternsLoaded = index === 0;
+    if (patternsLoaded) {
+      await logsExplorerPage.assertVisibilityPatternsRowToggle();
+      await logsExplorerPage.clickFilterPatternButton();
+      await logsExplorerPage.assertChartIsRendered();
+      await logsExplorerPage.assertVisibilityCanvas();
+      await logsExplorerPage.assertVisibilityDataGridRow();
+      } else {
+        console.log('Patterns not loaded.');
+        throw new Error('Test is failed due to an error when loading categories.');
+      }
+    
   });
 });

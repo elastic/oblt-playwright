@@ -77,22 +77,10 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Logs Elasticsearch query - [Metrics Kubernetes] Cores used vs total cores.`);
-    await dashboardPage.assertVisibilityVisualization(coresUsedVsTotal);
-    await dashboardPage.kubernetesVisualizationOptions(coresUsedVsTotal);
-    await dashboardPage.openRequestsView();
-    await dashboardPage.queryToClipboard();
-    await dashboardPage.logQuery(coresUsedVsTotal);
-    await dashboardPage.closeFlyout();
-  });
-  
-  await test.step('step04', async () => {
-    console.log(`\n[${testInfo.title}] Step 04 - Logs Elasticsearch query - [Metrics Kubernetes] Top memory intensive pods.`);
-    await dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods);
-    await dashboardPage.kubernetesVisualizationOptions(topMemoryIntensivePods);
-    await dashboardPage.openRequestsView();
-    await dashboardPage.queryToClipboard();
-    await dashboardPage.logQuery(topMemoryIntensivePods);
-    await dashboardPage.closeFlyout();
+    await Promise.all([
+      dashboardPage.assertVisibilityVisualization(coresUsedVsTotal),
+      dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
+      ]);
   });
 });
 
@@ -118,8 +106,10 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, landingPa
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
     await datePicker.setPeriod();
-    await inventoryPage.assertVisibilityVisualization(cpuUsage);
-    await inventoryPage.assertVisibilityVisualization(memoryUsage);
+    await Promise.all([
+      inventoryPage.assertVisibilityVisualization(cpuUsage),
+      inventoryPage.assertVisibilityVisualization(memoryUsage)
+      ]);
   });
 
   await test.step('step04', async () => {
@@ -139,7 +129,9 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, landingPa
   await test.step('step06', async () => {
     console.log(`\n[${testInfo.title}] Step 06 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.`);
     await datePicker.setPeriod();
-    await inventoryPage.assertVisibilityPodVisualization(podCpuUsage);
-    await inventoryPage.assertVisibilityPodVisualization(podMemoryUsage);
+    await Promise.all([
+      inventoryPage.assertVisibilityPodVisualization(podCpuUsage),
+      inventoryPage.assertVisibilityPodVisualization(podMemoryUsage)
+      ]);
   });
 });

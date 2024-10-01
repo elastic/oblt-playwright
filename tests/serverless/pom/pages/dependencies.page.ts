@@ -9,6 +9,8 @@ export default class DependenciesPage {
 
     private readonly dependenciesOperationsTab = () => this.page.getByRole('tab', { name: 'Operations' });
     private readonly dependencyTableRow = () => this.page.locator('xpath=//tbody[@class="css-0"]//tr[1]//a[1]');
+    public readonly dependencyTableLoaded = () => this.page.locator('xpath=//span[text()="Based on sampled spans"]');
+    public readonly dependencyTableNotLoaded = () => this.page.locator('xpath=//span[@class="euiTableCellContent__text"][text()="Failed to fetch"]');
     private readonly timelineTransaction = () => this.page.locator('xpath=(//div[@type="transaction"])[1]//*[@color]');
     private readonly tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
     private readonly investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
