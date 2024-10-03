@@ -1,5 +1,5 @@
 import { test } from '../fixtures/serverless/basePage';
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 import { waitForOneOf } from "../../src/types.ts";
 let apiKey = process.env.API_KEY;
 
@@ -64,6 +64,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await dashboardPage.assertVisibilityHeading();
     await dashboardPage.assertVisibilityTable();
     await dashboardPage.searchDashboard('Cluster Overview');
+    await page.keyboard.press('Enter');
     await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
   });
 
@@ -76,7 +77,11 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   });
   
   await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Logs Elasticsearch query - [Metrics Kubernetes] Cores used vs total cores.`);
+    console.log(`\n[${testInfo.title}] Step 03 - Asserts visualizations visibility.`);
+    await expect(page.locator(`xpath=//*[@data-test-subj="globalLoadingIndicator"]`)).toBeHidden();
+    if (page.locator(`xpath=//div[@data-title="${coresUsedVsTotal}"]//div[@class="lnsEmbeddedError"]`) || page.locator(`xpath=//div[@data-title="${topMemoryIntensivePods}"]//div[@class="lnsEmbeddedError"]`)) {
+      throw new Error('Test is failed due to an error when loading visualization.');
+    }
     await Promise.all([
       dashboardPage.assertVisibilityVisualization(coresUsedVsTotal),
       dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
