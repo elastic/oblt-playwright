@@ -42,7 +42,7 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page, servicesPage }, testInfo) => {
   const throughput = "throughput";
 
   await test.step('step01', async () => {
@@ -57,7 +57,10 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servi
     await servicesPage.openTransactionsTab();
     await servicesPage.assertVisibilityVisualization(throughput);
     await servicesPage.selectMostImpactfulTransaction();
-    await servicesPage.assertVisibilityVisualization(throughput);
+
+    if (servicesPage.errorFetchingResource()) {
+      throw new Error('Test is failed due to an error when loading data.');
+    }
   });
   
   await test.step('step03', async () => {

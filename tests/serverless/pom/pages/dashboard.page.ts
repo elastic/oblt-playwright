@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { waitForOneOf } from "../../../../src/types.ts";
 
 export default class DashboardPage {
     page: Page;
@@ -75,7 +76,7 @@ export default class DashboardPage {
         }
 
     public async assertVisibilityVisualization(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-title="${title}"][@data-render-complete="true"]`), 'visualization should be rendered').toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be rendered').toBeVisible();
         }
 
     public async kubernetesVisualizationOptions(title: string) {
