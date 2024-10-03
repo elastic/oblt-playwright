@@ -82,6 +82,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     if (page.locator(`xpath=//div[@data-title="${coresUsedVsTotal}"]//div[@class="lnsEmbeddedError"]`) || page.locator(`xpath=//div[@data-title="${topMemoryIntensivePods}"]//div[@class="lnsEmbeddedError"]`)) {
       throw new Error('Test is failed due to an error when loading visualization.');
     }
+
     await Promise.all([
       dashboardPage.assertVisibilityVisualization(coresUsedVsTotal),
       dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
