@@ -1,4 +1,4 @@
-import {test as base} from "@playwright/test";
+import { test as base } from "@playwright/test";
 import DashboardPage from "../../stateful/pom/pages/dashboard.page";
 import DatasetsPage from "../../stateful/pom/pages/datasets.page";
 import DatePicker from "../../stateful/pom/components/date_picker.component";
@@ -9,6 +9,7 @@ import InventoryPage from "../../stateful/pom/pages/inventory.page";
 import LandingPage from "../../stateful/pom/pages/landing.page";
 import LogsExplorerPage from "../../stateful/pom/pages/logs_explorer.page";
 import ObservabilityPage from "../../stateful/pom/pages/observability.page";
+import OnboardingPage from "../../stateful/pom/pages/onboarding.page";
 import ServicesPage from "../../stateful/pom/pages/services.page";
 import TracesPage from "../../stateful/pom/pages/traces.page";
 
@@ -23,7 +24,8 @@ export const test = base.extend<{
     inventoryPage: InventoryPage, 
     landingPage: LandingPage, 
     logsExplorerPage: LogsExplorerPage, 
-    observabilityPage: ObservabilityPage, 
+    observabilityPage: ObservabilityPage,
+    onboardingPage: OnboardingPage, 
     servicesPage: ServicesPage, 
     tracesPage: TracesPage
     }>
@@ -66,6 +68,10 @@ export const test = base.extend<{
 
         observabilityPage: async({page}, use) => {
             await use(new ObservabilityPage(page));
+        },
+
+        onboardingPage: async({page}, use) => {
+            await use(new OnboardingPage(page));
         },
 
         servicesPage: async({page}, use) => {
