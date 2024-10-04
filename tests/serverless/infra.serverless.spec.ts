@@ -1,5 +1,5 @@
 import { test } from '../fixtures/serverless/basePage';
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { waitForOneOf } from "../../src/types.ts";
 let apiKey = process.env.API_KEY;
 
