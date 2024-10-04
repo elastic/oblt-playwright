@@ -8,7 +8,7 @@
 | [infra.serverless.spec.ts](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/infra.serverless.spec.ts)<br><br>Capturing Kubernetes metrics visualizations' request/query time in "Cluster Overview" dashboard. Tracking the duration it takes for Inventory/Hosts page elements and visualizations to render and appear on screen within the allocated timeframe, reflecting the anticipated test data volume.  | Kubernetes metrics from:<br>- Kubelet API,<br>- kube-state-metrics,<br>- Kubernetes API Server,<br>- Kubernetes Proxy.  |
 | [k8s_aggs.serverless.spec.ts](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/k8s_aggs.serverless.spec.ts)<br><br>Capturing query/request time in custom visualizations aggregating k8s metrics.  | Kubernetes metrics from:<br>- Kubelet API,<br>- kube-state-metrics,<br>- Kubernetes API Server,<br>- Kubernetes Proxy. |
 | [logs.serverless.spec.ts](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/logs.serverless.spec.ts)<br><br>Operating with Nginx access logs in Logs Explorer. Tracking the duration it takes for page elements and visualizations to render and appear on screen within the allocated timeframe, reflecting the anticipated test data volume.  | Nginx access logs.  |
-| [onboarding.stateful.spec.ts](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/onboarding.stateful.spec.ts)<br><br>Saves a bash script to auto-detect logs and metrics on a host. Validates data ingestion. | — |
+| [onboarding.serverless.spec.ts](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/onboarding.serverless.spec.ts)<br><br>Saves a bash script to auto-detect logs and metrics on a host. Validates data ingestion. | — |
 
 ## Stateful
 
