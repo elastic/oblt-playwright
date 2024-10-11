@@ -9,7 +9,7 @@ export default class ServicesPage {
 
     private readonly searchBar = () => this.page.getByTestId('apmUnifiedSearchBar');
     private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
-    private readonly opbeansGo = () => this.page.locator('xpath=//span[contains(text(),"opbeans-go")]');
+    private readonly opbeansGo = () => this.page.locator('xpath=//span[text()="opbeans-go"]');
     private readonly servicesTransactionsTab = () => this.page.getByTestId('transactionsTab');
     private readonly mostImpactfulTransaction = () => this.page.locator('xpath=//div[@data-test-subj="transactionsGroupTable"]//tbody[@class="css-0"]//tr[1]//a[1]');
     private readonly failedTransactionCorrelationsTab = () => this.page.getByRole('tab', { name: 'Failed transaction correlations' });
@@ -18,7 +18,7 @@ export default class ServicesPage {
     private readonly investigateButton = () => this.page.getByRole('button', { name: 'Investigate' });
     private readonly investigateHostLogsButton = () => this.page.getByRole('link', { name: 'Host logs' });
     private readonly errorDistributionChart = () => this.page.getByTestId('errorDistribution');
-    public readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[contains(text(), "Error while fetching resource")]');
+    public readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Error while fetching resource"]');
 
     public async selectServiceOpbeansGo() {
         await this.searchBar().click();

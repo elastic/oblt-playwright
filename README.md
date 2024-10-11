@@ -45,28 +45,21 @@ Note: API key is required.
 By default, tests run in headless mode. To launch browsers in headed mode, use the `--headed` flag.
 It is recommended to run tests during ongoing data collection.
 
-### Run all tests
 
-Specify project name (`stateful` or `serverless`) in the test command. Example:
+### Run a specific script
 
-```
-npx playwright test --project serverless --headed
-```
-
-### Run a specific test
-
-Specify test name in the test command. Example:
+Specify script name and project name (`stateful` or `serverless`) in the test command. Example:
 
 ```
 npx playwright test apm.serverless.spec.ts --project serverless --headed
 ```
 
-### Run an authorization test
+### Run a specific test
 
-Execute `serverless.auth.ts` or `stateful.auth.ts` as follows:
+Specify test name and project name (`stateful` or `serverless`) in the test command. Example:
 
 ```
-npx playwright test serverless.auth.ts
+npx playwright test -g "Auto-detect logs and metrics" --project serverless --headed
 ```
 
 ### API testing

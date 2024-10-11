@@ -2,7 +2,7 @@ import { test } from '../../tests/fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
 import { waitForOneOf } from "../../src/types.ts";
 
-test.beforeEach(async ({ landingPage, page }) => {
+test.beforeEach(async ({ landingPage, observabilityPage, page }) => {
   await landingPage.goto();
   const [ index ] = await waitForOneOf([
     page.locator('xpath=//a[@aria-label="Elastic home"]'),
@@ -14,38 +14,71 @@ test.beforeEach(async ({ landingPage, page }) => {
       await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
     };
   await landingPage.clickObservabilitySolutionLink();
+  await observabilityPage.clickExplorer();
 });
 
-test('Logs Explorer', async ({datePicker, logsExplorerPage, observabilityPage, page}) => {
-  // Step 01 - Navigates to Logs Explorer.
+test('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsExplorerPage}) => {
   await test.step('step01', async () => {
-    await observabilityPage.clickExplorer();
+    await logsExplorerPage.filterByKubernetesContainer();
     await logsExplorerPage.assertVisibilityCanvas();
     await logsExplorerPage.assertVisibilityDataGridRow();
   });
 
-  // Step 02 - Filters by nginx access logs.
   await test.step('step02', async () => {
-    await logsExplorerPage.filterByNginxAccess();
-    await page.waitForLoadState('networkidle');
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
-  });
-
-  // Step 03 - Filters data by selected date picker option.
-  await test.step('step03', async () => {
-    // await datePicker.assertVisibilityDatePicker();
     await datePicker.setPeriod();
-    await page.waitForLoadState('networkidle');
+    await logsExplorerPage.assertChartIsRendered();
     await logsExplorerPage.assertVisibilityCanvas();
     await logsExplorerPage.assertVisibilityDataGridRow();
-  });
-
-  // Step 04 - Clicks on one of the listed documents and waits for the content to load.
-  await test.step('step04', async () => {
-    await logsExplorerPage.expandLogsDataGridRow();
-    await logsExplorerPage.assertVisibilityFlyoutLogMessage();
-    await logsExplorerPage.assertVisibilityFlyoutService();
-    await logsExplorerPage.assertVisibilityDocViewer();
   });
 });
+
+test('Logs Explorer - All logs', async ({datePicker, logsExplorerPage}) => {
+  await test.step('step01', async () => {
+    await datePicker.setPeriod();
+    await logsExplorerPage.assertChartIsRendered();
+    await logsExplorerPage.assertVisibilityCanvas();
+    await logsExplorerPage.assertVisibilityDataGridRow();
+  });
+});
+
+test('Logs Explorer - Field Statistics', async ({datePicker, logsExplorerPage}) => { 
+  await test.step('step01', async () => {
+    await datePicker.setPeriod();
+    await logsExplorerPage.assertChartIsRendered();
+    await logsExplorerPage.assertVisibilityCanvas();
+    await logsExplorerPage.assertVisibilityDataGridRow();
+  });
+
+  await test.step('step02', async () => {
+    await logsExplorerPage.clickFieldStatsTab();
+    await logsExplorerPage.assertVisibilityFieldStatsDocCount();
+  });
+});
+
+test('Logs Explorer - Patterns', async ({datePicker, logsExplorerPage}) => { 
+  await test.step('step01', async () => {
+    await datePicker.setPeriod();
+    await logsExplorerPage.assertChartIsRendered();
+    await logsExplorerPage.assertVisibilityCanvas();
+    await logsExplorerPage.assertVisibilityDataGridRow();
+  });
+
+  await test.step('step02', async () => {
+    await logsExplorerPage.clickPatternsTab();
+    const [ index ] = await waitForOneOf([
+      logsExplorerPage.logPatternsRowToggle(),
+      logsExplorerPage.patternsNotLoaded()
+      ]);
+    const patternsLoaded = index === 0;
+    if (patternsLoaded) {
+      await logsExplorerPage.assertVisibilityPatternsRowToggle();
+      await logsExplorerPage.clickFilterPatternButton();
+      await logsExplorerPage.assertChartIsRendered();
+      await logsExplorerPage.assertVisibilityCanvas();
+      await logsExplorerPage.assertVisibilityDataGridRow();
+      } else {
+        console.log('Patterns not loaded.');
+        throw new Error('Test is failed due to an error when loading categories.');
+      }
+  });
+})

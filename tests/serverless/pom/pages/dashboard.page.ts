@@ -1,5 +1,4 @@
 import { expect, Page } from "@playwright/test";
-import { waitForOneOf } from "../../../../src/types.ts";
 
 export default class DashboardPage {
     page: Page;
@@ -20,6 +19,7 @@ export default class DashboardPage {
     private readonly inspectorRequestDetail = () => this.page.getByTestId('inspectorRequestDetailRequest');
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
+    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
 
     public async assertVisibilityHeading() {
         await expect(this.dashboardHeading()).toBeVisible();
@@ -79,6 +79,10 @@ export default class DashboardPage {
         await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be rendered').toBeVisible();
         }
 
+    public async assertEmbeddedError(title: string) {
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//div[@class="lnsEmbeddedError"]`), 'Error while loading visualization').toBeVisible();
+        }
+
     public async kubernetesVisualizationOptions(title: string) {
         await this.page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
         }
@@ -91,5 +95,9 @@ export default class DashboardPage {
         await this.queryToClipboard();
         await this.logQuery(name);
         await this.closeFlyout();
+        }
+
+    public async assertLoadingIndicator() {
+        await expect(this.loadingIndicator()).toBeHidden();
         }
 }
