@@ -42,7 +42,7 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servicesPage }, testInfo) => {
   const throughput = "throughput";
 
   await test.step('step01', async () => {
@@ -50,6 +50,9 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
     await landingPage.clickServices();
     await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
+    if (servicesPage.errorFetchingResource()) {
+      throw new Error('Test is failed due to an error when loading data.');
+    }
   });
   
   await test.step('step02', async () => {
@@ -57,10 +60,6 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, page,
     await servicesPage.openTransactionsTab();
     await servicesPage.assertVisibilityVisualization(throughput);
     await servicesPage.selectMostImpactfulTransaction();
-
-    if (servicesPage.errorFetchingResource()) {
-      throw new Error('Test is failed due to an error when loading data.');
-    }
   });
   
   await test.step('step03', async () => {
@@ -139,7 +138,12 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
   await test.step('step04', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Clicks on the most impactful operation.`);
     await dependenciesPage.clickTableRow();
-    await dependenciesPage.assertVisibilityTimelineTransaction();
+    await Promise.race([
+      dependenciesPage.assertVisibilityTimelineTransaction(),
+      dependenciesPage.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
   });
 
   await test.step('step05', async () => {

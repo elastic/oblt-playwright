@@ -78,15 +78,19 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Asserts visualizations visibility.`);
-    await expect(page.locator(`xpath=//*[@data-test-subj="globalLoadingIndicator"]`)).toBeHidden();
-    if (page.locator(`xpath=//div[@data-title="${coresUsedVsTotal}"]//div[@class="lnsEmbeddedError"]`) || page.locator(`xpath=//div[@data-title="${topMemoryIntensivePods}"]//div[@class="lnsEmbeddedError"]`)) {
-      throw new Error('Test is failed due to an error when loading visualization.');
-    }
-
-    await Promise.all([
-      dashboardPage.assertVisibilityVisualization(coresUsedVsTotal),
-      dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
-      ]);
+    await Promise.race([
+      Promise.all([
+        dashboardPage.assertLoadingIndicator(),
+        dashboardPage.assertVisibilityVisualization(coresUsedVsTotal),
+        dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
+          ]),
+        dashboardPage.assertEmbeddedError(coresUsedVsTotal).then(() => {
+            throw new Error('Test is failed due to an error when loading visualization.');
+        }),
+        dashboardPage.assertEmbeddedError(topMemoryIntensivePods).then(() => {
+          throw new Error('Test is failed due to an error when loading visualization.');
+      })
+    ]);
   });
 });
 

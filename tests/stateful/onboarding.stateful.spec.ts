@@ -28,60 +28,61 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
     let maxRetries = 3;
     let retries = 0;
     let codeBlockAppeared = false;
+    let clipboardData;
 
-    await onboardingPage.selectCollectLogs();
-    await onboardingPage.selectLogsAutoDetect();
-    if (onboardingPage.contentNotLoaded()) {
-        while (retries < maxRetries) {
-            try {
-                onboardingPage.clickRetry();
-                await onboardingPage.codeBlock().waitFor({state: 'visible', timeout: 2000});
-                codeBlockAppeared = true;
-                break;
-            } catch (error) {
-                retries++;
-                console.log(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
-            }
-        }
-        if (!codeBlockAppeared) {
-            throw new Error('Page content not loaded after 3 attempts.');
-        }
-    };
-    await onboardingPage.assertVisibilityCodeBlock();
-    await onboardingPage.copyToClipboard();
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
-    fs.writeFileSync(outputPath, clipboardData);
-    await onboardingPage.assertReceivedDataIndicator();
-});
+    const [ a ] = await waitForOneOf([
+        onboardingPage.useCaseLogs(),
+        onboardingPage.useCaseHost()
+        ]);
+    const useCaseLogs = a === 0;
+    if (useCaseLogs) {
+        await onboardingPage.selectCollectLogs()
+        } else {
+            await onboardingPage.selectHost()
+        };
 
-test('Kubernetes', async ({ onboardingPage, page }) => {
-    const fileName = 'code_snippet_kubernetes.sh';
-    const outputPath = path.join(outputDirectory, fileName);
-    let maxRetries = 3;
-    let retries = 0;
-    let codeBlockAppeared = false;
-
-    await onboardingPage.selectMonitorInfrastructure();
-    await onboardingPage.selectKubernetes();
-    if (onboardingPage.contentNotLoaded()) {
-        while (retries < maxRetries) {
-            try {
-                onboardingPage.clickRetry();
-                await onboardingPage.codeBlock().waitFor({state: 'visible', timeout: 2000});
-                codeBlockAppeared = true;
-                break;
-            } catch (error) {
-                retries++;
-                console.log(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
-            }
-        }
-        if (!codeBlockAppeared) {
-            throw new Error('Page content not loaded after 3 attempts.');
-        }
-    };
-    await onboardingPage.assertVisibilityCodeBlock();
-    await onboardingPage.copyToClipboard();
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
-    fs.writeFileSync(outputPath, clipboardData);
-    await onboardingPage.assertReceivedDataIndicator();
-});
+    const [ b ] = await waitForOneOf([
+        onboardingPage.streamHostLogs(),
+        onboardingPage.autoDetectElasticAgent()
+        ]);
+    const streamHostLogs = b === 0;
+    if (streamHostLogs) {
+        await onboardingPage.selectStreamLogs();
+        await Promise.race([
+            onboardingPage.codeBash(),
+            onboardingPage.assertErrorFetchingResource().then(() => {
+            throw new Error('Test is failed because due to an error while fetching resource.');
+            })
+        ]);
+        await onboardingPage.assertSystemIntegrationInstalled();
+        await onboardingPage.assertApiKeyCreated();
+        await onboardingPage.clickAutoDownloadConfigButton();
+        await onboardingPage.copyToClipboardCode();
+        clipboardData = await page.evaluate("navigator.clipboard.readText()");
+        fs.writeFileSync(outputPath, clipboardData);
+        await onboardingPage.assertShippedLogs();
+        } else {
+            await onboardingPage.selectAutoDetectWithElasticAgent();
+            if (onboardingPage.contentNotLoaded()) {
+                while (retries < maxRetries) {
+                    try {
+                        onboardingPage.clickRetry();
+                        await onboardingPage.codeBlock().waitFor({state: 'visible', timeout: 2000});
+                        codeBlockAppeared = true;
+                        break;
+                    } catch (error) {
+                        retries++;
+                        console.log(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
+                    }
+                }
+                if (!codeBlockAppeared) {
+                    throw new Error('Page content not loaded after 3 attempts.');
+                }
+            };
+            await onboardingPage.assertVisibilityCodeBlock();
+            await onboardingPage.copyToClipboard();
+            clipboardData = await page.evaluate("navigator.clipboard.readText()");
+            fs.writeFileSync(outputPath, clipboardData);
+            await onboardingPage.assertReceivedDataIndicator();
+        };
+})

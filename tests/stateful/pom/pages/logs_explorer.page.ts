@@ -10,14 +10,45 @@ export default class LogsExplorerPage {
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly toggleErrorMessage = () => this.page.getByTestId('field-error.log.message');
     private readonly toggleTopValue = () => this.page.locator('xpath=//div[@data-test-subj="dscFieldStats-topValues-bucket"][1]//button[1]');
+    private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
     private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
     private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
     private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
     private readonly flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
     private readonly docViewer = () => this.page.getByTestId('kbnDocViewer');
     private readonly datasetSelectorButton = () => this.page.getByTestId('datasetSelectorPopoverButton');
-    private readonly datasetNginx = () => this.page.locator('xpath=//button//span[text()="Nginx"]');
-    private readonly datasetNginxAccess = () => this.page.locator('xpath=//button//span[text()="access"]');
+    private readonly datasetKubernetes = () => this.page.locator('xpath=//button//span[text()="Kubernetes"]');
+    private readonly datasetKubernetesContainer = () => this.page.locator('xpath=//button//span[text()="container_logs"]');
+    private readonly fieldStatsTab = () => this.page.getByTestId('dscViewModeFieldStatsButton');
+    private readonly fieldStatsDocCount = () => this.page.locator('xpath=//div[@data-test-subj="dataVisualizerTableContainer"]//tbody//tr[1]//td[@data-test-subj="dataVisualizerTableColumnDocumentsCount"]');
+    private readonly patternsTab = () => this.page.getByTestId('dscViewModePatternAnalysisButton');
+    public readonly logPatternsRowToggle = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//td[@data-test-subj="aiopsLogPatternsExpandRowToggle"]');
+    private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
+    public readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
+
+    public async clickFieldStatsTab() {
+        await this.fieldStatsTab().click();
+        }
+
+    public async clickPatternsTab() {
+        await this.patternsTab().click();
+        }
+
+    public async clickFilterPatternButton() {
+        await this.logPatternsFilterIn().click();
+        }
+
+    public async assertChartIsRendered() {
+        await expect(this.histogramChartIsRendered()).toBeVisible();
+        }
+
+    public async assertVisibilityPatternsRowToggle() {
+        await expect(this.logPatternsRowToggle()).toBeVisible();
+        }
+
+    public async assertVisibilityFieldStatsDocCount() {
+        await expect(this.fieldStatsDocCount()).toBeVisible();
+        }
 
     public async assertVisibilityCanvas() {
         await expect(this.logsCanvas()).toBeVisible();
@@ -50,9 +81,9 @@ export default class LogsExplorerPage {
         await expect(this.docViewer()).toBeVisible();
         }
 
-    public async filterByNginxAccess() {
+    public async filterByKubernetesContainer() {
         await this.datasetSelectorButton().click();
-        await this.datasetNginx().click();
-        await this.datasetNginxAccess().click();
+        await this.datasetKubernetes().click();
+        await this.datasetKubernetesContainer().click();
         }
 }

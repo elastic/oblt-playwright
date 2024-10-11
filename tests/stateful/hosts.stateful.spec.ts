@@ -79,7 +79,7 @@ test.beforeAll('Check data', async ({ request }) => {
     }
 });
 
-test.beforeEach(async ({ landingPage, observabilityPage, page }) => {
+test.beforeEach(async ({ landingPage, page }) => {
     await landingPage.goto();
     const [ index ] = await waitForOneOf([
         page.locator('xpath=//a[@aria-label="Elastic home"]'),
@@ -91,56 +91,68 @@ test.beforeEach(async ({ landingPage, observabilityPage, page }) => {
         await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
         };
     await landingPage.clickObservabilitySolutionLink();
-    await observabilityPage.clickHosts();
 });
 
-test('Hosts - Landing page', async ({ datePicker, hostsPage }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "hostsView-metricChart-cpuUsage";
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
+    let asyncResults;
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertHostsNumber(),
-            hostsPage.assertVisibilityHostsTable(),
-            hostsPage.assertVisibilityVisualization(cpuUsageKPI),
-            hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
-            hostsPage.assertVisibilityVisualization(memoryUsageKPI),
-            hostsPage.assertVisibilityVisualization(diskUsageKPI),
-            hostsPage.assertVisibilityVisualization(cpuUsage), 
-            hostsPage.assertVisibilityVisualization(normalizedLoad),
-            ]);
+        await Promise.race([
+            asyncResults = Promise.all([
+                hostsPage.assertHostsNumber(),
+                hostsPage.assertVisibilityHostsTable(),
+                hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+                hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+                hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+                hostsPage.assertVisibilityVisualization(diskUsageKPI),
+                hostsPage.assertVisibilityVisualization(cpuUsage), 
+                hostsPage.assertVisibilityVisualization(normalizedLoad),
+                ]),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed because Hosts data failed to load.');
+            })
+        ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage }, testInfo) => {    
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {    
     await test.step('step01', async () => {
         const testStartTime = Date.now();
+        let asyncResults;
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await hostsPage.clickLogsTab();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityLogStream()
-            ]);
+        await Promise.race([
+            asyncResults = Promise.all([
+                hostsPage.assertVisibilityLogStream()
+                ]),
+            hostsPage.assertVisibilityNoLogs().then(() => {
+                throw new Error('Test is failed because no logs found.');
+            })
+        ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage }, testInfo) => {    
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {    
     await test.step('step01', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await hostsPage.clickAlertsTab();
@@ -153,7 +165,12 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage }, testInfo
     });
 });
 
-test('Hosts - Individual page', async ({ datePicker, hostsPage }, testInfo) => {
+/*
+All the individual host tests are not the best fit for the performance comparison purposes since there is no way to filter hosts by uptime.
+It would only be suitable in case when hosts in all the environments being compared have collected data within the selected time period. 
+*/
+
+test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -163,6 +180,8 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage }, testInfo) => {
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
+        await observabilityPage.clickHosts();
+        await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
     });
 
@@ -183,9 +202,11 @@ test('Hosts - Individual page', async ({ datePicker, hostsPage }, testInfo) => {
     });
 });
 
-test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metadata tab.`);
+        await observabilityPage.clickHosts();
+        await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsMetadataTab();
     });
@@ -203,7 +224,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, p
     });
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage }, testInfo) => {
+test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
@@ -213,6 +234,8 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage }, 
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
+        await observabilityPage.clickHosts();
+        await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsMetricsTab();
     });
@@ -234,9 +257,11 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage }, 
     });
 });
 
-test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Processes tab.`);
+        await observabilityPage.clickHosts();
+        await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsProcessesTab();
     });
@@ -246,17 +271,22 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         await page.reload();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityHostsProcessesTable()
-            ]);
-        writeFileReport(testStartTime, testInfo, asyncResults);
+        if (!hostsPage.hostsProcessesNotFound()) {
+            const asyncResults = await Promise.all([
+                hostsPage.assertVisibilityHostsProcessesTable()
+                ]);
+            writeFileReport(testStartTime, testInfo, asyncResults);
+        } else {
+            throw new Error('Test failed because no processes found.');
+        };
     });
 });
 
-test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage }, testInfo) => {
+test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
+        await observabilityPage.clickHosts();
+        await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await expect(hostsPage.hostsMetricsTab()).toBeVisible();
         const profilingTabVisibility = await hostsPage.hostsProfilingTab().isVisible();
@@ -270,16 +300,22 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage }
         await datePicker.assertVisibilityDatePickerHostsProfiling();
         await datePicker.setPeriod();
 
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityProfilingFlamegraph()
-            ]);
-        writeFileReport(testStartTime, testInfo, asyncResults);
+        if (!hostsPage.hostsAddProfilingButton()) {
+            const asyncResults = await Promise.all([
+                hostsPage.assertVisibilityProfilingFlamegraph()
+                ]);
+            writeFileReport(testStartTime, testInfo, asyncResults);
+        } else {
+            throw new Error('Test failed because profiling is not set up.');
+        };
     });
 });
 
-test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage }, testInfo) => {
+test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Logs tab.`);
+        await observabilityPage.clickHosts();
+        await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsLogsTab();
     });
@@ -288,10 +324,13 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage }, tes
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityHostsLogsTabStream()
-            ]);
-        writeFileReport(testStartTime, testInfo, asyncResults);
+        if (!hostsPage.logStreamNoMessages()) {
+            const asyncResults = await Promise.all([
+                hostsPage.assertVisibilityHostsLogsTabStream()
+                ]);
+            writeFileReport(testStartTime, testInfo, asyncResults);
+        } else {
+            throw new Error('Test failed because no logs found.');
+        };
     });
 });
