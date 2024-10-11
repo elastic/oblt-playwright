@@ -9,7 +9,7 @@ export default class OnboardingPage {
 
     private readonly useCaseLogs = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-logs"]//input[@type="radio"]');
     private readonly useCaseInfra = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-infra"]//input[@type="radio"]');
-    private readonly logsAutoDetect = () => this.page.locator('xpath=//button[contains(text(), "Auto-detect logs and metrics")]');
+    private readonly logsAutoDetect = () => this.page.locator('xpath=//button[contains(text(), "Stream host system logs")]');
     private readonly kubernetes = () => this.page.locator('xpath=//button[contains(text(), "Kubernetes")]');
     public readonly contentNotLoaded = () => this.page.locator('xpath=//h2[contains(text(),"Unable to load content")]');
     private readonly retryButton = () => this.page.getByTestId('observabilityOnboardingAutoDetectPanelGoBackButton');
