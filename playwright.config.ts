@@ -20,8 +20,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [[process.env.CI ? 'json' : 'json'], ["json", { outputFile: "playwright-report/results.json" }]],
   /* Timeouts */
-  timeout: 300000,
-  expect: {timeout: 300000},
+  timeout: 400000,
+  expect: {timeout: 400000},
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {

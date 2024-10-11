@@ -17,11 +17,11 @@ export default class LandingPage {
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
     private readonly applications = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm');
-    private readonly services = () => this.page.getByRole('link', { name: 'Services' });
+    private readonly services = () => this.page.getByRole('link', { name: 'Service Inventory' });
     private readonly traces = () => this.page.getByRole('link', { name: 'Traces' });
     private readonly dependencies = () => this.page.getByRole('link', { name: 'Dependencies' });
     private readonly infrastructure = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.metrics');
-    private readonly inventory = () => this.page.locator('xpath=//*[contains(text(),"Inventory")]');
+    private readonly inventory = () => this.page.locator('xpath=//*[contains(text(),"Infrastructure Inventory")]');
     private readonly hosts = () => this.page.getByRole('link', { name: 'Hosts' });
     private readonly projectSettings = () => this.page.locator('xpath=//button[@aria-controls="project_settings_project_nav"][2]');
     private readonly projectManagement = () => this.page.locator('xpath=//span[contains(text(),"Management")]');

@@ -50,7 +50,6 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
     await observabilityPage.clickServices();
     await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
-    await page.waitForLoadState('networkidle');
   });
   
   await test.step('step02', async () => {
@@ -59,16 +58,17 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
     await servicesPage.assertVisibilityVisualization(throughput);
     await servicesPage.selectMostImpactfulTransaction();
     await servicesPage.assertVisibilityVisualization(throughput);
+    if (servicesPage.errorFetchingResource()) {
+      throw new Error('Test is failed due to an error when loading data.');
+    }
   });
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "Failed transaction correlations" tab. Filters the result by a particular field value.`);
     await servicesPage.openFailedTransactionCorrelationsTab();
-    await page.waitForLoadState('networkidle');
     await servicesPage.assertVisibilityCorrelationButton();
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
-    await page.waitForLoadState('networkidle');
   });
   
   await test.step('step04', async () => {
@@ -82,11 +82,9 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
   await test.step('step05', async () => {
     console.log(`\n[${testInfo.title}] Step 05 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
     await datePicker.setPeriod();
-    await page.waitForLoadState('networkidle');
     await logsExplorerPage.filterLogsByError();
     await logsExplorerPage.assertVisibilityDataGridRow();
     await logsExplorerPage.expandLogsDataGridRow();
-    await page.waitForLoadState('networkidle');
   });
 });
 
@@ -94,17 +92,13 @@ test('APM - Traces', async ({ datePicker, observabilityPage, page, servicesPage,
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces.`);
     await observabilityPage.clickTraces();
-    await page.waitForLoadState('networkidle');
   });
   
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
     await tracesPage.openExplorerTab();
-    await page.waitForLoadState('networkidle');
     await datePicker.setPeriod();
-    await page.waitForLoadState('networkidle');
-    await tracesPage.filterBy('http.response.status_code : 502');
-    await page.waitForLoadState('networkidle');
+    await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
   });
   
   await test.step('step03', async () => {
@@ -124,21 +118,35 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected date picker option.`);
     await datePicker.setPeriod();
-    await page.waitForLoadState('networkidle');
   });
 
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Selects the dependency, then navigates to the "Operations" tab.`);
-    await dependenciesPage.clickTableRow();
-    await dependenciesPage.assertVisibilityTable();
-    await dependenciesPage.openOperationsTab();
-    await dependenciesPage.assertVisibilityTable();
+    const [ index ] = await waitForOneOf([
+      dependenciesPage.dependencyTableLoaded(),
+      dependenciesPage.dependencyTableNotLoaded()
+      ]);
+    const tableLoaded = index === 0;
+    if (tableLoaded) {
+      await dependenciesPage.clickTableRow();
+      await dependenciesPage.assertVisibilityTable();
+      await dependenciesPage.openOperationsTab();
+      await dependenciesPage.assertVisibilityTable();
+    } else {
+      console.log('Dependencies table not loaded.');
+      throw new Error('Test is failed due to an error when loading dependencies table.');
+    }
   });
 
   await test.step('step04', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Clicks on the most impactful operation.`);
     await dependenciesPage.clickTableRow();
-    await dependenciesPage.assertVisibilityTimelineTransaction();
+    await Promise.race([
+      dependenciesPage.assertVisibilityTimelineTransaction(),
+      dependenciesPage.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
   });
 
   await test.step('step05', async () => {

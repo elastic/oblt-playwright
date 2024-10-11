@@ -9,6 +9,7 @@ export default class DashboardPage {
 
     private readonly dashboardHeading = () => this.page.locator('xpath=//*[@id="dashboardListingHeading"]');
     private readonly dashboardTable = () => this.page.locator('xpath=//tbody[@class="css-0"]');
+    private readonly searchBox = () => this.page.getByTestId('tableListSearchBox');
     private readonly tags = () => this.page.locator('xpath=//span[@data-text="Tags"]');
     private readonly tagKubernetes = () => this.page.getByTestId('tag-searchbar-option-Kubernetes');
     private readonly visualizationOptions = () => this.page.getByTestId('embeddablePanelToggleMenuIcon');
@@ -18,6 +19,7 @@ export default class DashboardPage {
     private readonly inspectorRequestDetail = () => this.page.getByTestId('inspectorRequestDetailRequest');
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
+    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
 
     public async assertVisibilityHeading() {
         await expect(this.dashboardHeading()).toBeVisible();
@@ -25,6 +27,11 @@ export default class DashboardPage {
 
     public async assertVisibilityTable() {
         await expect(this.dashboardTable()).toBeVisible();
+        }
+
+    public async searchDashboard(input: string) {
+        await this.searchBox().click();
+        await this.searchBox().fill(input);
         }
 
     public async clickTags() {
@@ -72,7 +79,15 @@ export default class DashboardPage {
         await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be visible').toBeVisible();
         }
 
+    public async assertEmbeddedError(title: string) {
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//div[@class="lnsEmbeddedError"]`), 'Error while loading visualization').toBeVisible();
+        }
+
     public async kubernetesVisualizationOptions(title: string) {
         await this.page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
+        }
+
+    public async assertLoadingIndicator() {
+        await expect(this.loadingIndicator()).toBeHidden();
         }
 }

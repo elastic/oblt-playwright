@@ -8,6 +8,8 @@ export default class InventoryPage {
     }
     
     private readonly dismiss = () => this.page.locator('xpath=//span[contains(text(),"Dismiss")]');
+    private readonly metricDropdown = () => this.page.getByTestId('infraInventoryMetricDropdown');
+    private readonly metricMemoryUsage = () => this.page.locator('xpath=//div[@data-test-subj="infraInventoryMetricsContextMenu"]//span[contains(text(), "Memory usage")]');
     private readonly sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
     private readonly sortWaffleByValue = () => this.page.getByTestId('waffleSortByValue');
     private readonly nodesWaffleMap = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]');
@@ -39,6 +41,11 @@ export default class InventoryPage {
     public async sortByMetricValue() {
         await this.sortWaffleByDropdown().click();
         await this.sortWaffleByValue().click();
+        }
+
+    public async memoryUsage() {
+        await this.metricDropdown().click();
+        await this.metricMemoryUsage().click();
         }
 
     public async switchInventoryToPodsView() {

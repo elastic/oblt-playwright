@@ -17,7 +17,7 @@ test.beforeEach(async ({ landingPage, logsExplorerPage, page }) => {
   await logsExplorerPage.clickLogsExplorerTab();
 });
 
-test.skip('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsExplorerPage}) => {
+test('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsExplorerPage}) => {
   await test.step('step01', async () => {
     await logsExplorerPage.filterByKubernetesContainer();
     await logsExplorerPage.assertVisibilityCanvas();
@@ -80,6 +80,5 @@ test('Logs Explorer - Patterns', async ({datePicker, logsExplorerPage}) => {
         console.log('Patterns not loaded.');
         throw new Error('Test is failed due to an error when loading categories.');
       }
-    
   });
 });
