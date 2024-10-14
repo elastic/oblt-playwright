@@ -44,22 +44,22 @@ export default class DatePicker {
     /*
     Use this function to set a fixed time window. 
     */
-    public async setPeriod(from: string = process.env.START_DATE, to: string = process.env.END_DATE) {
-        await this.showDatesButton().click();
-        await this.absoluteTabStartDate().click();
-        await this.dateInput().fill(from);
-        await this.page.keyboard.press('Enter');
-        await this.nowButton().click();
-        await this.absoluteTabEndDate().click();
-        await this.dateInput().fill(to);
-        await this.page.keyboard.press('Enter');
-        await this.refreshQuery().click();
-    }
-
-    // public async setPeriod() {
-    //     await this.clickDatePicker();
-    //     await this.fillTimeValue(process.env.TIME_VALUE);
-    //     await this.selectTimeUnit(process.env.TIME_UNIT);
-    //     await this.clickApplyButton();
+    // public async setPeriod(from: string = process.env.START_DATE, to: string = process.env.END_DATE) {
+    //     await this.showDatesButton().click();
+    //     await this.absoluteTabStartDate().click();
+    //     await this.dateInput().fill(from);
+    //     await this.page.keyboard.press('Enter');
+    //     await this.nowButton().click();
+    //     await this.absoluteTabEndDate().click();
+    //     await this.dateInput().fill(to);
+    //     await this.page.keyboard.press('Enter');
+    //     await this.refreshQuery().click();
     // }
+
+    public async setPeriod() {
+        await this.clickDatePicker();
+        await this.fillTimeValue(process.env.TIME_VALUE);
+        await this.selectTimeUnit(process.env.TIME_UNIT);
+        await this.clickApplyButton();
+    }
 }

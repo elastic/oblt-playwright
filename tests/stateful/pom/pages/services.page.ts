@@ -7,8 +7,10 @@ export default class ServicesPage {
         this.page = page;
     }
 
+    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
     private readonly opbeansGo = () => this.page.locator('xpath=//span[contains(text(),"opbeans-go")]');
     private readonly servicesTransactionsTab = () => this.page.getByTestId('transactionsTab');
+    private readonly transactionErrorsNotFound = () => this.page.locator('xpath=//div[@data-test-subj="topErrorsForTransactionTable"]//*[text()="No errors found for this transaction group"]');
     private readonly mostImpactfulTransaction = () => this.page.locator('xpath=//div[@data-test-subj="transactionsGroupTable"]//tbody[@class="css-0"]//tr[1]//a[1]');
     private readonly failedTransactionCorrelationsTab = () => this.page.getByRole('tab', { name: 'Failed transaction correlations' });
     private readonly filterByCorrelationValueButton = () => this.page.locator('xpath=//div[@data-test-subj="apmCorrelationsTable"]//tbody[@class="css-0"]//tr[1]//td[4]//span[1]//button[1]');
@@ -27,8 +29,16 @@ export default class ServicesPage {
         await this.opbeansGo().click();
         }
 
+    public async assertVisibilityTransactionsTab() {
+        await expect(this.servicesTransactionsTab(), 'Transactions tab visualization should be visible').toBeVisible();
+        }
+
     public async openTransactionsTab() {
         await this.servicesTransactionsTab().click();
+        }
+
+    public async assertTransactionErrorsNotFound() {
+        await expect(this.transactionErrorsNotFound(), 'Transaction errors not found').toBeVisible();
         }
 
     public async selectMostImpactfulTransaction() {
@@ -36,7 +46,10 @@ export default class ServicesPage {
         }
 
     public async assertVisibilityVisualization(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+        Promise.all([
+            await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible(),
+            await expect(this.loadingIndicator(), 'Loading indicator should not be visible').not.toBeVisible()
+            ]);
         }
         
     public async openFailedTransactionCorrelationsTab() {
@@ -65,5 +78,9 @@ export default class ServicesPage {
 
     public async assertVisibilityErrorDistributionChart() {
         await expect(this.errorDistributionChart()).toBeVisible();
+        }
+
+    public async assertErrorFetchingResource() {
+        await expect(this.errorFetchingResource(), 'Error while fetching resource').toBeVisible();
         }
 }

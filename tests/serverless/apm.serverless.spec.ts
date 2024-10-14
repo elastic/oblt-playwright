@@ -44,15 +44,19 @@ test.afterEach(async ({}, testInfo) => {
 
 test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servicesPage }, testInfo) => {
   const throughput = "throughput";
+  const errorRate = "errorRate";
 
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Filters data by selected date picker option. Selects opbeans-go.`);
     await landingPage.clickServices();
     await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
-    if (servicesPage.errorFetchingResource()) {
-      throw new Error('Test is failed due to an error when loading data.');
-    }
+    await Promise.race([
+      servicesPage.assertVisibilityTransactionsTab(),
+      servicesPage.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
   });
   
   await test.step('step02', async () => {
@@ -60,6 +64,12 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servi
     await servicesPage.openTransactionsTab();
     await servicesPage.assertVisibilityVisualization(throughput);
     await servicesPage.selectMostImpactfulTransaction();
+    await Promise.race([
+      servicesPage.assertVisibilityVisualization(errorRate),
+      servicesPage.assertTransactionErrorsNotFound().then(() => {
+        throw new Error('Test is failed because transaction errors not found.');
+      })
+    ]);
   });
   
   await test.step('step03', async () => {
@@ -128,7 +138,12 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
         await dependenciesPage.clickTableRow();
         await dependenciesPage.assertVisibilityTable();
         await dependenciesPage.openOperationsTab();
-        await dependenciesPage.assertVisibilityTable();
+        await Promise.race([
+          dependenciesPage.assertVisibilityTable(),
+          dependenciesPage.assertOperationsNotFound().then(() => {
+            throw new Error('Test is failed because dependency operations not found');
+          })
+        ]);
       } else {
         console.log('Dependencies table not loaded.');
         throw new Error('Test is failed due to an error when loading dependencies table.');
