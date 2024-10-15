@@ -23,7 +23,6 @@ function writeFileReport(testStartTime, testInfo, asyncResults) {
         cluster_name: cluster_name,
         cluster_uuid: cluster_uuid,
         version: versionNumber,
-        build_hash: build_hash,
         date: testStartTime,
         time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
         measurements: resultsObj
@@ -101,7 +100,6 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "hostsView-metricChart-cpuUsage";
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
-    let asyncResults;
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
@@ -109,8 +107,8 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
         await landingPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
-        await Promise.race([
-            asyncResults = Promise.all([
+        const asyncResults = await Promise.race([
+            Promise.all([
                 hostsPage.assertHostsNumber(),
                 hostsPage.assertVisibilityHostsTable(),
                 hostsPage.assertVisibilityVisualization(cpuUsageKPI),
@@ -131,14 +129,13 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
 test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, landingPage }, testInfo) => {    
     await test.step('step01', async () => {
         const testStartTime = Date.now();
-        let asyncResults;
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await landingPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await hostsPage.clickLogsTab();
-        await Promise.race([
-            asyncResults = Promise.all([
+        const asyncResults = await Promise.race([
+            Promise.all([
                 hostsPage.assertVisibilityLogStream()
                 ]),
             hostsPage.assertVisibilityNoLogs().then(() => {
@@ -157,11 +154,15 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, landingPag
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await hostsPage.clickAlertsTab();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityAlertsChart(),
-            hostsPage.assertVisibilityAlertsTable()
-            ]);
+        const asyncResults = await Promise.race([
+            Promise.all([
+                hostsPage.assertVisibilityAlertsChart(),
+                hostsPage.assertVisibilityAlertsTable()
+                ]),
+            hostsPage.assertNoResultsMatchMessage().then(() => {
+                throw new Error('Test is failed because no alerts found.');
+            })
+        ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });

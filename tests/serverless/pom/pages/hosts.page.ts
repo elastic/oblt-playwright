@@ -7,6 +7,7 @@ export default class HostsPage {
         this.page = page;
     }
 
+    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
     private readonly hostsNumber = () => this.page.locator('xpath=//div[@data-test-subj="hostsViewKPI-hostsCount"]//p[@class="echMetricText__value"]');
     private readonly hostsTable = () => this.page.getByTestId('hostsView-table-loaded');
     private readonly hostsTableNoData = () => this.page.getByTestId('hostsViewTableNoData');
@@ -16,6 +17,7 @@ export default class HostsPage {
     private readonly alertsTab = () => this.page.getByTestId('hostsView-tabs-alerts');
     private readonly alertsChart = () => this.page.locator('xpath=//div[@data-test-subj="alertSummaryWidgetFullSizeChartContainer"]//div[contains(@class, "echChartContent")]');
     private readonly alertsTable = () => this.page.getByTestId('alertsTable');
+    private readonly noResultsMatchMessage = () => this.page.locator('xpath=//*[text()="No results match your search criteria"]');
     private readonly hostsMetadataTab = () => this.page.getByTestId('infraAssetDetailsMetadataTab');
     private readonly hostsMetadataTable = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsMetadataTable"]//tbody[@class="css-0"]');
     private readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
@@ -115,6 +117,13 @@ export default class HostsPage {
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {"Alerts table": elapsedTime};
         return result;
+        }
+
+    public async assertNoResultsMatchMessage() {
+        Promise.all([
+            await expect(this.noResultsMatchMessage(), 'Alerts table should be visible').toBeVisible(),
+            await expect(this.loadingIndicator(), 'Loading indicator should not be visible').not.toBeVisible()
+            ]);
         }
 
     public async assertVisibilityHostsMetadataTable() {
