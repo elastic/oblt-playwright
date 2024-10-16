@@ -9,7 +9,6 @@ const path = require('path');
 let versionNumber: string;
 let cluster_name: string;
 let cluster_uuid: string;
-let build_hash: string;
 
 function writeFileReport(testStartTime, testInfo, asyncResults) {
     const resultsObj = asyncResults.reduce((acc, obj) => {
@@ -44,7 +43,6 @@ test.beforeAll('Check data', async ({ request }) => {
     versionNumber = jsonDataCluster.version.number;
     cluster_name = jsonDataCluster.cluster_name;
     cluster_uuid = jsonDataCluster.cluster_uuid;
-    build_hash = jsonDataCluster.version.build_hash;
 
     console.log(`... checking node data.`);
     const currentTime = Date.now();
@@ -93,7 +91,7 @@ test.beforeEach(async ({ landingPage, page }) => {
     await landingPage.clickInfrastructure();
 });
 
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, landingPage }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -107,6 +105,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
         await landingPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
+        await page.evaluate("document.body.style.zoom=0.9");
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertHostsNumber(),
@@ -118,9 +117,21 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
                 hostsPage.assertVisibilityVisualization(cpuUsage), 
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
+            hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
             hostsPage.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
-            }),
+            })
         ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
@@ -172,7 +183,7 @@ All the individual host tests are not the best fit for the performance compariso
 It would only be suitable in case when hosts in all the environments being compared have collected data within the selected time period. 
 */
 
-test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, landingPage }, testInfo) => {
+test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";``
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -183,7 +194,34 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, l
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
         await landingPage.clickHosts();
-        await hostsPage.assertVisibilityHostsTable(),
+        await page.evaluate("document.body.style.zoom=0.9");
+        await Promise.race([
+            Promise.all([
+                hostsPage.assertHostsNumber(),
+                hostsPage.assertVisibilityHostsTable(),
+                hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+                hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+                hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+                hostsPage.assertVisibilityVisualization(diskUsageKPI),
+                hostsPage.assertVisibilityVisualization(cpuUsage), 
+                hostsPage.assertVisibilityVisualization(normalizedLoad),
+                ]),
+            hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed because Hosts data failed to load.');
+            })
+        ]);
         await hostsPage.clickTableCellHosts();
     });
 
@@ -191,14 +229,18 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, l
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityVisualization(cpuUsageKPI),
-            hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
-            hostsPage.assertVisibilityVisualization(memoryUsageKPI),
-            hostsPage.assertVisibilityVisualization(diskUsageKPI),
-            hostsPage.assertVisibilityVisualization(cpuUsage), 
-            hostsPage.assertVisibilityVisualization(normalizedLoad),
+        const asyncResults = await Promise.race([
+            Promise.all([
+                hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+                hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+                hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+                hostsPage.assertVisibilityVisualization(diskUsageKPI),
+                hostsPage.assertVisibilityVisualization(cpuUsage), 
+                hostsPage.assertVisibilityVisualization(normalizedLoad),
+                ]),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed due to an error when loading data.');
+                })
             ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
@@ -218,7 +260,6 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, l
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         await page.reload();
-
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityHostsMetadataTable()
             ]);
@@ -226,7 +267,11 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, l
     });
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, landingPage }, testInfo) => {
+test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
+    const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
+    const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
+    const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
+    const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const cpuUsageBreakdown = "infraAssetDetailsMetricChartcpuUsageBreakdown";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
@@ -237,7 +282,34 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, la
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
         await landingPage.clickHosts();
-        await hostsPage.assertVisibilityHostsTable(),
+        await page.evaluate("document.body.style.zoom=0.9");
+        await Promise.race([
+            Promise.all([
+                hostsPage.assertHostsNumber(),
+                hostsPage.assertVisibilityHostsTable(),
+                hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+                hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+                hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+                hostsPage.assertVisibilityVisualization(diskUsageKPI),
+                hostsPage.assertVisibilityVisualization(cpuUsage), 
+                hostsPage.assertVisibilityVisualization(normalizedLoad),
+                ]),
+            hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+            }),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed because Hosts data failed to load.');
+            })
+        ]);
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsMetricsTab();
     });
@@ -246,14 +318,18 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, la
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
-            hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsageBreakdown),
-            hostsPage.assertVisibilityVisualizationMetricsTab(normalizedLoad),
-            hostsPage.assertVisibilityVisualizationMetricsTab(loadBreakdown),
-            hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
-            hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
+        const asyncResults = await Promise.race([
+            Promise.all([
+                hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
+                hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsageBreakdown),
+                hostsPage.assertVisibilityVisualizationMetricsTab(normalizedLoad),
+                hostsPage.assertVisibilityVisualizationMetricsTab(loadBreakdown),
+                hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
+                hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
+                ]),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed due to an error when loading data.');
+                })
             ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
@@ -273,10 +349,17 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         await page.reload();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityHostsProcessesTable()
-            ]);
+        const asyncResults = await Promise.race([
+            Promise.all([
+                hostsPage.assertVisibilityHostsProcessesTable()
+            ]),
+            hostsPage.assertProcessesNotFound().then(() => {
+                throw new Error('Test failed because no processes found.');
+            }),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed due to an error when loading data.');
+              })
+          ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
@@ -294,10 +377,17 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, landi
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
-
-        const asyncResults = await Promise.all([
-            hostsPage.assertVisibilityHostsLogsTabStream()
-            ]);
+        const asyncResults = await Promise.race([
+            Promise.all([
+                hostsPage.assertVisibilityHostsLogsTabStream()
+            ]),
+            hostsPage.assertLogsNotFound().then(() => {
+                throw new Error('Test failed because no logs found.');
+            }),
+            hostsPage.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed due to an error when loading data.');
+              })
+          ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });

@@ -57,4 +57,11 @@ export default class DatePicker {
         await this.selectTimeUnit(process.env.TIME_UNIT);
         await this.clickApplyButton();
     }
+
+    public async setPeriodProfiling() {
+        await this.clickDatePickerHostsProfiling();
+        await this.fillTimeValue(process.env.TIME_VALUE);
+        await this.selectTimeUnit(process.env.TIME_UNIT);
+        await this.clickApplyButton();
+    }
 }

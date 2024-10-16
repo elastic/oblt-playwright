@@ -147,6 +147,10 @@ export default class HostsPage {
         return result;
         }
 
+    public async assertProcessesNotFound() {
+        await expect(this.hostsProcessesNotFound(), 'Processes not found').toBeVisible();
+        }
+
     public async assertVisibilityVisualization(title: string) {
         const startTime = performance.now();
         Promise.all([
@@ -160,7 +164,7 @@ export default class HostsPage {
         return result;
         }
 
-    public async assertVisibilityVisualizationNoData(title: string) {
+    public async assertVisualizationNoData(title: string) {
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]//p[@class="echMetricText__value"][@title="N/A"]`), `"${title}" visualization shows no data`).toBeVisible()
         }
 
@@ -179,13 +183,16 @@ export default class HostsPage {
     public async assertVisibilityHostsLogsTabStream() {
         const startTime = performance.now();
         await Promise.all([
-            expect(this.hostsLogsTabStream(), 'Log stream should be visible').toBeVisible(),
-            expect(this.logStreamNoMessages(), '"There are no log messages to display." message should be hidden').not.toBeVisible()
+            expect(this.hostsLogsTabStream(), 'Log stream should be visible').toBeVisible()
             ]);
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {"Log stream": elapsedTime};
         return result;
+        }
+
+    public async assertLogsNotFound() {
+        await expect(this.logStreamNoMessages(), 'Logs not found').toBeVisible();
         }
 
     public async assertErrorFetchingResource() {

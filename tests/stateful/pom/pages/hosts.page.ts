@@ -13,7 +13,7 @@ export default class HostsPage {
     private readonly hostsTableNoData = () => this.page.getByTestId('hostsViewTableNoData');
     private readonly logsTab = () => this.page.getByTestId('hostsView-tabs-logs');
     private readonly logStream = () => this.page.getByTestId('logStream');
-    public readonly logStreamNoMessages = () => this.page.locator('xpath=//h2[contains(text(),"There are no log messages to display.")]');
+    private readonly logStreamNoMessages = () => this.page.locator('xpath=//h2[contains(text(),"There are no log messages to display.")]');
     private readonly alertsTab = () => this.page.getByTestId('hostsView-tabs-alerts');
     private readonly alertsChart = () => this.page.locator('xpath=//div[@data-test-subj="alertSummaryWidgetFullSizeChartContainer"]//div[contains(@class, "echChartContent")]');
     private readonly alertsTable = () => this.page.getByTestId('alertsTable');
@@ -22,10 +22,10 @@ export default class HostsPage {
     private readonly hostsMetadataTable = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsMetadataTable"]//tbody[@class="css-0"]');
     public readonly hostsMetricsTab = () => this.page.getByTestId('infraAssetDetailsMetricsTab');
     private readonly hostsProcessesTab = () => this.page.getByTestId('infraAssetDetailsProcessesTab');
-    public readonly hostsProcessesNotFound = () => this.page.locator('xpath=//strong[contains(text(),"No processes found")]');
+    private readonly hostsProcessesNotFound = () => this.page.locator('xpath=//strong[contains(text(),"No processes found")]');
     private readonly hostsProcessesTabTable = () => this.page.locator('xpath=//table[@data-test-subj="infraAssetDetailsProcessesTable"]');
     public readonly hostsProfilingTab = () => this.page.getByTestId('infraAssetDetailsProfilingTab');
-    public readonly hostsAddProfilingButton = () => this.page.getByTestId('infraProfilingEmptyStateAddProfilingButton');
+    private readonly hostsAddProfilingButton = () => this.page.getByTestId('infraProfilingEmptyStateAddProfilingButton');
     private readonly profilingTabFlamegraph = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsProfilingTabContent"]//div[contains(@class, "echChartContent")]');
     private readonly profilingTabFlamegraphProgressBar = () => this.page.locator('xpath=//div[@aria-labelledby="flamegraph"]//span[@role="progressbar"]');
     private readonly hostsLogsTab = () => this.page.getByTestId('infraAssetDetailsLogsTab');
@@ -155,6 +155,10 @@ export default class HostsPage {
         return result;
         }
 
+    public async assertProcessesNotFound() {
+        await expect(this.hostsProcessesNotFound(), 'Processes not found').toBeVisible();
+        }
+
     public async assertVisibilityVisualization(title: string) {
         const startTime = performance.now();
         Promise.all([
@@ -168,7 +172,7 @@ export default class HostsPage {
         return result;
         }
 
-    public async assertVisibilityVisualizationNoData(title: string) {
+    public async assertVisualizationNoData(title: string) {
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]//p[@class="echMetricText__value"][@title="N/A"]`), `"${title}" visualization shows no data`).toBeVisible()
         }
 
@@ -196,16 +200,23 @@ export default class HostsPage {
         return result;
         }
 
+    public async assertAddProfilingButton() {
+        await expect(this.hostsAddProfilingButton(), '"Add Profiling" button').toBeVisible();
+        }
+
     public async assertVisibilityHostsLogsTabStream() {
         const startTime = performance.now();
         await Promise.all([
-            expect(this.hostsLogsTabStream(), 'Log stream should be visible').toBeVisible(),
-            //expect(this.logStreamNoMessages(), '"There are no log messages to display." message should be hidden').not.toBeVisible()
+            expect(this.hostsLogsTabStream(), 'Log stream should be visible').toBeVisible()
             ]);
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {"Log stream": elapsedTime};
         return result;
+        }
+
+    public async assertLogsNotFound() {
+        await expect(this.logStreamNoMessages(), 'Logs not found').toBeVisible();
         }
 
     public async assertErrorFetchingResource() {
