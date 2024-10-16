@@ -17,7 +17,7 @@ test.beforeEach(async ({ landingPage, page }) => {
   await page.goto('/app/management/data/data_quality');
 });
 
-test('Logs Explorer - Datasets', async ({ datasetsPage }) => { 
+test('Data Set Quality', async ({ datasetsPage }) => { 
     await test.step('pageContentLoading', async () => {
         await datasetsPage.assertVisibilityQualityStatistics();
         await datasetsPage.assertVisibilityStatistics();
