@@ -26,6 +26,7 @@ export default class InventoryPage {
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutInfraAssetDetailsCloseButton = () => this.page.locator('xpath=//div[@data-component-name="infraAssetDetailsFlyout"]//button[@data-test-subj="euiFlyoutCloseButton"]');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
+    private readonly noDataToDisplay = () => this.page.locator('xpath=//*[text()="There is no data to display."]');
 
     public async clickDismiss() {
         await this.dismiss().click();
@@ -44,6 +45,10 @@ export default class InventoryPage {
     public async switchInventoryToPodsView() {
         await this.inventorySwitcher().click();
         await this.inventorySwitcherPods().click();
+        }
+
+    public async assertWaffleMap() {
+        await expect(this.nodesWaffleMap(), 'Waffle map').toBeVisible();
         }
 
     public async clickNodeWaffleContainer() {
@@ -102,5 +107,9 @@ export default class InventoryPage {
 
     public async assertVisibilityPodVisualization(title: string) {
         await expect(this.page.locator(`xpath=//div[@id="${title}"]//div[@class="echChartContent"]`), `"${title}" visualization should be rendered`).toBeVisible();
+        }
+
+    public async assertNoData() {
+        await expect(this.noDataToDisplay(), 'There is no data to display').toBeVisible();
         }
 }
