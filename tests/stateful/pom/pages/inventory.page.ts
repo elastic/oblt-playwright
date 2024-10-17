@@ -33,6 +33,7 @@ export default class InventoryPage {
     private readonly infraSearchField = () => this.page.locator('xpath=//input[@data-test-subj="infraSearchField"]');
     private readonly pressEnter = () => this.page.keyboard.press('Enter');
     private readonly arrowDown = () => this.page.keyboard.press('ArrowDown');
+    private readonly noDataToDisplay = () => this.page.locator('xpath=//*[text()="There is no data to display."]');
 
     public async clickDismiss() {
         await this.dismiss().click();
@@ -51,6 +52,10 @@ export default class InventoryPage {
     public async switchInventoryToPodsView() {
         await this.inventorySwitcher().click();
         await this.inventorySwitcherPods().click();
+        }
+
+    public async assertWaffleMap() {
+        await expect(this.nodesWaffleMap(), 'Waffle map').toBeVisible();
         }
 
     public async clickNodeWaffleContainer() {
@@ -141,5 +146,9 @@ export default class InventoryPage {
         await this.infraSearchField().click();
         await this.infraSearchField().fill('kube-system');
         await this.pressEnter();
+        }
+
+    public async assertNoData() {
+        await expect(this.noDataToDisplay(), 'There is no data to display').toBeVisible();
         }
 }

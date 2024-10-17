@@ -85,12 +85,18 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
         dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
           ]),
         dashboardPage.assertEmbeddedError(coresUsedVsTotal).then(() => {
-            throw new Error('Test is failed due to an error when loading visualization.');
-        }),
+          throw new Error('Test is failed due to an error when loading visualization.');
+          }),
         dashboardPage.assertEmbeddedError(topMemoryIntensivePods).then(() => {
           throw new Error('Test is failed due to an error when loading visualization.');
-      })
-    ]);
+          }),
+        dashboardPage.assertNoData(coresUsedVsTotal).then(() => {
+          throw new Error('Test is failed because no results found.');
+          }),
+        dashboardPage.assertNoData(topMemoryIntensivePods).then(() => {
+          throw new Error('Test is failed because no results found.');
+          })
+      ]);
   });
 });
 
@@ -103,6 +109,12 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, landingPa
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Inventory.`);
     await landingPage.clickInventory();
+    await Promise.race([
+      inventoryPage.assertWaffleMap(),
+      inventoryPage.assertNoData().then(() => {
+        throw new Error('Test is failed because there is no data to display');
+        })
+      ]);
   });
 
   await test.step('step02', async () => {
@@ -126,6 +138,12 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, landingPa
     console.log(`\n[${testInfo.title}] Step 04 - Returns back to Observability > Infrastructure > Inventory. Selects "Pods" as "Show" option.`);
     await inventoryPage.closeInfraAssetDetailsFlyout();
     await inventoryPage.switchInventoryToPodsView();
+    await Promise.race([
+      inventoryPage.assertWaffleMap(),
+      inventoryPage.assertNoData().then(() => {
+        throw new Error('Test is failed because there is no data to display');
+        })
+      ]);
   });
 
   await test.step('step05', async () => {

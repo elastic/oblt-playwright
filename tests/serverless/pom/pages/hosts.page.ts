@@ -153,11 +153,12 @@ export default class HostsPage {
 
     public async assertVisibilityVisualization(title: string) {
         const startTime = performance.now();
-        Promise.all([
+        await Promise.all([
             await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible(),
             await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"][@data-loading="true"]`), 'Data loading should be completed').not.toBeVisible(),
             await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "euiProgress")]`), 'Progress bar should not be visible').not.toBeVisible()
             ]);
+        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]//p[@class="echMetricText__value"][@title="N/A"]`), `"${title}" visualization shows no data`).not.toBeVisible();
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};
