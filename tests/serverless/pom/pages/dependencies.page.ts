@@ -16,7 +16,6 @@ export default class DependenciesPage {
     private readonly tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
     private readonly investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
     private readonly investigateViewInDiscoverButton = () => this.page.getByRole('link', { name: 'View transaction in Discover' });
-    public readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Error while fetching resource"]');
 
     public async clickTableRow() {
         await this.dependencyTableRow().click();
@@ -52,9 +51,5 @@ export default class DependenciesPage {
 
     public async clickTraceLogsButton() {
         await this.investigateViewInDiscoverButton().click();
-        }
-
-    public async assertErrorFetchingResource() {
-        await expect(this.errorFetchingResource(), 'Error while fetching resource').toBeVisible();
         }
 }

@@ -111,7 +111,6 @@ export default defineConfig({
         },
       },
       dependencies: ['stateful_auth'],
-      //teardown: 'stateful_teardown',
     },
     {
       name: 'serverless',
@@ -128,7 +127,6 @@ export default defineConfig({
         },
       },
       dependencies: ['serverless_auth'],
-      //teardown: 'serverless_teardown',
     },
     {
       name: 'api',

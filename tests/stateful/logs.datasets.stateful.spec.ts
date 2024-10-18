@@ -1,19 +1,9 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
-import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 
-test.beforeEach(async ({ landingPage, page }) => {
-  await landingPage.goto();
-
-  const [ index ] = await waitForOneOf([
-    page.locator('xpath=//a[@aria-label="Elastic home"]'),
-    landingPage.spaceSelector(),
-    ]);
-  const spaceSelector = index === 1;
-  if (spaceSelector) {
-      await page.locator('xpath=//a[contains(text(),"Default")]').click();
-      await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
-    };
+test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
+  await sideNav.goto();
+  await spaceSelectorStateful(headerBar, spaceSelector);
   await page.goto('/app/management/data/data_quality');
 });
 

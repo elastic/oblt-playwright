@@ -2,27 +2,33 @@ import { test as base } from "@playwright/test";
 import DashboardPage from "../../serverless/pom/pages/dashboard.page";
 import DatePicker from "../../serverless/pom/components/date_picker.component";
 import DependenciesPage from "../../serverless/pom/pages/dependencies.page";
+import HeaderBar from "../../serverless/pom/components/header_bar.component";
 import HostsPage from "../../serverless/pom/pages/hosts.page";
 import InventoryPage from "../../serverless/pom/pages/inventory.page";
-import LandingPage from "../../serverless/pom/pages/landing.page";
 import LogsExplorerPage from "../../serverless/pom/pages/logs_explorer.page";
 import ManagementPage from "../../serverless/pom/pages/management.page";
+import Notifications from "../../serverless/pom/components/notifications.component";
 import OnboardingPage from "../../serverless/pom/pages/onboarding.page";
 import ServicesPage from "../../serverless/pom/pages/services.page";
+import SideNav from "../../serverless/pom/components/side_nav.component";
+import { SpaceSelector } from "../../serverless/pom/components/space_selector.component";
 import TracesPage from "../../serverless/pom/pages/traces.page";
 
 
 export const test = base.extend<{
     dashboardPage: DashboardPage, 
     datePicker: DatePicker, 
-    dependenciesPage: DependenciesPage, 
+    dependenciesPage: DependenciesPage,
+    headerBar: HeaderBar,
     hostsPage: HostsPage, 
     inventoryPage: InventoryPage, 
-    landingPage: LandingPage, 
     logsExplorerPage: LogsExplorerPage, 
     managementPage: ManagementPage,
+    notifications: Notifications,
     onboardingPage: OnboardingPage,
-    servicesPage: ServicesPage, 
+    servicesPage: ServicesPage,
+    sideNav: SideNav, 
+    spaceSelector: SpaceSelector,
     tracesPage: TracesPage
     }>
     ({
@@ -38,16 +44,16 @@ export const test = base.extend<{
             await use(new DependenciesPage(page));
         },
 
+        headerBar: async({page}, use) => {
+            await use(new HeaderBar(page));
+        },
+
         hostsPage: async({page}, use) => {
             await use(new HostsPage(page));
         },
         
         inventoryPage: async({page}, use) => {
             await use(new InventoryPage(page));
-        },
-        
-        landingPage: async({page}, use) => {
-            await use(new LandingPage(page));
         },
 
         logsExplorerPage: async({page}, use) => {
@@ -58,12 +64,24 @@ export const test = base.extend<{
             await use(new ManagementPage(page));
         },
 
+        notifications: async({page}, use) => {
+            await use(new Notifications(page));
+        },
+
         onboardingPage: async({page}, use) => {
             await use(new OnboardingPage(page));
         },
 
         servicesPage: async({page}, use) => {
             await use(new ServicesPage(page));
+        },
+
+        sideNav: async({page}, use) => {
+            await use(new SideNav(page));
+        },
+
+        spaceSelector: async({page}, use) => {
+            await use(new SpaceSelector(page));
         },
 
         tracesPage: async({page}, use) => {

@@ -19,7 +19,6 @@ export default class DashboardPage {
     private readonly inspectorRequestDetail = () => this.page.getByTestId('inspectorRequestDetailRequest');
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
-    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
 
     public async assertVisibilityHeading() {
         await expect(this.dashboardHeading()).toBeVisible();
@@ -89,9 +88,5 @@ export default class DashboardPage {
 
     public async kubernetesVisualizationOptions(title: string) {
         await this.page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
-        }
-
-    public async assertLoadingIndicator() {
-        await expect(this.loadingIndicator()).toBeHidden();
         }
 }

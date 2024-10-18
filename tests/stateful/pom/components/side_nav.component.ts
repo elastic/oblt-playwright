@@ -1,7 +1,6 @@
 import { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
 
-export default class LandingPage {
+export default class SideNav {
     page: Page;
 
     constructor(page: Page) {
@@ -12,7 +11,6 @@ export default class LandingPage {
         await this.page.goto('/');
     }
 
-    readonly spaceSelector = () => this.page.locator('xpath=//h1[contains(text(),"Select your space")]');
     private readonly toggleNavButton = () => this.page.getByTestId('toggleNavButton');
     private readonly homeLink = () => this.page.getByTestId('homeLink');
     private readonly discover = () => this.page.locator('xpath=//span[@title="Discover"]');
@@ -50,17 +48,17 @@ export default class LandingPage {
 
     public async clickAPM() {
         await this.apm().click();
-    }
+        }
 
     public async clickInfrastructure() {
         await this.infrastructure().click();
-    }
+        }
 
     public async clickStackManagement() {
         await this.stackManagement().click();
-    }
+        }
 
     public async clickObservabilitySolutionLink() {
         await this.observabilitySolutionLink().click();
-    }
+        }
 }

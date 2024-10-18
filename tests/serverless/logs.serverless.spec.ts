@@ -1,19 +1,10 @@
 import { test } from '../../tests/fixtures/serverless/basePage';
-import { expect } from '@playwright/test';
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 
-test.beforeEach(async ({ landingPage, logsExplorerPage, page }) => {
-  await landingPage.goto();
-  const [ index ] = await waitForOneOf([
-    page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
-    landingPage.spaceSelector(),
-    ]);
-  const spaceSelector = index === 1;
-  if (spaceSelector) {
-    await page.locator('xpath=//a[contains(text(),"Default")]').click();
-    await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
-    };
-  await landingPage.clickDiscover();
+test.beforeEach(async ({ logsExplorerPage, sideNav, spaceSelector }) => {
+  await sideNav.goto();
+  await spaceSelectorServerless(sideNav, spaceSelector);
+  await sideNav.clickDiscover();
   await logsExplorerPage.clickLogsExplorerTab();
 });
 
