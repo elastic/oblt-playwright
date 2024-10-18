@@ -1,6 +1,6 @@
 import { test } from '../fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorStateful } from "../../src/helpers.ts";
 
 const apiKey = process.env.API_KEY;
 const outputDirectory = process.env.HOSTS_DIR;
@@ -76,21 +76,13 @@ test.beforeAll('Check data', async ({ request }) => {
     }
 });
 
-test.beforeEach(async ({ landingPage, page }) => {
-    await landingPage.goto();
-    const [ index ] = await waitForOneOf([
-        page.locator('xpath=//a[@aria-label="Elastic home"]'),
-        landingPage.spaceSelector(),
-        ]);
-    const spaceSelector = index === 1;
-    if (spaceSelector) {
-        await page.locator('xpath=//a[contains(text(),"Default")]').click();
-        await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
-        };
-    await landingPage.clickObservabilitySolutionLink();
+test.beforeEach(async ({ headerBar. sideNav, spaceSelector }) => {
+    await sideNav.goto();
+    await spaceSelectorStateful(headerBar, spaceSelector);
+    await sideNav.clickObservabilitySolutionLink();
 });
 
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -128,7 +120,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, obse
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
             })
         ]);
@@ -182,7 +174,7 @@ All the individual host tests are not the best fit for the performance compariso
 It would only be suitable in case when hosts in all the environments being compared have collected data within the selected time period. 
 */
 
-test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
+test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -217,7 +209,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, o
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
             })
         ]);
@@ -237,7 +229,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, o
                 hostsPage.assertVisibilityVisualization(cpuUsage), 
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
                 })
             ]);
@@ -266,7 +258,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, o
     });
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
+test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -305,7 +297,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, ob
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
             })
         ]);
@@ -326,7 +318,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, ob
                 hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
                 hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
                 ]),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
                 })
             ]);
@@ -334,7 +326,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, ob
     });
 });
 
-test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
+test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Processes tab.`);
         await observabilityPage.clickHosts();
@@ -355,15 +347,15 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
             hostsPage.assertProcessesNotFound().then(() => {
                 throw new Error('Test failed because no processes found.');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
-              })
+            })
           ]);
         writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
 
-test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
+test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, notifications, observabilityPage }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
         await observabilityPage.clickHosts();
@@ -387,15 +379,15 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
             hostsPage.assertAddProfilingButton().then(() => {
                 throw new Error('Test failed because profiling is not set up.');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
-              })
+            })
           ]);
           writeFileReport(testStartTime, testInfo, asyncResults);
     });
 });
 
-test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, observabilityPage }, testInfo) => {
+test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, notifications, observabilityPage }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Logs tab.`);
         await observabilityPage.clickHosts();
@@ -415,7 +407,7 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, obser
             hostsPage.assertLogsNotFound().then(() => {
                 throw new Error('Test failed because no logs found.');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
               })
           ]);

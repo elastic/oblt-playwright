@@ -29,7 +29,6 @@ export default class HostsPage {
     private readonly hostsLimit500 = () => this.page.getByTestId('hostsViewLimitSelection500Button');
     private readonly hostsLogs = () => this.page.getByTestId('hostsView-tabs-logs');
     private readonly tableCellHosts = () => this.page.locator('xpath=//tbody//tr[1]//td//span[contains(@class, "euiTableCellContent__text")]');
-    private readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Error while fetching resource"]');
 
     public async clickTableCellHosts() {
         await this.tableCellHosts().click();
@@ -194,9 +193,5 @@ export default class HostsPage {
 
     public async assertLogsNotFound() {
         await expect(this.logStreamNoMessages(), 'Logs not found').toBeVisible();
-        }
-
-    public async assertErrorFetchingResource() {
-        await expect(this.errorFetchingResource(), 'Error while fetching resource').toBeVisible();
         }
 }

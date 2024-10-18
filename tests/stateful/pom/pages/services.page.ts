@@ -18,7 +18,6 @@ export default class ServicesPage {
     private readonly investigateButton = () => this.page.getByRole('button', { name: 'Investigate' });
     private readonly investigateHostLogsButton = () => this.page.getByRole('link', { name: 'Host logs' });
     private readonly errorDistributionChart = () => this.page.getByTestId('errorDistribution');
-    public readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Error while fetching resource"]');
 
     public async assertVisibilityServiceOpbeansGo() {
         const truthiness = await this.opbeansGo().isVisible({timeout: 10000});
@@ -78,9 +77,5 @@ export default class ServicesPage {
 
     public async assertVisibilityErrorDistributionChart() {
         await expect(this.errorDistributionChart()).toBeVisible();
-        }
-
-    public async assertErrorFetchingResource() {
-        await expect(this.errorFetchingResource(), 'Error while fetching resource').toBeVisible();
         }
 }

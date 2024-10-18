@@ -4,13 +4,16 @@ import DatasetsPage from "../../stateful/pom/pages/datasets.page";
 import DatePicker from "../../stateful/pom/components/date_picker.component";
 import DependenciesPage from "../../stateful/pom/pages/dependencies.page";
 import DiscoverPage from "../../stateful/pom/pages/discover.page";
+import HeaderBar from "../../stateful/pom/components/header_bar.component";
 import HostsPage from "../../stateful/pom/pages/hosts.page";
 import InventoryPage from "../../stateful/pom/pages/inventory.page";
-import LandingPage from "../../stateful/pom/pages/landing.page";
 import LogsExplorerPage from "../../stateful/pom/pages/logs_explorer.page";
+import Notifications from "../../stateful/pom/components/notifications.component";
 import ObservabilityPage from "../../stateful/pom/pages/observability.page";
 import OnboardingPage from "../../stateful/pom/pages/onboarding.page";
 import ServicesPage from "../../stateful/pom/pages/services.page";
+import SideNav from "../../stateful/pom/components/side_nav.component";
+import { SpaceSelector } from "../../stateful/pom/components/space_selector.component";
 import TracesPage from "../../stateful/pom/pages/traces.page";
 
 
@@ -20,13 +23,16 @@ export const test = base.extend<{
     datePicker: DatePicker, 
     dependenciesPage: DependenciesPage, 
     discoverPage: DiscoverPage,
+    headerBar: HeaderBar,
     hostsPage: HostsPage, 
     inventoryPage: InventoryPage, 
-    landingPage: LandingPage, 
-    logsExplorerPage: LogsExplorerPage, 
+    logsExplorerPage: LogsExplorerPage,
+    notifications: Notifications, 
     observabilityPage: ObservabilityPage,
     onboardingPage: OnboardingPage, 
-    servicesPage: ServicesPage, 
+    servicesPage: ServicesPage,
+    sideNav: SideNav, 
+    spaceSelector: SpaceSelector,
     tracesPage: TracesPage
     }>
     ({
@@ -50,6 +56,10 @@ export const test = base.extend<{
             await use(new DiscoverPage(page));
         },
 
+        headerBar: async({page}, use) => {
+            await use(new HeaderBar(page));
+        },
+
         hostsPage: async({page}, use) => {
             await use(new HostsPage(page));
         },
@@ -57,13 +67,13 @@ export const test = base.extend<{
         inventoryPage: async({page}, use) => {
             await use(new InventoryPage(page));
         },
-        
-        landingPage: async({page}, use) => {
-            await use(new LandingPage(page));
-        },
 
         logsExplorerPage: async({page}, use) => {
             await use(new LogsExplorerPage(page));
+        },
+
+        notifications: async({page}, use) => {
+            await use(new Notifications(page));
         },
 
         observabilityPage: async({page}, use) => {
@@ -76,6 +86,14 @@ export const test = base.extend<{
 
         servicesPage: async({page}, use) => {
             await use(new ServicesPage(page));
+        },
+
+        sideNav: async({page}, use) => {
+            await use(new SideNav(page));
+        },
+
+        spaceSelector: async({page}, use) => {
+            await use(new SpaceSelector(page));
         },
 
         tracesPage: async({page}, use) => {

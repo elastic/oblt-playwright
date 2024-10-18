@@ -19,7 +19,6 @@ export default class DashboardPage {
     private readonly inspectorRequestDetail = () => this.page.getByTestId('inspectorRequestDetailRequest');
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
-    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
 
     public async assertVisibilityHeading() {
         await expect(this.dashboardHeading()).toBeVisible();
@@ -99,9 +98,5 @@ export default class DashboardPage {
         await this.queryToClipboard();
         await this.logQuery(name);
         await this.closeFlyout();
-        }
-
-    public async assertLoadingIndicator() {
-        await expect(this.loadingIndicator()).toBeHidden();
         }
 }

@@ -1,6 +1,6 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check APM data', async ({request}) => {
@@ -23,18 +23,10 @@ test.beforeAll('Check APM data', async ({request}) => {
   };
 });
 
-test.beforeEach(async ({ landingPage, page }) => {
-  await landingPage.goto();
-  const [ index ] = await waitForOneOf([
-    page.locator('xpath=//a[@aria-label="Elastic home"]'),
-    landingPage.spaceSelector(),
-    ]);
-  const spaceSelector = index === 1;
-  if (spaceSelector) {
-      await page.locator('xpath=//a[contains(text(),"Default")]').click();
-      await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
-    };
-  await landingPage.clickObservabilitySolutionLink();
+test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
+  await sideNav.goto();
+  await spaceSelectorStateful(headerBar, spaceSelector);
+  await sideNav.clickObservabilitySolutionLink();
 });
 
 test.afterEach(async ({}, testInfo) => {
@@ -42,7 +34,7 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage, page, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, logsExplorerPage, notifications, observabilityPage, servicesPage }, testInfo) => {
   const throughput = "throughput";
   const errorRate = "errorRate";
 
@@ -53,7 +45,7 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
     await servicesPage.selectServiceOpbeansGo();
     await Promise.race([
       servicesPage.assertVisibilityTransactionsTab(),
-      servicesPage.assertErrorFetchingResource().then(() => {
+      notifications.assertErrorFetchingResource().then(() => {
         throw new Error('Test is failed due to an error when loading data.');
       })
     ]);
@@ -70,10 +62,6 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
         throw new Error('Test is failed because transaction errors not found.');
       })
     ]);
-    await servicesPage.assertVisibilityVisualization(throughput);
-    if (servicesPage.errorFetchingResource()) {
-      throw new Error('Test is failed due to an error when loading data.');
-    }
   });
   
   await test.step('step03', async () => {
@@ -101,7 +89,7 @@ test('APM - Services', async ({ datePicker, logsExplorerPage, observabilityPage,
   });
 });
 
-test('APM - Traces', async ({ datePicker, observabilityPage, page, servicesPage, tracesPage }, testInfo) => {
+test('APM - Traces', async ({ datePicker, notifications, observabilityPage, servicesPage, tracesPage }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces.`);
     await observabilityPage.clickTraces();
@@ -116,12 +104,18 @@ test('APM - Traces', async ({ datePicker, observabilityPage, page, servicesPage,
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "View related error" in the timeline.`);
+    await Promise.race([
+      tracesPage.assertRelatedError(),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
     await tracesPage.clickRelatedError();
     await servicesPage.assertVisibilityErrorDistributionChart();
   });
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, observabilityPage, page }, testInfo) => {  
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, observabilityPage }, testInfo) => {  
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies.`);
     await observabilityPage.clickDependencies();
@@ -161,7 +155,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     await dependenciesPage.clickTableRow();
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
-      dependenciesPage.assertErrorFetchingResource().then(() => {
+      notifications.assertErrorFetchingResource().then(() => {
         throw new Error('Test is failed due to an error when loading data.');
       })
     ]);

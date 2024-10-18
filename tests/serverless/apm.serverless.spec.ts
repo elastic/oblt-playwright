@@ -1,6 +1,6 @@
 import { test } from '../../tests/fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check APM data', async ({request}) => {
@@ -23,18 +23,10 @@ test.beforeAll('Check APM data', async ({request}) => {
   };
 });
 
-test.beforeEach(async ({ landingPage, page }) => {
-  await landingPage.goto();
-  const [ index ] = await waitForOneOf([
-    page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
-    landingPage.spaceSelector(),
-    ]);
-  const spaceSelector = index === 1;
-  if (spaceSelector) {
-    await page.locator('xpath=//a[contains(text(),"Default")]').click();
-    await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
-    };
-  await landingPage.clickApplications();
+test.beforeEach(async ({ sideNav, spaceSelector }) => {
+  await sideNav.goto();
+  await spaceSelectorServerless(sideNav, spaceSelector);
+  await sideNav.clickApplications();
 });
 
 test.afterEach(async ({}, testInfo) => {
@@ -42,18 +34,18 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, sideNav, logsExplorerPage, notifications, servicesPage }, testInfo) => {
   const throughput = "throughput";
   const errorRate = "errorRate";
 
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Filters data by selected date picker option. Selects opbeans-go.`);
-    await landingPage.clickServices();
+    await sideNav.clickServices();
     await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
     await Promise.race([
       servicesPage.assertVisibilityTransactionsTab(),
-      servicesPage.assertErrorFetchingResource().then(() => {
+      notifications.assertErrorFetchingResource().then(() => {
         throw new Error('Test is failed due to an error when loading data.');
       })
     ]);
@@ -95,10 +87,10 @@ test('APM - Services', async ({ datePicker, landingPage, logsExplorerPage, servi
   });
 });
 
-test('APM - Traces', async ({ datePicker, landingPage, servicesPage, tracesPage }, testInfo) => {
+test('APM - Traces', async ({ datePicker, sideNav, notifications, servicesPage, tracesPage }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces.`);
-    await landingPage.clickTraces();
+    await sideNav.clickTraces();
   });
   
   await test.step('step02', async () => {
@@ -110,15 +102,21 @@ test('APM - Traces', async ({ datePicker, landingPage, servicesPage, tracesPage 
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "View related error" in the timeline.`);
+    await Promise.race([
+      tracesPage.assertRelatedError(),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
     await tracesPage.clickRelatedError();
     await servicesPage.assertVisibilityErrorDistributionChart();
   });
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, logsExplorerPage }, testInfo) => {
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, logsExplorerPage, notifications }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies.`);
-    await landingPage.clickDependencies();
+    await sideNav.clickDependencies();
     await dependenciesPage.assertVisibilityTable();
   });
 
@@ -155,7 +153,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, landingPage, l
     await dependenciesPage.clickTableRow();
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
-      dependenciesPage.assertErrorFetchingResource().then(() => {
+      notifications.assertErrorFetchingResource().then(() => {
         throw new Error('Test is failed due to an error when loading data.');
       })
     ]);
