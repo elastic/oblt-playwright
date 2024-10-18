@@ -1,7 +1,6 @@
-import { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
+import { expect, Page } from "@playwright/test";
 
-export default class LandingPage {
+export default class SideNav {
     page: Page;
 
     constructor(page: Page) {
@@ -12,7 +11,7 @@ export default class LandingPage {
         await this.page.goto('/');
     }
 
-    readonly spaceSelector = () => this.page.locator('xpath=//h1[contains(text(),"Select your space")]');
+    public readonly sideNav = () => this.page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]');
     private readonly discover = () => this.page.locator('xpath=//a[@id="observability-logs-explorer"]');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
@@ -27,6 +26,10 @@ export default class LandingPage {
     private readonly projectManagement = () => this.page.locator('xpath=//span[contains(text(),"Management")]');
     private readonly fleet = () => this.page.locator('xpath=//span[contains(text(),"Fleet")]');
 
+    public async assertSideNav() {
+        await expect(this.sideNav(), 'Side navigation panel').toBeVisible();
+        }
+
     public async clickDiscover() {
         await this.discover().click();
         }
@@ -39,46 +42,43 @@ export default class LandingPage {
         await this.alerts().click();
         }
 
-    // Applications actions
     public async clickApplications() {
         await this.applications().click();
-    }
+        }
 
     public async clickServices() {
         await this.services().click();
-    }
+        }
 
     public async clickTraces() {
         await this.traces().click();
-    }
+        }
 
     public async clickDependencies() {
         await this.dependencies().click();
-    }
+        }
 
-    // Infrastructure actions
     public async clickInfrastructure() {
         await this.infrastructure().click();
-    }
+        }
 
     public async clickInventory() {
         await this.inventory().click();
-    }
+        }
 
     public async clickHosts() {
         await this.hosts().click();
-    }
+        }
 
-    // Project settings actions
     public async clickSettings() {
         await this.projectSettings().click();
-    }
+        }
 
     public async clickManagement() {
         await this.projectManagement().click();
-    }
+        }
 
     public async clickFleet() {
         await this.fleet().click();
-    }
+        }
 }

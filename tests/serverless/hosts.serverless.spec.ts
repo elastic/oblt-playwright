@@ -1,6 +1,6 @@
 import { test } from '../fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorServerless } from "../../src/helpers.ts";
 
 const apiKey = process.env.API_KEY;
 const outputDirectory = process.env.HOSTS_DIR;
@@ -59,7 +59,8 @@ test.beforeAll('Check data', async ({ request }) => {
         data: {
             "filterQuery":"",
             "metrics":[{"type":"cpu"}],
-            "nodeType":"host","sourceId":"default",
+            "nodeType":"host",
+            "sourceId":"default",
             "accountId":"",
             "region":"",
             "groupBy":[],
@@ -77,21 +78,13 @@ test.beforeAll('Check data', async ({ request }) => {
     }
 });
 
-test.beforeEach(async ({ landingPage, page }) => {
-    await landingPage.goto();
-    const [ index ] = await waitForOneOf([
-        page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
-        landingPage.spaceSelector(),
-        ]);
-      const spaceSelector = index === 1;
-      if (spaceSelector) {
-        await page.locator('xpath=//a[contains(text(),"Default")]').click();
-        await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
-        };
-    await landingPage.clickInfrastructure();
+test.beforeEach(async ({ sideNav, spaceSelector }) => {
+    await sideNav.goto();
+    await spaceSelectorServerless(sideNav, spaceSelector);
+    await sideNav.clickInfrastructure();
 });
 
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, sideNav, notifications, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -102,7 +95,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
     await test.step('step01', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await page.evaluate("document.body.style.zoom=0.9");
@@ -129,7 +122,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
             })
         ]);
@@ -137,11 +130,11 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, land
     });
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, landingPage }, testInfo) => {    
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav }, testInfo) => {    
     await test.step('step01', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await hostsPage.clickLogsTab();
@@ -157,11 +150,11 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, landingPage 
     });
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, landingPage }, testInfo) => {    
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, sideNav }, testInfo) => {    
     await test.step('step01', async () => {
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await hostsPage.clickAlertsTab();
@@ -183,7 +176,7 @@ All the individual host tests are not the best fit for the performance compariso
 It would only be suitable in case when hosts in all the environments being compared have collected data within the selected time period. 
 */
 
-test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
+test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, sideNav, notifications, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";``
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -193,7 +186,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, l
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await page.evaluate("document.body.style.zoom=0.9");
         await Promise.race([
             Promise.all([
@@ -218,7 +211,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, l
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
             })
         ]);
@@ -238,7 +231,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, l
                 hostsPage.assertVisibilityVisualization(cpuUsage), 
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
                 })
             ]);
@@ -246,10 +239,10 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, l
     });
 });
 
-test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
+test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, sideNav, page }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metadata tab.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsMetadataTab();
@@ -267,7 +260,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, l
     });
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
+test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, sideNav, notifications, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -281,7 +274,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, la
 
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await page.evaluate("document.body.style.zoom=0.9");
         await Promise.race([
             Promise.all([
@@ -306,7 +299,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, la
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed because Hosts data failed to load.');
             })
         ]);
@@ -327,7 +320,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, la
                 hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsage), 
                 hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
                 ]),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
                 })
             ]);
@@ -335,10 +328,10 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, la
     });
 });
 
-test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, landingPage, page }, testInfo) => {
+test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, sideNav, notifications, page }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Processes tab.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsProcessesTab();
@@ -356,7 +349,7 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
             hostsPage.assertProcessesNotFound().then(() => {
                 throw new Error('Test failed because no processes found.');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
               })
           ]);
@@ -364,10 +357,10 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
     });
 });
 
-test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, landingPage }, testInfo) => {
+test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, sideNav, notifications }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Logs tab.`);
-        await landingPage.clickHosts();
+        await sideNav.clickHosts();
         await hostsPage.assertVisibilityHostsTable(),
         await hostsPage.clickTableCellHosts();
         await hostsPage.openHostsLogsTab();
@@ -384,7 +377,7 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, landi
             hostsPage.assertLogsNotFound().then(() => {
                 throw new Error('Test failed because no logs found.');
             }),
-            hostsPage.assertErrorFetchingResource().then(() => {
+            notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Test is failed due to an error when loading data.');
               })
           ]);

@@ -1,6 +1,6 @@
 import { test as ess_auth, expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
-import { waitForOneOf } from "../src/types.ts";
+import { waitForOneOf } from "../src/helpers.ts";
 
 ess_auth('Authentication', async ({page}) => {
   await page.goto(process.env.KIBANA_HOST);

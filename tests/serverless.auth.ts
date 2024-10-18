@@ -1,7 +1,7 @@
 import { test as serverless_auth } from './fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
-import { waitForOneOf } from "../src/types.ts";
+import { waitForOneOf } from "../src/helpers.ts";
 
 serverless_auth('Authentication', async ({page}) => {
   await page.goto(process.env.KIBANA_HOST);

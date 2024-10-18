@@ -1,9 +1,8 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
-import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../src/types.ts";
+import { spaceSelectorStateful } from "../../src/helpers.ts";
 let apiKey = process.env.API_KEY;
 
-test.beforeAll('Check node data', async ({request}) => {
+test.beforeAll('Check pod data', async ({request}) => {
   console.log(`... checking node data.`);
   const currentTime = Date.now();
   const rangeTime = currentTime - 1200000;
@@ -19,7 +18,8 @@ test.beforeAll('Check node data', async ({request}) => {
       data: {
         "filterQuery":"",
         "metrics":[{"type":"cpu"}],
-        "nodeType":"host","sourceId":"default",
+        "nodeType":"pod",
+        "sourceId":"default",
         "accountId":"",
         "region":"",
         "groupBy":[],
@@ -31,30 +31,23 @@ test.beforeAll('Check node data', async ({request}) => {
   expect(response.status()).toBe(200);
   const jsonData = JSON.parse(await response.text());
   const nodesArr = jsonData.nodes;
-  expect(nodesArr, 'The number of available nodes in the Inventory should not be less than 1.').not.toHaveLength(0);
-  console.log(`✓ Node data is checked.`);
+  expect(nodesArr, 'The number of available pods in the Inventory should not be less than 1.').not.toHaveLength(0);
+  console.log(`✓ Pod data is checked.`);
 });
 
-test.beforeEach(async ({ landingPage, page }) => {
-  await landingPage.goto();
-  const [ index ] = await waitForOneOf([
-    page.locator('xpath=//a[@aria-label="Elastic home"]'),
-    landingPage.spaceSelector(),
-    ]);
-  const spaceSelector = index === 1;
-  if (spaceSelector) {
-      await page.locator('xpath=//a[contains(text(),"Default")]').click();
-      await expect(page.locator('xpath=//a[@aria-label="Elastic home"]')).toBeVisible();
-    };
-  await landingPage.clickObservabilitySolutionLink();
+test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
+  await sideNav.goto();
+  await spaceSelectorStateful(headerBar, spaceSelector);
+  await sideNav.clickObservabilitySolutionLink();
 });
 
 test.afterEach(async ({}, testInfo) => {
   if (testInfo.status == testInfo.expectedStatus) {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
-}});
+  }
+});
 
-test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, page }, testInfo) => {
+test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top memory intensive pods";
 
@@ -66,6 +59,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await dashboardPage.searchDashboard('Cluster Overview');
     await page.keyboard.press('Enter');
     await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
+  });
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit.`);
@@ -79,27 +73,27 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     console.log(`\n[${testInfo.title}] Step 03 - Asserts visualizations visibility.`);
     await Promise.race([
       Promise.all([
-        dashboardPage.assertLoadingIndicator(),
+        headerBar.assertLoadingIndicator(),
         dashboardPage.assertVisibilityVisualization(coresUsedVsTotal),
         dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
           ]),
-        dashboardPage.assertEmbeddedError(coresUsedVsTotal).then(() => {
-          throw new Error('Test is failed due to an error when loading visualization.');
-          }),
-        dashboardPage.assertEmbeddedError(topMemoryIntensivePods).then(() => {
-          throw new Error('Test is failed due to an error when loading visualization.');
-          }),
-        dashboardPage.assertNoData(coresUsedVsTotal).then(() => {
-          throw new Error('Test is failed because no results found.');
-          }),
-        dashboardPage.assertNoData(topMemoryIntensivePods).then(() => {
-          throw new Error('Test is failed because no results found.');
-          })
+      dashboardPage.assertEmbeddedError(coresUsedVsTotal).then(() => {
+        throw new Error('Test is failed due to an error when loading visualization.');
+        }),
+      dashboardPage.assertEmbeddedError(topMemoryIntensivePods).then(() => {
+        throw new Error('Test is failed due to an error when loading visualization.');
+        }),
+      dashboardPage.assertNoData(coresUsedVsTotal).then(() => {
+        throw new Error('Test is failed because no results found.');
+        }),
+      dashboardPage.assertNoData(topMemoryIntensivePods).then(() => {
+        throw new Error('Test is failed because no results found.');
+        })
       ]);
   });
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabilityPage, page }, testInfo) => {
+test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabilityPage }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
@@ -164,7 +158,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
 });
 
 // Skipped until Metrics Explorer is available in Serverless.
-test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, inventoryPage, observabilityPage, page }, testInfo) => {
+test.skip('Infrastructure - Metrics Explorer', async ({ datePicker, inventoryPage, observabilityPage }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > Infrastructure > Metrics Explorer.`);
     await observabilityPage.clickMetricsExplorer();
