@@ -1,5 +1,4 @@
 import { test } from '../fixtures/stateful/basePage.ts';
-import { expect } from "@playwright/test";
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 const fs = require('fs');
 const path = require('path');
