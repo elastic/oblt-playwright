@@ -24,11 +24,7 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
         onboardingPage.useCaseHost()
         ]);
     const useCaseLogs = a === 0;
-    if (useCaseLogs) {
-        await onboardingPage.selectCollectLogs()
-        } else {
-            await onboardingPage.selectHost()
-        };
+    useCaseLogs ? await onboardingPage.selectCollectLogs() : await onboardingPage.selectHost();
 
     const [ b ] = await waitForOneOf([
         onboardingPage.streamHostLogs(),
@@ -40,7 +36,7 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
         await Promise.race([
             onboardingPage.codeBash(),
             onboardingPage.assertErrorFetchingResource().then(() => {
-            throw new Error('Test is failed because due to an error while fetching resource.');
+            throw new Error('Test is failed due to an error while fetching resource.');
             })
         ]);
         await onboardingPage.assertSystemIntegrationInstalled();
