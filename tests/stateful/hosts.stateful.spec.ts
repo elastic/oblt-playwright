@@ -76,7 +76,7 @@ test.beforeAll('Check data', async ({ request }) => {
     }
 });
 
-test.beforeEach(async ({ headerBar. sideNav, spaceSelector }) => {
+test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
     await sideNav.goto();
     await spaceSelectorStateful(headerBar, spaceSelector);
     await sideNav.clickObservabilitySolutionLink();
