@@ -11,7 +11,7 @@ test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
     await page.goto('/app/observabilityOnboarding');
 });
 
-test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
+test('Auto-detect logs and metrics', async ({ headerBar, onboardingPage, page }) => {
     const fileName = 'code_snippet_logs_auto_detect.sh';
     const outputPath = path.join(outputDirectory, fileName);
     let maxRetries = 3;
@@ -33,6 +33,7 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
     const streamHostLogs = b === 0;
     if (streamHostLogs) {
         await onboardingPage.selectStreamLogs();
+        await headerBar.assertLoadingIndicator();
         await Promise.race([
             onboardingPage.codeBash(),
             onboardingPage.assertErrorFetchingResource().then(() => {
@@ -48,7 +49,12 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
         await onboardingPage.assertShippedLogs();
         } else {
             await onboardingPage.selectAutoDetectWithElasticAgent();
-            if (onboardingPage.contentNotLoaded()) {
+            const [ c ] = await waitForOneOf([
+                onboardingPage.codeBlock(),
+                onboardingPage.contentNotLoaded()
+                ]);
+            const codeNotLoaded = c === 1;
+            if (codeNotLoaded) {
                 while (retries < maxRetries) {
                     try {
                         onboardingPage.clickRetry();

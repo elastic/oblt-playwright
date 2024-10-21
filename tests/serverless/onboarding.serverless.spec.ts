@@ -1,5 +1,5 @@
 import { test } from '../fixtures/serverless/basePage';
-import { spaceSelectorServerless } from "../../src/helpers.ts";
+import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 const fs = require('fs');
 const path = require('path');
 const inputFilePath = process.env.REPORT_FILE;
@@ -20,7 +20,12 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
 
     await onboardingPage.selectCollectLogs();
     await onboardingPage.selectLogsAutoDetect();
-    if (onboardingPage.contentNotLoaded()) {
+    const [ c ] = await waitForOneOf([
+        onboardingPage.codeBlock(),
+        onboardingPage.contentNotLoaded()
+        ]);
+    const codeNotLoaded = c === 1;
+    if (codeNotLoaded) {
         while (retries < maxRetries) {
             try {
                 onboardingPage.clickRetry();
@@ -52,7 +57,12 @@ test('Kubernetes', async ({ onboardingPage, page }) => {
 
     await onboardingPage.selectMonitorInfrastructure();
     await onboardingPage.selectKubernetes();
-    if (onboardingPage.contentNotLoaded()) {
+    const [ c ] = await waitForOneOf([
+        onboardingPage.codeBlock(),
+        onboardingPage.contentNotLoaded()
+        ]);
+    const codeNotLoaded = c === 1;
+    if (codeNotLoaded) {
         while (retries < maxRetries) {
             try {
                 onboardingPage.clickRetry();
