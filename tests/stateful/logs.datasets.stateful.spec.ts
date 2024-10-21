@@ -1,5 +1,5 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
-import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
+import { spaceSelectorStateful } from "../../src/helpers.ts";
 
 test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
   await sideNav.goto();
