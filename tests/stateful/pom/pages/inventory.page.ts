@@ -13,11 +13,11 @@ export default class InventoryPage {
     private readonly sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
     private readonly sortWaffleByValue = () => this.page.getByTestId('waffleSortByValue');
     private readonly nodesWaffleMap = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]');
-    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/*[@data-test-subj="nodeContainer"][1]');
+    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]//span[1]//div[@data-test-subj="nodeContainer"]');
     private readonly inventorySwitcher = () => this.page.getByTestId('openInventorySwitcher');
     private readonly inventorySwitcherPods = () => this.page.getByTestId('goToPods');
     private readonly tableView = () => this.page.locator('xpath=//button[@title="Table view"]');
-    private readonly tableCell = () => this.page.locator('xpath=(//tbody//td)[1]//span[contains(@class, "euiTableCellContent__text")]');
+    private readonly tableCell = () => this.page.locator('xpath=(//tbody//th)[1]//button');
     private readonly popoverK8sMetrics = () => this.page.locator('xpath=//*[contains(text(),"Kubernetes Pod metrics")]');
     private readonly logsSearchField = () => this.page.locator('xpath=//input[@placeholder="Search for log entries..."]');
     private readonly inspector = () => this.page.locator('xpath=//..//button[@data-test-subj="embeddablePanelAction-openInspector"]');
@@ -108,11 +108,8 @@ export default class InventoryPage {
         }
 
     public async assertVisibilityVisualization(title: string) {
-        if (await this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`).isHidden()){
-        await this.arrowDown();
-        }
         const startTime = performance.now();
-        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"][@data-render-complete="true"]`), `"${title}" visualization should be visible`).toBeVisible();
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};

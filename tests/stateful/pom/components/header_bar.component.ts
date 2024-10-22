@@ -8,13 +8,13 @@ export default class HeaderBar {
     }
 
     private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
-    public readonly logo = () => this.page.locator('xpath=//a[@aria-label="Elastic home"]');
+    public readonly helpMenuButton = () => this.page.locator('xpath=//div[@data-test-subj="helpMenuButton"]');
 
     public async assertLoadingIndicator() {
         await expect(this.loadingIndicator(), 'Loading indicator').toBeHidden();
         }
 
-    public async assertLogo() {
-        await expect(this.logo(), 'Elastic logo').toBeHidden();
+    public async assertHelpMenuButton() {
+        await expect(this.helpMenuButton(), 'Help menu button').toBeVisible();
         }
 }

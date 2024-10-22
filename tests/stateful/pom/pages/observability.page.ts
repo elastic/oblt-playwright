@@ -12,7 +12,7 @@ export default class ObservabilityPage {
     private readonly services = () => this.page.getByTestId('observability-nav-apm-services');
     private readonly traces = () => this.page.getByTestId('observability-nav-apm-traces');
     private readonly dependencies = () => this.page.getByTestId('observability-nav-apm-dependencies');
-    private readonly inventory = () => this.page.getByTestId('observability-nav-metrics-inventory');
+    private readonly inventory = () => this.page.getByTestId('observability-nav-metrics-infrastructure_inventory');
     private readonly metricsExplorer = () => this.page.getByTestId('observability-nav-metrics-metrics_explorer');
     private readonly hosts = () => this.page.getByTestId('observability-nav-metrics-hosts');
 
