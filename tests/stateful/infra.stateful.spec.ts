@@ -1,38 +1,9 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
-import { spaceSelectorStateful } from "../../src/helpers.ts";
+import { checkPodData, spaceSelectorStateful } from "../../src/helpers.ts";
 let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check pod data', async ({request}) => {
-  console.log(`... checking node data.`);
-  const currentTime = Date.now();
-  const rangeTime = currentTime - 1200000;
-
-  let response = await request.post('api/metrics/snapshot', {
-      headers: {
-        "accept": "application/json",
-        "Authorization": apiKey,
-        "Content-Type": "application/json;charset=UTF-8",
-        "kbn-xsrf": "true",          
-        "x-elastic-internal-origin": "kibana"
-      },
-      data: {
-        "filterQuery":"",
-        "metrics":[{"type":"cpu"}],
-        "nodeType":"pod",
-        "sourceId":"default",
-        "accountId":"",
-        "region":"",
-        "groupBy":[],
-        "timerange":{"interval":"1m","to":currentTime,"from":rangeTime,"lookbackSize":5},
-        "includeTimeseries":true,
-        "dropPartialBuckets":true
-      }
-  })
-  expect(response.status()).toBe(200);
-  const jsonData = JSON.parse(await response.text());
-  const nodesArr = jsonData.nodes;
-  expect(nodesArr, 'The number of available pods in the Inventory should not be less than 1.').not.toHaveLength(0);
-  console.log(`✓ Pod data is checked.`);
+  await checkPodData(request);
 });
 
 test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
@@ -49,7 +20,7 @@ test.afterEach(async ({}, testInfo) => {
 
 test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
-  const topMemoryIntensivePods = "Top memory intensive pods";
+  const topMemoryIntensivePods = "Top Memory intensive pods per Node";
 
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Dashboards, filters dashboards by Kubernetes tag.`);
@@ -93,9 +64,9 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   });
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabilityPage }, testInfo) => {
+test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabilityPage, page }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
-  const memoryUsage = "infraAssetDetailsHostMetricsChartmemoryUsage";
+  const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
   const podMemoryUsage = "podMemoryUsage";
   
@@ -120,6 +91,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
   
   await test.step('step03', async () => {
     console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
+    await page.evaluate("document.body.style.zoom=0.8");
     await datePicker.setPeriod();
     await Promise.all([
       inventoryPage.assertVisibilityVisualization(cpuUsage),

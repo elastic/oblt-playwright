@@ -75,11 +75,11 @@ export default class DashboardPage {
         }
 
     public async assertVisibilityVisualization(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), 'visualization should be rendered').toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//canvas[@class="echCanvasRenderer"]`), `visualization "${title}" should be rendered`).toBeVisible();
         }
 
     public async assertEmbeddedError(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//div[@class="lnsEmbeddedError"]`), 'Error while loading visualization').toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//div[@class="lnsEmbeddedError"]`), `Error while loading visualization "${title}"`).toBeVisible();
         }
 
     public async assertNoData(title: string) {
