@@ -27,17 +27,15 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.KIBANA_HOST,
-
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     testIdAttribute: 'data-test-subj',
     video: {
       mode: 'off',
-      size: {width: 1920, height: 1200}},
-    
+      size: {width: 1920, height: 1200}
+      },
     permissions: ["clipboard-read"],
   },
-
   projects: [
     {
       name: 'stateful_auth',
@@ -58,36 +56,6 @@ export default defineConfig({
       use: {
         testIdAttribute: 'data-test-id',
         viewport: {width: 1920, height: 1080},
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        }
-      },
-    },
-    {
-      name: 'stateful_teardown',
-      testMatch: 'stateful.teardown.setup.ts',
-      use: {
-        viewport: {width: 1920, height: 1080},
-        storageState: STORAGE_STATE,
-        testIdAttribute: 'data-test-subj',
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        }
-      },
-    },
-    {
-      name: 'serverless_teardown',
-      testMatch: 'serverless.teardown.setup.ts',
-      use: {
-        viewport: {width: 1920, height: 1080},
-        storageState: STORAGE_STATE,
-        testIdAttribute: 'data-test-subj',
         launchOptions: {
           logger: {
             isEnabled: () => true,
@@ -127,6 +95,25 @@ export default defineConfig({
         },
       },
       dependencies: ['serverless_auth'],
+    },
+    {
+      name: 'serverless_security',
+      testMatch: '**\/*.journey.ts',      
+      timeout: 540000, // 9 minute timeout for the scripts
+      use: {
+        ...devices['Desktop Chrome'],
+        ignoreHTTPSErrors: true,
+        timezoneId: 'UTC',
+        locale: 'en-US',
+        viewport: {width: 1920, height: 1200},
+        launchOptions: {
+          logger: {
+            isEnabled: () => true,
+            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
+          }
+        },
+      },
+      dependencies: [],
     },
     {
       name: 'api',
