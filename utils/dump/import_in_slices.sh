@@ -12,7 +12,6 @@ sudo mkdir -p ${OUTPUT_PATH}/${INPUT_INDEX}
 for (( i=0; i<=9; i++ ))
 do
     OUTPUT_FILE="${INPUT_INDEX}-${i}.json"
-    SEARCH_BODY=""{\"slice\": {\"id\": ${i},\"max\": 9}}""
-    sudo ./bin/elasticdump --input=${INPUT_PATH} --input-index=${INPUT_INDEX} --output=${OUTPUT_PATH}/${OUTPUT_FILE} --searchBody=${SEARCH_BODY} --type=data>
+    sudo ./bin/elasticdump --input=${INPUT_PATH} --input-index=${INPUT_INDEX} --output=${OUTPUT_PATH}/${OUTPUT_FILE} --searchBody "{\"slice\": {\"id\": ${i}, \"max\": 9}, \"query\": {\"range\": {\"@timestamp\": {\"gte\": \"now-7d\"}}}}" --type=data
 done
 wait
