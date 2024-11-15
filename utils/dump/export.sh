@@ -9,7 +9,7 @@ OUTPUT_PATH=$3
 
 for (( i=0; i<=9; i++ ))
 do
-	INPUT_FILE="${BASE_INDEX_NAME}-${i}.json"
-	sudo ./bin/elasticdump --input=${INPUT_PATH}/${INPUT_FILE} --output=${OUTPUT_PATH}/${BASE_INDEX_NAME} --limit 10000 --noRefresh --esCompress &
+  INPUT_FILE="${BASE_INDEX_NAME}-${i}.json"
+  sudo ./bin/elasticdump --input=${INPUT_PATH}/${INPUT_FILE} --output=${OUTPUT_PATH}/${BASE_INDEX_NAME} --limit 10000 --noRefresh --esCompress &
 done
 wait
