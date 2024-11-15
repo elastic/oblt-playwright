@@ -18,15 +18,13 @@ function randomDate(start, end) {
     return date.toISOString();
 }
 
-function updateTimestamps(obj, startDate, endDate, filename) {
+function updateTimestamps(obj, startDate, endDate) {
     let modified = false;
 
     function recursiveUpdate(obj) {
         if (typeof obj !== 'object' || obj === null) return;
-
         for (const key in obj) {
             if (key === '@timestamp' && typeof obj[key] === 'string') {
-                const oldTimestamp = obj[key];
                 obj[key] = randomDate(startDate, endDate);
                 modified = true;
             } else if (typeof obj[key] === 'object') {
