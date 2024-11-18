@@ -13,23 +13,25 @@ import ServicesPage from "../../serverless/pom/pages/services.page";
 import SideNav from "../../serverless/pom/components/side_nav.component";
 import { SpaceSelector } from "../../serverless/pom/components/space_selector.component";
 import TracesPage from "../../serverless/pom/pages/traces.page";
+import KubernetesOverviewDashboardPage from "../../serverless/pom/pages/kubernetes_overview_dashboard.page";
 
 
 export const test = base.extend<{
-    dashboardPage: DashboardPage, 
-    datePicker: DatePicker, 
+    dashboardPage: DashboardPage,
+    datePicker: DatePicker,
     dependenciesPage: DependenciesPage,
     headerBar: HeaderBar,
-    hostsPage: HostsPage, 
-    inventoryPage: InventoryPage, 
-    discoverPage: DiscoverPage, 
+    hostsPage: HostsPage,
+    inventoryPage: InventoryPage,
+    discoverPage: DiscoverPage,
     managementPage: ManagementPage,
     notifications: Notifications,
     onboardingPage: OnboardingPage,
     servicesPage: ServicesPage,
-    sideNav: SideNav, 
+    sideNav: SideNav,
     spaceSelector: SpaceSelector,
-    tracesPage: TracesPage
+    tracesPage: TracesPage,
+    kubernetesOverviewDashboardPage: KubernetesOverviewDashboardPage
     }>
     ({
         dashboardPage: async({page}, use) => {
@@ -51,7 +53,7 @@ export const test = base.extend<{
         hostsPage: async({page}, use) => {
             await use(new HostsPage(page));
         },
-        
+
         inventoryPage: async({page}, use) => {
             await use(new InventoryPage(page));
         },
@@ -86,5 +88,9 @@ export const test = base.extend<{
 
         tracesPage: async({page}, use) => {
             await use(new TracesPage(page));
+        },
+
+        kubernetesOverviewDashboardPage: async({page}, use) => {
+            await use(new KubernetesOverviewDashboardPage(page));
         }
     });

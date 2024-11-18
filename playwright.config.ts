@@ -1,7 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
-require('dotenv').config();
+const dotEnvPath = process.env.DOTENV_PATH ?? path.join(__dirname, '.env');
+
+require('dotenv').config({ path: dotEnvPath });
+
 let apiKey = process.env.API_KEY;
 
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
@@ -34,7 +37,7 @@ export default defineConfig({
     video: {
       mode: 'off',
       size: {width: 1920, height: 1200}},
-    
+
     permissions: ["clipboard-read"],
   },
 
@@ -136,7 +139,7 @@ export default defineConfig({
           "accept": "application/json",
           "Authorization": apiKey,
           "Content-Type": "application/json;charset=UTF-8",
-          "kbn-xsrf": "true",          
+          "kbn-xsrf": "true",
           "x-elastic-internal-origin": "kibana"
         },
       },

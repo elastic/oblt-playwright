@@ -33,12 +33,13 @@ export default class HostsPage {
     private readonly hostsLimit500 = () => this.page.getByTestId('hostsViewLimitSelection500Button');
     private readonly hostsLogs = () => this.page.getByTestId('hostsView-tabs-logs');
     private readonly tableCellHosts = () => this.page.locator('xpath=//tbody//tr[1]//td//span[contains(@class, "euiTableCellContent__text")]');
+    private readonly hostKPICPUPercentage = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsKPIcpuUsage"]//p[@class="echMetricText__value"]');
 
     public async clickTableCellHosts() {
         await expect(this.hostsTable()).toBeVisible();
         await this.tableCellHosts().click();
         }
-    
+
     public async setHostsLimit500() {
         await this.hostsLimit500().click();
         }
@@ -218,4 +219,9 @@ export default class HostsPage {
     public async assertLogsNotFound() {
         await expect(this.logStreamNoMessages(), 'Logs not found').toBeVisible();
         }
+
+    public async assertHostKPICPUPercentage() {
+        await expect(this.hostKPICPUPercentage()).toBeVisible();
+        expect(await this.hostKPICPUPercentage().textContent()).not.toBe('N/A');
+    }
 }

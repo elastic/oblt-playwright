@@ -8,20 +8,25 @@ Install [Playwright](https://playwright.dev/docs/intro).
 Examine available [test scenarios and required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data_mapping.md).
 Have ideas for new user journeys? Check [the guide for creating a new test](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md).
 
-## Setup 
+## Setup
 
 Create .env file in the root directory with the following environmental variables:
 
 ```
-KIBANA_HOST = 
+# Only if you are running tests against
+# your local Kibana and ES
+# CLUSTER_ENVIRONMENT = local
+KIBANA_HOST =
 ELASTICSEARCH_HOST =
-KIBANA_USERNAME = 
-KIBANA_PASSWORD = 
+KIBANA_USERNAME =
+KIBANA_PASSWORD =
 TIME_UNIT = 'Minutes'
 TIME_VALUE = 15
 API_KEY = 'ApiKey ...'
 REPORT_FILE = ../test-results/results.json
 ```
+
+Use `DOTENV_PATH` environment variable when running Playwright to switch between alternative configurations when needed, for example `DOTENV_PATH=./.env.serverless npx playwright test …`
 
 #### Verbose logging
 
@@ -32,7 +37,7 @@ DEBUG = "pw:api"
 
 ### Create alerting rules
 
-In case there is a need to assess the impact of alerting rules execution on performance, it is recommended to create alerting rules before generating any data by running the following command: 
+In case there is a need to assess the impact of alerting rules execution on performance, it is recommended to create alerting rules before generating any data by running the following command:
 
 ```
 npx playwright test alerting_rules.api.spec.ts --project api
@@ -70,7 +75,7 @@ To authorize access to Elasticsearch resources, pass your API key into `API_KEY`
 npx playwright test --project api
 ```
 
-## Get Elasticsearch-friendly JSON test report 
+## Get Elasticsearch-friendly JSON test report
 
 Playwright spits out JSON test reports that have nested structure, which not quite suitable for Elasticsearch - results for each test is a separate array with its own fields. The problem is nested field type is not supported in Kibana visualizations. To solve this, use [this script](https://github.com/elastic/oblt-playwright/blob/main/utils/split_json_report.ts) to flatten and split a report by each test:
 

@@ -1,11 +1,14 @@
 import { test as ess_auth, expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 import { waitForOneOf } from "../src/helpers.ts";
+const isLocalCluster = process.env.CLUSTER_ENVIRONMENT === 'local';
 
 ess_auth('Authentication', async ({page}) => {
   await page.goto(process.env.KIBANA_HOST);
   console.log(`...waiting for login page elements to appear.`);
-  await page.getByRole('button', { name: 'Log in with Elasticsearch' }).click();
+  if (!isLocalCluster)  {
+    await page.getByRole('button', { name: 'Log in with Elasticsearch' }).click();
+  }
   await page.getByLabel('Username').fill(process.env.KIBANA_USERNAME);
   await page.getByLabel('Password', { exact: true }).click();
   await page.getByLabel('Password', { exact: true }).fill(process.env.KIBANA_PASSWORD);

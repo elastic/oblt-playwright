@@ -7,37 +7,40 @@ export default class OnboardingPage {
         this.page = page;
     }
 
-    private readonly useCaseLogs = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-logs"]//input[@type="radio"]');
-    private readonly useCaseInfra = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-infra"]//input[@type="radio"]');
-    private readonly logsAutoDetect = () => this.page.locator('xpath=//button[contains(text(), "Auto-detect logs and metrics")]');
-    private readonly kubernetes = () => this.page.locator('xpath=//button[contains(text(), "Kubernetes")]');
+    public readonly useCaseHost = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-host"]//input[@type="radio"]');
+    public readonly useCaseKubernetes = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-kubernetes"]//input[@type="radio"]');
+    public readonly autoDetectElasticAgent = () => this.page.getByTestId('integration-card:auto-detect-logs');
+    private readonly kubernetesQuickStartCard = () => this.page.locator('xpath=//div[@data-test-subj="integration-card:kubernetes-quick-start"]');
     public readonly contentNotLoaded = () => this.page.locator('xpath=//h2[contains(text(),"Unable to load content")]');
     private readonly retryButton = () => this.page.getByTestId('observabilityOnboardingAutoDetectPanelGoBackButton');
     public readonly codeBlock = () => this.page.locator('xpath=//code[@data-code-language="text"]');
     private readonly copyToClipboardButton = () => this.page.getByTestId('observabilityOnboardingCopyToClipboardButton');
     private readonly inProgressIndicator = () => this.page.locator('xpath=//div[contains(text(), "Waiting for installation to complete...")]');
     private readonly receivedDataIndicator = () => this.page.locator('xpath=//div[contains(text(), "Your data is ready to explore!")]');
+    private readonly receivedDataIndicatorKubernetes = () => this.page.locator('xpath=//div[contains(text(), "We are monitoring your cluster")]');
     private readonly actionLinkSystem = () => this.page.locator('xpath=//a[contains(@data-test-subj, "observabilityOnboardingDataIngestStatusActionLink-system")]');
+    private readonly autoDetectSystemIntegrationActionLink = () => this.page.locator('xpath=//a[@data-test-subj="observabilityOnboardingDataIngestStatusActionLink-inventory-host-details"]');
+    private readonly kubernetesAgentExploreDataActionLink = () => this.page.locator('xpath=//a[@data-test-subj="observabilityOnboardingDataIngestStatusActionLink-kubernetes-f4dc26db-1b53-4ea2-a78b-1bfab8ea267c"]');
 
-    public async selectCollectLogs() {
-        await this.useCaseLogs().click();
-        }
+    public async selectHost() {
+        await this.useCaseHost().click();
+    }
 
-    public async selectLogsAutoDetect() {
-        await this.logsAutoDetect().click();
-        }
+    public async selectKubernetesUseCase() {
+        await this.useCaseKubernetes().click();
+    }
 
-    public async selectMonitorInfrastructure() {
-        await this.useCaseInfra().click();
-        }
+    public async selectAutoDetectWithElasticAgent() {
+        await this.autoDetectElasticAgent().click();
+    }
 
     public async clickRetry() {
         await this.retryButton().click();
         }
-    
-    public async selectKubernetes() {
-        await this.kubernetes().click();
-        }
+
+    public async selectKubernetesQuickstart() {
+        await this.kubernetesQuickStartCard().click();
+    }
 
     public async copyToClipboard() {
         await this.copyToClipboardButton().click();
@@ -58,4 +61,16 @@ export default class OnboardingPage {
     public async assertReceivedDataIndicator() {
         await expect(this.receivedDataIndicator(), 'Received data indicator should be visible').toBeVisible();
         }
+
+    public async assertReceivedDataIndicatorKubernetes() {
+        await expect(this.receivedDataIndicatorKubernetes(), 'Received data indicator should be visible').toBeVisible();
+    }
+
+    public async clickAutoDetectSystemIntegrationCTA() {
+        await this.autoDetectSystemIntegrationActionLink().click();
+    }
+
+    public async clickKubernetesAgentCTA() {
+        await this.kubernetesAgentExploreDataActionLink().click();
+    }
 }

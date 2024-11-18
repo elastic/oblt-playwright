@@ -8,4 +8,4 @@ playwright/.auth
 /test-results/
 /playwright-report/
 /playwright/.cache/
-/.env
+/.env*

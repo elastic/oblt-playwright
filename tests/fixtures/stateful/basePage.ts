@@ -15,25 +15,27 @@ import ServicesPage from "../../stateful/pom/pages/services.page";
 import SideNav from "../../stateful/pom/components/side_nav.component";
 import { SpaceSelector } from "../../stateful/pom/components/space_selector.component";
 import TracesPage from "../../stateful/pom/pages/traces.page";
+import KubernetesOverviewDashboardPage from "../../stateful/pom/pages/kubernetes_overview_dashboard.page";
 
 
 export const test = base.extend<{
-    dashboardPage: DashboardPage, 
-    datasetsPage: DatasetsPage, 
-    datePicker: DatePicker, 
-    dependenciesPage: DependenciesPage, 
+    dashboardPage: DashboardPage,
+    datasetsPage: DatasetsPage,
+    datePicker: DatePicker,
+    dependenciesPage: DependenciesPage,
     discoverPage: DiscoverPage,
     headerBar: HeaderBar,
-    hostsPage: HostsPage, 
-    inventoryPage: InventoryPage, 
+    hostsPage: HostsPage,
+    inventoryPage: InventoryPage,
     logsExplorerPage: LogsExplorerPage,
-    notifications: Notifications, 
+    notifications: Notifications,
     observabilityPage: ObservabilityPage,
-    onboardingPage: OnboardingPage, 
+    onboardingPage: OnboardingPage,
     servicesPage: ServicesPage,
-    sideNav: SideNav, 
+    sideNav: SideNav,
     spaceSelector: SpaceSelector,
-    tracesPage: TracesPage
+    tracesPage: TracesPage,
+    kubernetesOverviewDashboardPage: KubernetesOverviewDashboardPage
     }>
     ({
         dashboardPage: async({page}, use) => {
@@ -63,7 +65,7 @@ export const test = base.extend<{
         hostsPage: async({page}, use) => {
             await use(new HostsPage(page));
         },
-        
+
         inventoryPage: async({page}, use) => {
             await use(new InventoryPage(page));
         },
@@ -98,5 +100,9 @@ export const test = base.extend<{
 
         tracesPage: async({page}, use) => {
             await use(new TracesPage(page));
+        },
+
+        kubernetesOverviewDashboardPage: async({page}, use) => {
+            await use(new KubernetesOverviewDashboardPage(page));
         }
     });
