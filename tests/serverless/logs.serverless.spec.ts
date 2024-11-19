@@ -1,72 +1,60 @@
 import { test } from '../../tests/fixtures/serverless/basePage';
 import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 
-test.beforeEach(async ({ logsExplorerPage, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ discoverPage, sideNav, spaceSelector }) => {
   await sideNav.goto();
   await spaceSelectorServerless(sideNav, spaceSelector);
   await sideNav.clickDiscover();
-  await logsExplorerPage.clickLogsExplorerTab();
+  await discoverPage.discoverTab().click();
 });
 
-test('Logs Explorer - Kubernetes Container logs', async ({datePicker, logsExplorerPage}) => {
+test('Discover - All logs', async ({datePicker, discoverPage}) => {
   await test.step('step01', async () => {
-    await logsExplorerPage.filterByKubernetesContainer();
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
+    await discoverPage.selectLogsDataView();
+    await datePicker.setPeriod();
+    await discoverPage.assertChartIsRendered();
+    await discoverPage.assertVisibilityCanvas();
+    await discoverPage.assertVisibilityDataGridRow();
+  });
+});
+
+test('Discover - Field Statistics', async ({datePicker, discoverPage}) => { 
+  await test.step('step01', async () => {
+    await discoverPage.selectLogsDataView();
+    await datePicker.setPeriod();
+    await discoverPage.assertChartIsRendered();
+    await discoverPage.assertVisibilityCanvas();
+    await discoverPage.assertVisibilityDataGridRow();
   });
 
   await test.step('step02', async () => {
-    await datePicker.setPeriod();
-    await logsExplorerPage.assertChartIsRendered();
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
+    await discoverPage.clickFieldStatsTab();
+    await discoverPage.assertVisibilityFieldStatsDocCount();
   });
 });
 
-test('Logs Explorer - All logs', async ({datePicker, logsExplorerPage}) => {
+test('Discover - Patterns', async ({datePicker, discoverPage}) => { 
   await test.step('step01', async () => {
+    await discoverPage.selectLogsDataView();
     await datePicker.setPeriod();
-    await logsExplorerPage.assertChartIsRendered();
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
-  });
-});
-
-test('Logs Explorer - Field Statistics', async ({datePicker, logsExplorerPage}) => { 
-  await test.step('step01', async () => {
-    await datePicker.setPeriod();
-    await logsExplorerPage.assertChartIsRendered();
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
+    await discoverPage.assertChartIsRendered();
+    await discoverPage.assertVisibilityCanvas();
+    await discoverPage.assertVisibilityDataGridRow();
   });
 
   await test.step('step02', async () => {
-    await logsExplorerPage.clickFieldStatsTab();
-    await logsExplorerPage.assertVisibilityFieldStatsDocCount();
-  });
-});
-
-test('Logs Explorer - Patterns', async ({datePicker, logsExplorerPage}) => { 
-  await test.step('step01', async () => {
-    await datePicker.setPeriod();
-    await logsExplorerPage.assertChartIsRendered();
-    await logsExplorerPage.assertVisibilityCanvas();
-    await logsExplorerPage.assertVisibilityDataGridRow();
-  });
-
-  await test.step('step02', async () => {
-    await logsExplorerPage.clickPatternsTab();
+    await discoverPage.clickPatternsTab();
     const [ index ] = await waitForOneOf([
-      logsExplorerPage.logPatternsRowToggle(),
-      logsExplorerPage.patternsNotLoaded()
+      discoverPage.logPatternsRowToggle(),
+      discoverPage.patternsNotLoaded()
       ]);
     const patternsLoaded = index === 0;
     if (patternsLoaded) {
-      await logsExplorerPage.assertVisibilityPatternsRowToggle();
-      await logsExplorerPage.clickFilterPatternButton();
-      await logsExplorerPage.assertChartIsRendered();
-      await logsExplorerPage.assertVisibilityCanvas();
-      await logsExplorerPage.assertVisibilityDataGridRow();
+      await discoverPage.assertVisibilityPatternsRowToggle();
+      await discoverPage.clickFilterPatternButton();
+      await discoverPage.assertChartIsRendered();
+      await discoverPage.assertVisibilityCanvas();
+      await discoverPage.assertVisibilityDataGridRow();
       } else {
         console.log('Patterns not loaded.');
         throw new Error('Test is failed due to an error when loading categories.');

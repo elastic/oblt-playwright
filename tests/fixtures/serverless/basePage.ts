@@ -5,7 +5,7 @@ import DependenciesPage from "../../serverless/pom/pages/dependencies.page";
 import HeaderBar from "../../serverless/pom/components/header_bar.component";
 import HostsPage from "../../serverless/pom/pages/hosts.page";
 import InventoryPage from "../../serverless/pom/pages/inventory.page";
-import LogsExplorerPage from "../../serverless/pom/pages/logs_explorer.page";
+import DiscoverPage from "../../serverless/pom/pages/discover.page";
 import ManagementPage from "../../serverless/pom/pages/management.page";
 import Notifications from "../../serverless/pom/components/notifications.component";
 import OnboardingPage from "../../serverless/pom/pages/onboarding.page";
@@ -22,7 +22,7 @@ export const test = base.extend<{
     headerBar: HeaderBar,
     hostsPage: HostsPage, 
     inventoryPage: InventoryPage, 
-    logsExplorerPage: LogsExplorerPage, 
+    discoverPage: DiscoverPage, 
     managementPage: ManagementPage,
     notifications: Notifications,
     onboardingPage: OnboardingPage,
@@ -56,8 +56,8 @@ export const test = base.extend<{
             await use(new InventoryPage(page));
         },
 
-        logsExplorerPage: async({page}, use) => {
-            await use(new LogsExplorerPage(page));
+        discoverPage: async({page}, use) => {
+            await use(new DiscoverPage(page));
         },
 
         managementPage: async({page}, use) => {
