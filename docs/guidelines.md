@@ -28,9 +28,9 @@ test('<test name>', async ({page, <fixtures>}) => {
 |   | Tip |
 | ------------- | ------------- |
 | `<test section>`  | [Navigation method](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#landingpage) to a target section.<br><br>Example:<br><br>`clickInfrastructure();`  |
-| `<fixtures>`  | [Pages/components](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) that you're going to use.<br><br>Example:<br><br>`{ datePicker, sideNav, logsExplorerPage, page, servicesPage }`<br><br>Note: `page` is always required.  |
+| `<fixtures>`  | [Pages/components](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) that you're going to use.<br><br>Example:<br><br>`{ datePicker, sideNav, discoverPage, page, servicesPage }`<br><br>Note: `page` is always required.  |
 | `<step name>`  | In a test report, `<step name>` is used as a property of the step duration: `"step01": 4351`, hence apply JSON property name format here.<br><br>Example:<br><br>`step01` |
-| `<page>.<method>` | Specify target page and desired action separated by a dot.<br>Use [this section](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) to check what methods are available for the specified page/component.<br><br>Example:<br><br>`await logsExplorerPage.clickLogsExplorerTab();`<br>`await logsExplorerPage.assertVisibilityCanvas();`<br>`await logsExplorerPage.assertVisibilityDataGridRow();`<br><br>Some methods require passing a parameter:<br><br>`assertVisibilityVisualization(string)`<br><br>For example, you might need to pass a visualization name:<br><br>`assertVisibilityVisualization('infraAssetDetailsKPIcpuUsage')`<br><br>If a method is used repeatedly across the test, it is recommended adding a variable for the value:<br><br>`const cpuUsage = 'infraAssetDetailsKPIcpuUsage';`<br>`await infrastructurePage.assertVisibilityVisualization(cpuUsage);` |
+| `<page>.<method>` | Specify target page and desired action separated by a dot.<br>Use [this section](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md#available-methods) to check what methods are available for the specified page/component.<br><br>Example:<br><br>`await discoverPage.clickLogsExplorerTab();`<br>`await discoverPage.assertVisibilityCanvas();`<br>`await discoverPage.assertVisibilityDataGridRow();`<br><br>Some methods require passing a parameter:<br><br>`assertVisibilityVisualization(string)`<br><br>For example, you might need to pass a visualization name:<br><br>`assertVisibilityVisualization('infraAssetDetailsKPIcpuUsage')`<br><br>If a method is used repeatedly across the test, it is recommended adding a variable for the value:<br><br>`const cpuUsage = 'infraAssetDetailsKPIcpuUsage';`<br>`await infrastructurePage.assertVisibilityVisualization(cpuUsage);` |
 
 **General tip:**
 
@@ -155,9 +155,9 @@ test('<test name>', async ({page, <fixtures>}) => {
 </details>
 
 <details>
-<summary>logsExplorerPage</summary>
+<summary>discoverPage</summary>
 
-## [logsExplorerPage](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/pom/pages/logs_explorer.page.ts)
+## [discoverPage](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/pom/pages/logs_explorer.page.ts)
 
 | Actions  |
 | :------------ |

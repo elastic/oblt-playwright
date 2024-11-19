@@ -1,13 +1,15 @@
 import { expect, Page } from "@playwright/test";
 
-export default class LogsExplorerPage {
+export default class DiscoverPage {
     page: Page;
 
     constructor(page: Page) {
         this.page = page;
     }
 
-    private readonly logsExplorerTab = () => this.page.getByTestId('logsExplorerTab');
+    public readonly discoverTab = () => this.page.getByTestId('discoverTab');
+    private readonly dataView = () => this.page.getByTestId('discover-dataView-switch-link');
+    private readonly dataViewLogs = () => this.page.locator('xpath=//li[@value="logs-*"]');
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
@@ -26,8 +28,13 @@ export default class LogsExplorerPage {
     private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
     public readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
     
-    public async clickLogsExplorerTab() {
-        await this.logsExplorerTab().click();
+    public async clickDataView() {
+        await this.dataView().click();
+        }
+
+    public async selectLogsDataView() {
+        await this.dataView().click();
+        await this.dataViewLogs().click();
         }
 
     public async clickFieldStatsTab() {

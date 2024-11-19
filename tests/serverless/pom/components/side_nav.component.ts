@@ -12,15 +12,15 @@ export default class SideNav {
     }
 
     public readonly sideNav = () => this.page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]');
-    private readonly discover = () => this.page.locator('xpath=//a[@id="observability-logs-explorer"]');
+    private readonly discover = () => this.page.locator('xpath=//a[@href="/app/last-used-logs-viewer"]');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
-    private readonly applications = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.apm');
-    private readonly services = () => this.page.getByRole('link', { name: 'Service Inventory' });
+    private readonly applications = () => this.page.locator('xpath=//button//*[text()="Applications"]');
+    private readonly services = () => this.page.getByRole('link', { name: 'Service inventory' });
     private readonly traces = () => this.page.getByRole('link', { name: 'Traces' });
     private readonly dependencies = () => this.page.getByRole('link', { name: 'Dependencies' });
-    private readonly infrastructure = () => this.page.getByTestId('accordionArrow accordionArrow-observability_project_nav.metrics');
-    private readonly inventory = () => this.page.locator('xpath=//*[contains(text(),"Infrastructure Inventory")]');
+    private readonly infrastructure = () => this.page.locator('xpath=//button//*[text()="Infrastructure"]');
+    private readonly inventory = () => this.page.locator('xpath=//*[contains(text(),"Infrastructure inventory")]');
     private readonly hosts = () => this.page.getByRole('link', { name: 'Hosts' });
     private readonly projectSettings = () => this.page.locator('xpath=//button[@aria-controls="project_settings_project_nav"][2]');
     private readonly projectManagement = () => this.page.locator('xpath=//span[contains(text(),"Management")]');

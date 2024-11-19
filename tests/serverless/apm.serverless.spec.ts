@@ -34,7 +34,7 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('APM - Services', async ({ datePicker, sideNav, logsExplorerPage, notifications, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications, servicesPage }, testInfo) => {
   const throughput = "throughput";
   const errorRate = "errorRate";
 
@@ -75,33 +75,36 @@ test('APM - Services', async ({ datePicker, sideNav, logsExplorerPage, notificat
   await test.step('step04', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Clicks on "Investigate", navigates to "Host logs".`);
     await servicesPage.clickInvestigate();
-    await servicesPage.clickHostLogsButton();
-    await logsExplorerPage.assertVisibilityCanvas();
-  });
-  
-  await test.step('step05', async () => {
-    console.log(`\n[${testInfo.title}] Step 05 - Filters logs by selected date picker option, then filters by error messages. Expands certain document.`);
-    await datePicker.setPeriod();
-    await logsExplorerPage.filterLogsByError();
-    await logsExplorerPage.expandLogsDataGridRow();
+    await servicesPage.clickViewInDiscoverButton();
+    await discoverPage.assertVisibilityCanvas();
   });
 });
 
-test('APM - Traces', async ({ datePicker, sideNav, notifications, servicesPage, tracesPage }, testInfo) => {
+test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, servicesPage, tracesPage }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces.`);
     await sideNav.clickTraces();
   });
-  
+
   await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
-    await tracesPage.openExplorerTab();
+    console.log(`\n[${testInfo.title}] Step 02 - Waits for top traces table to be loaded.`);
     await datePicker.setPeriod();
-    await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
+    await Promise.race([
+      headerBar.assertLoadingIndicator(),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
   });
   
   await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "View related error" in the timeline.`);
+    console.log(`\n[${testInfo.title}] Step 03 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
+    await tracesPage.openExplorerTab();
+    await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
+  });
+  
+  await test.step('step04', async () => {
+    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the "View related error" in the timeline.`);
     await Promise.race([
       tracesPage.assertRelatedError(),
       notifications.assertErrorFetchingResource().then(() => {
@@ -113,7 +116,7 @@ test('APM - Traces', async ({ datePicker, sideNav, notifications, servicesPage, 
   });
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, logsExplorerPage, notifications }, testInfo) => {
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies.`);
     await sideNav.clickDependencies();
@@ -169,6 +172,6 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, logsE
     console.log(`\n[${testInfo.title}] Step 06 - Clicks on "Investigate", selects "Trace logs".`);
     await dependenciesPage.clickInvestigateButton();
     await dependenciesPage.clickTraceLogsButton();
-    await logsExplorerPage.assertVisibilityDataGridRow();
+    await discoverPage.assertVisibilityDataGridRow();
   });
 });
