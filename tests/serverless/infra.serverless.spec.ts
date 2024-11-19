@@ -1,6 +1,6 @@
 import { test } from '../fixtures/serverless/basePage';
+import { expect } from "@playwright/test";
 import { checkPodData, spaceSelectorServerless } from "../../src/helpers.ts";
-let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check pod data', async ({ request }) => {
   await checkPodData(request);
@@ -28,6 +28,12 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await dashboardPage.assertVisibilityTable();
     await dashboardPage.searchDashboard('Cluster Overview');
     await page.keyboard.press('Enter');
+    await Promise.race([
+      expect(page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" })).toBeVisible(),
+      dashboardPage.assertNoDashboard().then(() => {
+        throw new Error('Test is failed because no dashboard with the name "[Metrics Kubernetes] Cluster Overview" found.');
+        })
+      ]);
     await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
   });
 

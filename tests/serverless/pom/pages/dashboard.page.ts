@@ -86,6 +86,10 @@ export default class DashboardPage {
         await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//*[text()="No results found"]`), 'No results found').toBeVisible();
         }
 
+    public async assertNoDashboard() {
+        await expect(this.page.locator('xpath=//*[text()="No dashboards matched your search."]'), '"No dashboard found" message').toBeVisible();
+        }
+
     public async kubernetesVisualizationOptions(title: string) {
         await this.page.locator(`xpath=//button[@aria-label="Panel options for ${title}"]`).click();
         }
