@@ -6,7 +6,6 @@ import { waitForOneOf } from "../src/helpers.ts";
 serverless_auth('Authentication', async ({page}) => {
   await page.goto(process.env.KIBANA_HOST);
   console.log(`...waiting for login page elements to appear.`);
-  await page.locator('xpath=//button[contains(text(), "Accept")]').click();
   await page.getByTestId('login-username').click();
   await page.getByTestId('login-username').fill(process.env.KIBANA_USERNAME);
   await page.getByTestId('login-password').click();

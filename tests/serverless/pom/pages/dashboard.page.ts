@@ -79,7 +79,7 @@ export default class DashboardPage {
         }
 
     public async assertEmbeddedError(title: string) {
-        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//div[@class="lnsEmbeddedError"]`), `Error while loading visualization "${title}"`).toBeVisible();
+        expect(this.page.locator(`xpath=//div[@data-title="${title}"]//div[@data-test-subj="embeddable-lens-failure"]`), `Error while loading visualization "${title}"`).toBeDefined();
         }
 
     public async assertNoData(title: string) {

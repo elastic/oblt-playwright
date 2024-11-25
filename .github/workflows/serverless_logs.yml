@@ -1,4 +1,4 @@
-name: '[serverless] SLOs performance tests'
+name: Serverless - Logs
 on: workflow_dispatch
 permissions:
   contents: read
@@ -32,25 +32,19 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: npm ci
  
-      - name: Install Playwright Browsers
+      - name: Install Chromium
         if: steps.cache-playwright.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps
+        run: npx playwright install-deps chromium
 
   test:
     needs: install
     timeout-minutes: 60
-    name: Performance tests
     runs-on: ubuntu-latest
-    env:
-        API_KEY: ${{ secrets.API_KEY }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
-        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
-        REPORT_FILE: ${{ secrets.REPORT_FILE }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 20
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
@@ -65,28 +59,35 @@ jobs:
           ~/.cache/ms-playwright
         key: playwright-${{ hashFiles('package-lock.json') }}
     
-    - name: Run SLO transforms performance tests
-      run: npx playwright test slos.api.spec.ts
-      
+    - name: Run Playwright tests
+      run: npx playwright test logs.serverless.spec.ts --project serverless
+      env:
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+        API_KEY: ${{ secrets.API_KEY }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_X }}
+
     - uses: actions/upload-artifact@v4
-      if: success()
+      if: always()
       with:
         name: test-results
-        path: playwright-report
+        path: playwright-report/
         retention-days: 1
 
   parse:
+    if: always()
     needs: test
     name: Parse raw test report
-    if: success()
     runs-on: ubuntu-latest
     env:
-        REPORT_FILE: ${{ secrets.REPORT_FILE }}
+        REPORT_FILE: ${{ vars.REPORT_FILE }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 20
 
     - name: Cache node_modules
       uses: actions/cache@v4
@@ -101,32 +102,32 @@ jobs:
         path: /home/runner/work/oblt-playwright
         
     - name: Parse raw report
-      run: node utils/slo_report_parser.ts
+      run: node utils/split_json_report.js
 
-    - name: Remove raw test report from artifacts
-      run: rm -rf /home/runner/work/oblt-playwright/test-results/results.json
+    - name: Remove raw test report
+      run: rm -rf /home/runner/work/oblt-playwright/playwright-report/test-results
       
     - name: Upload test report
       uses: actions/upload-artifact@v4
       with:
         name: perf-test-report
         path: /home/runner/work/oblt-playwright/test-results
-        retention-days: 90
+        retention-days: 30
 
   upload:
+    if: always()
     needs: parse
     name: Upload test reports to Elasticsearch
-    if: success()
     runs-on: ubuntu-latest
     env:
-        API_KEY: ${{ secrets.API_KEY }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
-        ELASTIC_SLO_INDEX: ${{ secrets.ELASTIC_SLO_INDEX }}
+        REPORTING_CLUSTER_API_KEY: ${{ secrets.REPORTING_CLUSTER_API_KEY }}
+        REPORTING_CLUSTER_ES: ${{ secrets.REPORTING_CLUSTER_ES }}
+        REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 20
   
     - name: Download raw test report from artifacts
       uses: actions/download-artifact@v4

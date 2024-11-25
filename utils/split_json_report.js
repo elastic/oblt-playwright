@@ -26,8 +26,7 @@ testSuites.forEach(suite => {
               workerIndex: result.workerIndex,
               retry: result.retry,
               errors: result.errors,
-              timeout: test.timeout,
-              stdout: result.stdout,
+              timeout: test.timeout
             };
             const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;
             const outputPath = path.join(outputDirectory, fileName);
