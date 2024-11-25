@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPORT_DIR=/home/runner/work/oblt-playwright/perf-test-report/
+REPORT_DIR=/home/runner/work/oblt-playwright/
 FILES=$(find "$REPORT_DIR" -type f -name "*.json" ! -name "results.json")
 for file in $FILES; do
     echo "Found file: $file"
