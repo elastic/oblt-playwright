@@ -9,7 +9,7 @@ const outputDirectory = path.dirname(inputFilePath);
 test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
     await sideNav.goto();
     await spaceSelectorStateful(headerBar, spaceSelector);
-    await page.goto('ftw/app/observabilityOnboarding');
+    await page.goto('/app/observabilityOnboarding');
 });
 
 test('Auto-detect logs and metrics', async ({ headerBar, onboardingPage, page }) => {
