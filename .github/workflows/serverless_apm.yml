@@ -1,5 +1,8 @@
-name: Serverless - APM
-on: workflow_dispatch
+name: "Serverless - APM (7 Days)"
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 permissions:
   contents: read
 
