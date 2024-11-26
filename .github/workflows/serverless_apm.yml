@@ -38,6 +38,7 @@ jobs:
 
   test:
     needs: install
+    name: Run tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
