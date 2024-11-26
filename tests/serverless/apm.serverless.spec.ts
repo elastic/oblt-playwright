@@ -82,12 +82,8 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
 
 test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, servicesPage, tracesPage }, testInfo) => {
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces. Waits for top traces table to be loaded.`);
     await sideNav.clickTraces();
-  });
-
-  await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Waits for top traces table to be loaded.`);
     await datePicker.setPeriod();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
@@ -97,14 +93,14 @@ test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, ser
     ]);
   });
   
-  await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
+  await test.step('step02', async () => {
+    console.log(`\n[${testInfo.title}] Step 02 - Opens the "Explorer" tab, filters data by http.response.status_code : 502.`);
     await tracesPage.openExplorerTab();
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
   });
   
-  await test.step('step04', async () => {
-    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the "View related error" in the timeline.`);
+  await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "View related error" in the timeline. Asserts related errors.`);
     await Promise.race([
       tracesPage.assertRelatedError(),
       notifications.assertErrorFetchingResource().then(() => {
@@ -118,18 +114,14 @@ test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, ser
 
 test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications }, testInfo) => {
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies. Filters data by selected date picker option.`);
     await sideNav.clickDependencies();
     await dependenciesPage.assertVisibilityTable();
-  });
-
-  await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected date picker option.`);
     await datePicker.setPeriod();
   });
 
-  await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Selects the dependency, then navigates to the "Operations" tab.`);
+  await test.step('step02', async () => {
+    console.log(`\n[${testInfo.title}] Step 02 - Selects the dependency, then navigates to the "Operations" tab.`);
     const [ index ] = await waitForOneOf([
       dependenciesPage.dependencyTableLoaded(),
       dependenciesPage.dependencyTableNotLoaded()
@@ -151,8 +143,8 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
       }
   });
 
-  await test.step('step04', async () => {
-    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the most impactful operation.`);
+  await test.step('step03', async () => {
+    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the most impactful operation.`);
     await dependenciesPage.clickTableRow();
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
@@ -162,8 +154,8 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
     ]);
   });
 
-  await test.step('step05', async () => {
-    console.log(`\n[${testInfo.title}] Step 05 - Clicks on the transaction in the timeline to open the detailed view.`);
+  await test.step('step04', async () => {
+    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the transaction in the timeline to open the detailed view.`);
     await dependenciesPage.clickTimelineTransaction();
     await dependenciesPage.assertVisibilityTabPanel();
   });
