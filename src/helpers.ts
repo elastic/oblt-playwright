@@ -6,7 +6,7 @@ import { SpaceSelector as SpaceSelectorServerless } from '../tests/serverless/po
 const fs = require('fs');
 const path = require('path');
 const apiKey = process.env.API_KEY;
-const outputDirectory = process.env.HOSTS_DIR;
+const outputDirectory = "/home/runner/work/oblt-playwright/playwright-report/";
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
 
