@@ -1,4 +1,4 @@
-name: Serverless - Hosts
+name: "Serverless - Hosts [7 days]"
 on: workflow_dispatch
 permissions:
   contents: read
