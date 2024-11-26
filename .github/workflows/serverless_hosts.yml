@@ -1,5 +1,8 @@
-name: Serverless - Hosts
-on: workflow_dispatch
+name: "Serverless - Hosts (7 Days)"
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 permissions:
   contents: read
 
