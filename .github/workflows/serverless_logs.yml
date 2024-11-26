@@ -1,5 +1,8 @@
-name: Serverless - Logs
-on: workflow_dispatch
+name: "Serverless - Logs (7 Days)"
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
 permissions:
   contents: read
 
@@ -38,6 +41,7 @@ jobs:
 
   test:
     needs: install
+    name: Run tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -105,7 +109,7 @@ jobs:
       run: node utils/split_json_report.js
 
     - name: Remove raw test report
-      run: rm -rf /home/runner/work/oblt-playwright/playwright-report/test-results
+      run: rm -r /home/runner/work/oblt-playwright/test-results/results.json
       
     - name: Upload test report
       uses: actions/upload-artifact@v4
