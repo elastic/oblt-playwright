@@ -3,6 +3,10 @@ import path from 'path';
 
 const dotEnvPath = process.env.DOTENV_PATH ?? path.join(__dirname, '.env');
 
+console.log('---------------------------------------------------------------');
+console.log(__dirname);
+console.log('---------------------------------------------------------------');
+
 require('dotenv').config({ path: dotEnvPath });
 
 let apiKey = process.env.API_KEY;
@@ -14,7 +18,7 @@ export default defineConfig({
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  // forbidOnly: !!process.env.CI,
+  forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
@@ -23,8 +27,8 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "list",
   /* Timeouts */
-  timeout: 400000,
-  expect: {timeout: 400000},
+  timeout: 60000,
+  expect: {timeout: 60000},
 
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -39,6 +43,7 @@ export default defineConfig({
       size: {width: 1920, height: 1200}},
 
     permissions: ["clipboard-read"],
+    screenshot: 'on'
   },
 
   projects: [
