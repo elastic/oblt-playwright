@@ -14,25 +14,29 @@ testSuites.forEach(suite => {
     spec.tests.forEach(test => {
         test.results.forEach(result => {
             let stepData = {};
+            let errorData = {};
             (result.steps || []).forEach(step => {
                 stepData[step.title] = step.duration;
             });
-            const jsonData = {
-              title: spec.title,
-              startTime: result.startTime,
-              status: result.status,
-              duration: result.duration,
-              ...stepData,
-              workerIndex: result.workerIndex,
-              retry: result.retry,
-              errors: result.errors,
-              timeout: test.timeout
-            };
-            const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;
-            const outputPath = path.join(outputDirectory, fileName);
-            fs.writeFileSync(outputPath, JSON.stringify(jsonData, null, 2));
-            console.log(`File "${fileName}" has been created successfully.`);
-      });
+            (result.errors || []).forEach(error => {
+                errorData.error = (error.message.match(/:(\s*[\w\s]+)(?=\s|$|[^a-zA-Z0-9])/) || [])[1]?.trim();
+                const jsonData = {
+                  title: spec.title,
+                  startTime: result.startTime,
+                  status: result.status,
+                  duration: result.duration,
+                  ...stepData,
+                  workerIndex: result.workerIndex,
+                  retry: result.retry,
+                  ...errorData,
+                  timeout: test.timeout
+                };     
+                const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;
+                const outputPath = path.join(outputDirectory, fileName);
+                fs.writeFileSync(outputPath, JSON.stringify(jsonData, null, 2));
+                console.log(`File "${fileName}" has been created successfully.`);
+            });
+          });
     });
   });
 });

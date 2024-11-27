@@ -1,8 +1,8 @@
-name: "Serverless - APM (7 Days)"
+name: "Serverless - APM"
 on:
   schedule:
+    - cron: "0 * * * *"
     - cron: "*/30 * * * *"
-  workflow_dispatch:
 permissions:
   contents: read
 
@@ -39,11 +39,12 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install-deps chromium
 
-  test:
+  test_7_days:
     needs: install
-    name: Run tests
+    name: Run tests (7 days)
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    if: github.event.schedule == '*/30 * * * *'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -73,6 +74,41 @@ jobs:
         TIME_UNIT: ${{ vars.TIME_UNIT }}
         TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
+  test_14_days:
+    needs: install
+    name: Run tests (14 days)
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 * * * *'
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test apm.serverless.spec.ts --project serverless
+      env:
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+        API_KEY: ${{ secrets.API_KEY }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
+
     - uses: actions/upload-artifact@v4
       if: always()
       with:
@@ -81,8 +117,10 @@ jobs:
         retention-days: 1
 
   parse:
-    if: always()
-    needs: test
+    needs:
+      - test_7_days
+      - test_14_days
+    if: ${{ needs.test_7_days.result == 'completed' || needs.test_14_days.result == 'completed' }}
     name: Parse raw test report
     runs-on: ubuntu-latest
     env:
@@ -119,8 +157,8 @@ jobs:
         retention-days: 30
 
   upload:
-    if: always()
     needs: parse
+    if: ${{ needs.parse.result == 'completed' }}
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
     env:
