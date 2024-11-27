@@ -70,6 +70,7 @@ jobs:
         KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
         KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
+        API_KEY: ${{ secrets.API_KEY }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
         TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
