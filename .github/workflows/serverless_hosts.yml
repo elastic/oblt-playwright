@@ -129,7 +129,7 @@ jobs:
     needs:
       - test_7_days
       - test_14_days
-    if: ${{ needs.test_7_days.result == 'success' || needs.test_14_days.result == 'success' }}
+    if: ${{ needs.test_7_days.result == 'completed' || needs.test_14_days.result == 'completed' }}
     name: Parse raw test report
     runs-on: ubuntu-latest
     env:
@@ -154,9 +154,6 @@ jobs:
         
     - name: Parse raw report
       run: node utils/split_json_report.js
-
-    - name: Remove raw test report
-      run: rm -r /home/runner/work/oblt-playwright/test-results/results.json
       
     - name: Upload test report
       uses: actions/upload-artifact@v4
@@ -166,8 +163,8 @@ jobs:
         retention-days: 30
 
   upload:
-    if: always()
     needs: parse
+    if: ${{ needs.parse.result == 'completed' }}
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
     env:
