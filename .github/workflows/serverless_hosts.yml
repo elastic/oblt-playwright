@@ -129,7 +129,7 @@ jobs:
     needs:
       - test_7_days
       - test_14_days
-    if: ${{ needs.test_7_days.result == 'completed' || needs.test_14_days.result == 'completed' }}
+    if: always()
     name: Parse raw test report
     runs-on: ubuntu-latest
     env:
@@ -164,13 +164,13 @@ jobs:
 
   upload:
     needs: parse
-    if: ${{ needs.parse.result == 'completed' }}
+    if: ${{ needs.parse.result == 'success' }}
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
     env:
         REPORTING_CLUSTER_API_KEY: ${{ secrets.REPORTING_CLUSTER_API_KEY }}
         REPORTING_CLUSTER_ES: ${{ secrets.REPORTING_CLUSTER_ES }}
-        REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
+        REPORTING_CLUSTER_INDEX: ${{ github.event.schedule == '*/30 * * * *' && vars.REPORTING_CLUSTER_INDEX_X || vars.REPORTING_CLUSTER_INDEX_Y }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
