@@ -20,7 +20,8 @@ testSuites.forEach(suite => {
             });
             (result.errors || []).forEach(error => {
                 errorData.error = (error.message.match(/:(\s*[\w\s]+)(?=\s|$|[^a-zA-Z0-9])/) || [])[1]?.trim();
-                const jsonData = {
+            });
+            const jsonData = {
                   title: spec.title,
                   startTime: result.startTime,
                   status: result.status,
@@ -31,11 +32,10 @@ testSuites.forEach(suite => {
                   ...errorData,
                   timeout: test.timeout
                 };     
-                const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;
-                const outputPath = path.join(outputDirectory, fileName);
-                fs.writeFileSync(outputPath, JSON.stringify(jsonData, null, 2));
-                console.log(`File "${fileName}" has been created successfully.`);
-            });
+            const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;
+            const outputPath = path.join(outputDirectory, fileName);
+            fs.writeFileSync(outputPath, JSON.stringify(jsonData, null, 2));
+            console.log(`File "${fileName}" has been created successfully.`);
           });
     });
   });
