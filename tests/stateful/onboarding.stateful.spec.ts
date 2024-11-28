@@ -51,6 +51,7 @@ test('Auto-detect logs and metrics', async ({ headerBar, onboardingPage, page })
     fs.writeFileSync(outputPath, clipboardData);
 
     await onboardingPage.assertReceivedDataIndicator();
+    await page.waitForTimeout(60000);
     await onboardingPage.clickAutoDetectSystemIntegrationCTA();
 
     const hostsPage = new HostsPage(await page.waitForEvent('popup'))
