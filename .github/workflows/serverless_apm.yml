@@ -158,7 +158,7 @@ jobs:
 
   upload:
     needs: parse
-    if: ${{ needs.parse.result == 'success' }}
+    if: always()
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
     env:
