@@ -3,10 +3,6 @@ import path from 'path';
 
 const dotEnvPath = process.env.DOTENV_PATH ?? path.join(__dirname, '.env');
 
-console.log('---------------------------------------------------------------');
-console.log(__dirname);
-console.log('---------------------------------------------------------------');
-
 require('dotenv').config({ path: dotEnvPath });
 
 let apiKey = process.env.API_KEY;
