@@ -21,7 +21,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   // workers: 4,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [[process.env.CI ? 'json' : 'list'], ["json", { outputFile: "playwright-report/results.json" }]],
+  reporter: [[process.env.CI ? 'json' : 'json'], ["json", { outputFile: "playwright-report/results.json" }]],
   /* Timeouts */
   timeout: 400000,
   expect: {timeout: 400000},
