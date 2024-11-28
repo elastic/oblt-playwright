@@ -34,6 +34,8 @@ export default class HostsPage {
     private readonly hostsLogs = () => this.page.getByTestId('hostsView-tabs-logs');
     private readonly tableCellHosts = () => this.page.locator('xpath=//tbody//tr[1]//td//span[contains(@class, "euiTableCellContent__text")]');
     private readonly hostKPICPUPercentage = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsKPIcpuUsage"]//p[@class="echMetricText__value"]');
+    private readonly hostDetailsLogsTab = () => this.page.locator('xpath=//button[@data-test-subj="infraAssetDetailsLogsTab"]');
+    private readonly hostDetailsLogsStream = () => this.page.locator('xpath=//div[@data-test-subj="logStream"]');
 
     public async clickTableCellHosts() {
         await expect(this.hostsTable()).toBeVisible();
@@ -224,4 +226,13 @@ export default class HostsPage {
         await expect(this.hostKPICPUPercentage()).toBeVisible();
         expect(await this.hostKPICPUPercentage().textContent()).not.toBe('N/A');
     }
+
+    public async clickHostDetailsLogsTab() {
+        await this.hostDetailsLogsTab().click();
+    }
+
+    public async assertHostDetailsLogsStream() {
+        await expect(this.hostDetailsLogsStream(), 'Host details log stream should be visible').toBeVisible();
+    }
+
 }
