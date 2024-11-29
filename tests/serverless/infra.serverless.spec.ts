@@ -31,7 +31,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await Promise.race([
       expect(page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" })).toBeVisible(),
       dashboardPage.assertNoDashboard().then(() => {
-        throw new Error('Test is failed because no dashboard with the name "[Metrics Kubernetes] Cluster Overview" found.');
+        throw new Error('Test is failed because no dashboard found.');
         })
       ]);
     await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
