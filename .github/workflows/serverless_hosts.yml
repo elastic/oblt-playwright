@@ -134,6 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
+        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
         API_KEY: ${{ secrets.API_KEY }}
     steps:
     - uses: actions/checkout@v4
