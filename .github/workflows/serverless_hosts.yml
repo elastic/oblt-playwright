@@ -134,6 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
+        API_KEY: ${{ secrets.API_KEY }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
