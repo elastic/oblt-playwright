@@ -24,7 +24,7 @@ export default class TracesPage {
       }
 
     public async assertRelatedError() {
-        await expect(this.relatedError() || this.relatedErrors(), 'Related errors in timeline').toBeVisible();
+        await expect(this.relatedError() || this.relatedErrors(), 'Trace-related errors in timeline should be visible').toBeVisible();
       }
 
     public async clickRelatedError() {
