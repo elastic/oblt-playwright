@@ -62,6 +62,7 @@ async function parse() {
               const jsonData = {
                     title: spec.title,
                     startTime: result.startTime,
+                    period: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
                     status: result.status,
                     duration: result.duration,
                     ...stepData,
