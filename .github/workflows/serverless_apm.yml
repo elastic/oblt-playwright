@@ -64,11 +64,6 @@ jobs:
           path: |
             ~/.cache/ms-playwright
           key: playwright-${{ hashFiles('package-lock.json') }}
-
-      - name: Set delay
-        run:
-          RANDOM_DELAY=$(( RANDOM % 3600 ))
-          sleep $RANDOM_DELAY
       
       - name: Run Playwright tests
         run: npx playwright test apm.serverless.spec.ts --project serverless
