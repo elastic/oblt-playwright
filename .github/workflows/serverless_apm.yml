@@ -64,11 +64,6 @@ jobs:
           path: |
             ~/.cache/ms-playwright
           key: playwright-${{ hashFiles('package-lock.json') }}
-
-      - name: Set delay
-        run:
-          RANDOM_DELAY=$(( RANDOM % 3600 ))
-          sleep $RANDOM_DELAY
       
       - name: Run Playwright tests
         run: npx playwright test apm.serverless.spec.ts --project serverless
@@ -183,6 +178,8 @@ jobs:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
         API_KEY: ${{ secrets.API_KEY }}
+        TIME_VALUE: ${{ github.job.name == 'test_1_day' && vars.TIME_VALUE_Z || (github.job.name == 'test_7_days' && vars.TIME_VALUE_X || vars.TIME_VALUE_Y) }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
