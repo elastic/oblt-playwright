@@ -68,6 +68,7 @@ async function parse() {
                     workerIndex: result.workerIndex,
                     retry: result.retry,
                     ...errorData,
+                    errorData: result.error,
                     timeout: test.timeout,
                     cluster_name: cluster_name,
                     cluster_uuid: cluster_uuid,
