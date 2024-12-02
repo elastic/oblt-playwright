@@ -103,7 +103,7 @@ All the individual host tests are not the best fit for the performance compariso
 It would only be suitable in case when hosts in all the environments being compared have collected data within the selected time period. 
 */
 
-test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, sideNav, notifications, page, request }, testInfo) => {
+test.skip('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, sideNav, notifications, page, request }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";``
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -166,7 +166,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, s
     });
 });
 
-test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, sideNav, page, request }, testInfo) => {
+test.skip('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, sideNav, page, request }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metadata tab.`);
         await sideNav.clickHosts();
@@ -187,7 +187,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, s
     });
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, sideNav, notifications, page, request }, testInfo) => {
+test.skip('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, sideNav, notifications, page, request }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -255,7 +255,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, si
     });
 });
 
-test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, sideNav, notifications, page, request }, testInfo) => {
+test.skip('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, sideNav, notifications, page, request }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Processes tab.`);
         await sideNav.clickHosts();
@@ -284,7 +284,7 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
     });
 });
 
-test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, sideNav, notifications, request }, testInfo) => {
+test.skip('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, sideNav, notifications, request }, testInfo) => {
     await test.step('step01', async () => {
         console.log(`\n[${testInfo.title}] Step 01 - Navigates to Logs tab.`);
         await sideNav.clickHosts();
