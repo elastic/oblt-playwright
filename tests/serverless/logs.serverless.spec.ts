@@ -8,38 +8,70 @@ test.beforeEach(async ({ discoverPage, sideNav, spaceSelector }) => {
   await discoverPage.discoverTab().click();
 });
 
-test('Discover - All logs', async ({datePicker, discoverPage}) => {
+test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications}) => {
   await test.step('step01', async () => {
     await discoverPage.selectLogsDataView();
     await datePicker.setPeriod();
-    await discoverPage.assertChartIsRendered();
-    await discoverPage.assertVisibilityCanvas();
-    await discoverPage.assertVisibilityDataGridRow();
+    await Promise.race([
+      Promise.all([
+        discoverPage.assertChartIsRendered(),
+        discoverPage.assertVisibilityCanvas(),
+        discoverPage.assertVisibilityDataGridRow(),
+        headerBar.assertLoadingIndicator()
+      ]),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+        })
+    ]);
   });
 });
 
-test('Discover - Field Statistics', async ({datePicker, discoverPage}) => { 
+test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications}) => { 
   await test.step('step01', async () => {
     await discoverPage.selectLogsDataView();
     await datePicker.setPeriod();
-    await discoverPage.assertChartIsRendered();
-    await discoverPage.assertVisibilityCanvas();
-    await discoverPage.assertVisibilityDataGridRow();
+    await Promise.race([
+      Promise.all([
+        await discoverPage.assertChartIsRendered(),
+        await discoverPage.assertVisibilityCanvas(),
+        await discoverPage.assertVisibilityDataGridRow(),
+        headerBar.assertLoadingIndicator()
+      ]),
+    notifications.assertErrorFetchingResource().then(() => {
+      throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
   });
 
   await test.step('step02', async () => {
     await discoverPage.clickFieldStatsTab();
-    await discoverPage.assertVisibilityFieldStatsDocCount();
+    await Promise.race([
+      Promise.all([
+        discoverPage.assertVisibilityFieldStatsDocCount(),
+        headerBar.assertLoadingIndicator()
+      ]),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+        })
+    ]);
   });
 });
 
-test('Discover - Patterns', async ({datePicker, discoverPage}) => { 
+test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications}) => { 
   await test.step('step01', async () => {
     await discoverPage.selectLogsDataView();
     await datePicker.setPeriod();
-    await discoverPage.assertChartIsRendered();
-    await discoverPage.assertVisibilityCanvas();
-    await discoverPage.assertVisibilityDataGridRow();
+    await Promise.race([
+      Promise.all([
+        await discoverPage.assertChartIsRendered(),
+        await discoverPage.assertVisibilityCanvas(),
+        await discoverPage.assertVisibilityDataGridRow(),
+        headerBar.assertLoadingIndicator()
+      ]),
+    notifications.assertErrorFetchingResource().then(() => {
+      throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
   });
 
   await test.step('step02', async () => {
