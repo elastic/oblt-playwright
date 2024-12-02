@@ -2,7 +2,8 @@ name: "Serverless - Logs"
 on:
   schedule:
     - cron: "0 * * * *"
-    - cron: "*/30 * * * *"
+    - cron: "15 * * * *"
+    - cron: "30 * * * *"
 permissions:
   contents: read
 
@@ -39,12 +40,54 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
+test_1_day:
+    needs: install
+    name: Run tests (1 day)
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '0 * * * *'
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test logs.serverless.spec.ts --project serverless
+      env:
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+        API_KEY: ${{ secrets.API_KEY }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: playwright-report/
+        retention-days: 1
+
   test_7_days:
     needs: install
     name: Run tests (7 days)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.schedule == '*/30 * * * *'
+    if: github.event.schedule == '15 * * * *'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -86,7 +129,7 @@ jobs:
     name: Run tests (14 days)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.schedule == '0 * * * *'
+    if: github.event.schedule == '30 * * * *'
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -125,10 +168,11 @@ jobs:
 
   parse:
     needs:
+      - test_1_day
       - test_7_days
       - test_14_days
     if: always()
-    name: Parse raw test report
+    name: Parse test report
     runs-on: ubuntu-latest
     env:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
@@ -170,7 +214,7 @@ jobs:
     env:
         REPORTING_CLUSTER_API_KEY: ${{ secrets.REPORTING_CLUSTER_API_KEY }}
         REPORTING_CLUSTER_ES: ${{ secrets.REPORTING_CLUSTER_ES }}
-        REPORTING_CLUSTER_INDEX: ${{ github.event.schedule == '*/30 * * * *' && vars.REPORTING_CLUSTER_INDEX_X || vars.REPORTING_CLUSTER_INDEX_Y }}
+        REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
