@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import { test } from '../fixtures/stateful/basePage.ts';
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 import HostsPage from './pom/pages/hosts.page.ts';
@@ -9,7 +10,7 @@ const outputDirectory = path.dirname(inputFilePath);
 test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
     await sideNav.goto();
     await spaceSelectorStateful(headerBar, spaceSelector);
-    await page.goto('/app/observabilityOnboarding');
+    await page.goto(`${process.env.KIBANA_HOST}/app/observabilityOnboarding`);
 });
 
 test('Auto-detect logs and metrics', async ({ headerBar, onboardingPage, page }) => {
@@ -53,7 +54,20 @@ test('Auto-detect logs and metrics', async ({ headerBar, onboardingPage, page })
     await onboardingPage.assertReceivedDataIndicator();
     await onboardingPage.clickAutoDetectSystemIntegrationCTA();
 
-    const hostsPage = new HostsPage(await page.waitForEvent('popup'))
+    const hostsPage = new HostsPage(await page.waitForEvent('popup'));
+
+    /**
+     * There is a glitch on the Hosts page where it can show "No data"
+     * screen even though data is available and it can show it with a delay
+     * after the Hosts page layout was loaded. This workaround waits for
+     * the No Data screen to be visible, and if so - reloads the page.
+     * If the No Data screen does not appear, the test can proceed normally.
+     * Seems like some caching issue with the Hosts page.
+     */
+    try {
+        await hostsPage.noData().waitFor({ state: 'visible', timeout: 10000 });
+        await hostsPage.page.reload();
+    } catch {}
 
     await hostsPage.clickHostDetailsLogsTab();
     await hostsPage.assertHostDetailsLogsStream()
