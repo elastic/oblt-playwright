@@ -181,7 +181,7 @@ jobs:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
         API_KEY: ${{ secrets.API_KEY }}
-        TIME_VALUE: ${{ github.job.name == 'test_1_day' && vars.TIME_VALUE_Z || (github.job.name == 'test_7_days' && vars.TIME_VALUE_X || vars.TIME_VALUE_Y) }}
+        TIME_VALUE: ${{ github.job.name == 'test_1_day' && vars.TIME_VALUE_Z || (github.job.name == 'test_7_days' && vars.TIME_VALUE_X) || vars.TIME_VALUE_Y }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
     steps:
     - uses: actions/checkout@v4
