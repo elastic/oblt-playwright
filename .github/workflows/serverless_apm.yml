@@ -194,12 +194,21 @@ jobs:
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
         API_KEY: ${{ secrets.API_KEY }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ needs.test_1_day.outputs.is_running == 'true' && vars.TIME_VALUE_X || (needs.test_7_days.outputs.is_running == 'true' && vars.TIME_VALUE_Y || (needs.test_14_days.outputs.is_running == 'true' && vars.TIME_VALUE_Z)) }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: 20
+
+    - name: Set environment variables
+      run: |
+        if [ "${{ needs.test_1_day.outputs.is_running }}" == "true" ]; then
+            echo "TIME_VALUE=${{ vars.TIME_VALUE_X }}" >> $GITHUB_ENV
+          elif [ "${{ needs.test_7_days.outputs.is_running }}" == "true" ]; then
+            echo "TIME_VALUE=${{ vars.TIME_VALUE_Y }}" >> $GITHUB_ENV
+          elif [ "${{ needs.test_14_days.outputs.is_running }}" == "true" ]; then
+            echo "TIME_VALUE=${{ vars.TIME_VALUE_Z }}" >> $GITHUB_ENV
+          fi
 
     - name: Cache node_modules
       uses: actions/cache@v4
@@ -214,7 +223,9 @@ jobs:
         path: /home/runner/work/oblt-playwright
         
     - name: Parse raw report
-      run: node utils/split_json_report.js
+      run: |
+        echo "Using TIME_VALUE: $TIME_VALUE"
+        node utils/split_json_report.js
       
     - name: Upload test report
       uses: actions/upload-artifact@v4
