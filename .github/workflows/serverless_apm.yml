@@ -187,12 +187,12 @@ jobs:
 
     - name: Set environment variables
       run: |
-        if [ "${{ github.job }}" == 'test_1_day' ]; then
-          echo "TIME_VALUE=1" >> $TIME_VALUE
-        elif [ "${{ github.job }}" == 'test_7_days' ]; then
-          echo "TIME_VALUE=7" >> $TIME_VALUE
+        if [ "${{ github.job.name == 'test_1_day' }}" ]; then
+          echo "TIME_VALUE=1" >> $GITHUB_ENV
+        elif [ "${{ github.job.name == 'test_7_days' }}" ]; then
+          echo "TIME_VALUE=7" >> $$GITHUB_ENV
         else
-          echo "TIME_VALUE=14" >> $TIME_VALUE
+          echo "TIME_VALUE=14" >> $$GITHUB_ENV
         fi
 
     - name: Cache node_modules
