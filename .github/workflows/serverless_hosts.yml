@@ -55,7 +55,7 @@ jobs:
           node-version: 20
       - name: Indicate running status
         id: set_output
-        run: echo "is_running=true"
+        run: echo "is_running=true" >> $GITHUB_ENV
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
@@ -103,7 +103,7 @@ jobs:
         node-version: 20
     - name: Indicate running status
       id: set_output
-      run: echo "is_running=true"
+      run: echo "is_running=true" >> $GITHUB_ENV
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
@@ -151,7 +151,7 @@ jobs:
         node-version: 20
     - name: Indicate running status
       id: set_output
-      run: echo "is_running=true"
+      run: echo "is_running=true" >> $GITHUB_ENV
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
