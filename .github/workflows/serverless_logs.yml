@@ -178,13 +178,22 @@ jobs:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
         API_KEY: ${{ secrets.API_KEY }}
-        TIME_VALUE: ${{ github.job.name == 'test_1_day' && vars.TIME_VALUE_Z || github.job.name == 'test_7_days' && vars.TIME_VALUE_X || github.job.name == 'test_14_days' && vars.TIME_VALUE_Y }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: 20
+
+    - name: Set environment variables
+      run: |
+        if [ "${{ github.job }}" == 'test_1_day' ]; then
+          echo "TIME_VALUE=1" >> $TIME_VALUE
+        elif [ "${{ github.job }}" == 'test_7_days' ]; then
+          echo "TIME_VALUE=7" >> $TIME_VALUE
+        else
+          echo "TIME_VALUE=14" >> $TIME_VALUE
+        fi
 
     - name: Cache node_modules
       uses: actions/cache@v4
