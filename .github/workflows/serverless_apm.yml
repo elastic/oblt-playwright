@@ -189,11 +189,6 @@ jobs:
     if: always()
     name: Parse test report
     runs-on: ubuntu-latest
-    env:
-        REPORT_FILE: ${{ vars.REPORT_FILE }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
-        API_KEY: ${{ secrets.API_KEY }}
-        TIME_UNIT: ${{ vars.TIME_UNIT }}
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
@@ -202,6 +197,8 @@ jobs:
 
     - name: Set environment variables
       run: |
+        set -e
+        echo "Test..."
         if [ "${{ needs.test_1_day.outputs.is_running }}" == "true" ]; then
             echo "TIME_VALUE=${{ vars.TIME_VALUE_X }}" >> $GITHUB_ENV
           elif [ "${{ needs.test_7_days.outputs.is_running }}" == "true" ]; then
@@ -226,6 +223,11 @@ jobs:
       run: |
         echo "Using TIME_VALUE: $TIME_VALUE"
         node utils/split_json_report.js
+      env:
+        REPORT_FILE: ${{ vars.REPORT_FILE }}
+        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST }}
+        API_KEY: ${{ secrets.API_KEY }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
       
     - name: Upload test report
       uses: actions/upload-artifact@v4
