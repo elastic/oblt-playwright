@@ -55,7 +55,7 @@ jobs:
           node-version: 20
       - name: Indicate running status
         id: set_output
-        run: echo "is_running=true" >> $GITHUB_ENV
+        run: echo "is_running=true" >> $GITHUB_OUTPUT
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
@@ -102,7 +102,7 @@ jobs:
         node-version: 20
     - name: Indicate running status
       id: set_output
-      run: echo "is_running=true" >> $GITHUB_ENV
+      run: echo "is_running=true" >> $GITHUB_OUTPUT
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
@@ -149,7 +149,7 @@ jobs:
         node-version: 20
     - name: Indicate running status
       id: set_output
-      run: echo "is_running=true" >> $GITHUB_ENV
+      run: echo "is_running=true" >> $GITHUB_OUTPUT
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
@@ -203,7 +203,7 @@ jobs:
             echo "TIME_VALUE=1" >> $GITHUB_ENV
           elif [[ ${{ needs.test_7_days.outputs.is_running }} == "true" ]]; then
             echo "TIME_VALUE=7" >> $GITHUB_ENV
-          else [[ ${{ needs.test_14_days.outputs.is_running }} == "true" ]]; then
+          elif [[ ${{ needs.test_14_days.outputs.is_running }} == "true" ]]; then
             echo "TIME_VALUE=14" >> $GITHUB_ENV
           fi
 
