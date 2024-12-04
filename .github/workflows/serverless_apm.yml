@@ -55,7 +55,7 @@ jobs:
           node-version: 20
       - name: Indicate running status
         id: set_output
-        run: echo "is_running=true" >> $GITHUB_ENV
+        run: echo "is_running=true" >> $GITHUB_OUTPUT
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
@@ -102,7 +102,7 @@ jobs:
         node-version: 20
     - name: Indicate running status
       id: set_output
-      run: echo "is_running=true" >> $GITHUB_ENV
+      run: echo "is_running=true" >> $GITHUB_OUTPUT
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
@@ -149,7 +149,7 @@ jobs:
         node-version: 20
     - name: Indicate running status
       id: set_output
-      run: echo "is_running=true" >> $GITHUB_ENV
+      run: echo "is_running=true" >> $GITHUB_OUTPUT
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
@@ -196,16 +196,18 @@ jobs:
         node-version: 20
 
     - name: Set environment variables
+      env:
+        TEST_1_DAY_IS_RUNNING: ${{ needs.test_1_day.outputs.is_running }}
+        TEST_7_DAYS_IS_RUNNING: ${{ needs.test_7_days.outputs.is_running }}
+        TEST_14_DAYS_IS_RUNNING: ${{ needs.test_14_days.outputs.is_running }}
       run: |
-        set -e
-        echo "Test..."
-        if [[ ${{ needs.test_1_day.outputs.is_running }} == "true" ]]; then
-            echo "TIME_VALUE=1" >> $GITHUB_ENV
-          elif [[ ${{ needs.test_7_days.outputs.is_running }} == "true" ]]; then
-            echo "TIME_VALUE=7" >> $GITHUB_ENV
-          else [[ ${{ needs.test_14_days.outputs.is_running }} == "true" ]]; then
-            echo "TIME_VALUE=14" >> $GITHUB_ENV
-          fi
+        if [[ "$TEST_1_DAY_IS_RUNNING" == "true" ]]; then
+          echo "TIME_VALUE=${{ vars.TIME_VALUE_X }}" >> $GITHUB_ENV
+        elif [[ "$TEST_7_DAYS_IS_RUNNING" == "true" ]]; then
+          echo "TIME_VALUE=${{ vars.TIME_VALUE_Y }}" >> $GITHUB_ENV
+        elif [[ "$TEST_14_DAYS_IS_RUNNING" == "true" ]]; then
+          echo "TIME_VALUE=${{ vars.TIME_VALUE_Z }}" >> $GITHUB_ENV
+        fi
 
     - name: Cache node_modules
       uses: actions/cache@v4
