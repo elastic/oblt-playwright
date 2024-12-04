@@ -202,12 +202,13 @@ jobs:
 
     - name: Set environment variables
       run: |
+        echo ${{ needs.test_14_days.outputs.is_running }}
         if [ "${{ needs.test_1_day.outputs.is_running }}" == "true" ]; then
-            echo "TIME_VALUE=${{ vars.TIME_VALUE_X }}" >> $GITHUB_ENV
+            echo "TIME_VALUE=1" >> $GITHUB_ENV
           elif [ "${{ needs.test_7_days.outputs.is_running }}" == "true" ]; then
-            echo "TIME_VALUE=${{ vars.TIME_VALUE_Y }}" >> $GITHUB_ENV
+            echo "TIME_VALUE=7" >> $GITHUB_ENV
           elif [ "${{ needs.test_14_days.outputs.is_running }}" == "true" ]; then
-            echo "TIME_VALUE=${{ vars.TIME_VALUE_Z }}" >> $GITHUB_ENV
+            echo "TIME_VALUE=14" >> $GITHUB_ENV
           fi
 
     - name: Cache node_modules
