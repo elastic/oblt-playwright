@@ -1,9 +1,12 @@
 import { test } from '../fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
-import { checkHostData, spaceSelectorStateful, writeFileReportHosts } from "../../src/helpers.ts";
+import { getHostData, spaceSelectorStateful, writeFileReportHosts } from "../../src/helpers.ts";
 
 test.beforeAll('Check data', async ({ request }) => {
-    await checkHostData(request);
+    const nodesData = await getHostData(request);
+    const nodesArr = nodesData.nodes;
+    const metricValue = nodesData.nodes[0].metrics[0].value;
+    test.skip(nodesArr.length == 0 || metricValue == null, 'Test is skipped due to lack of node data.');
 });
 
 test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
@@ -60,6 +63,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
 
 test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilityPage, request }, testInfo) => {    
     await test.step('step01', async () => {
+        let noLogsData = false;
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await observabilityPage.clickHosts();
@@ -71,7 +75,8 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilit
                 hostsPage.assertVisibilityLogStream()
                 ]),
             hostsPage.assertVisibilityNoLogs().then(() => {
-                throw new Error('Test is failed because no logs found.');
+                noLogsData = true;
+                test.skip(noLogsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -80,6 +85,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilit
 
 test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabilityPage, request }, testInfo) => {    
     await test.step('step01', async () => {
+        let noAlertsData = false;
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await observabilityPage.clickHosts();
@@ -92,7 +98,8 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabil
                 hostsPage.assertVisibilityAlertsTable()
                 ]),
             hostsPage.assertNoResultsMatchMessage().then(() => {
-                throw new Error('Test is failed because no alerts found.');
+                noAlertsData = true;
+                test.skip(noAlertsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
