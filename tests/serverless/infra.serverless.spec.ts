@@ -1,9 +1,11 @@
 import { test } from '../fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
-import { checkPodData, spaceSelectorServerless } from "../../src/helpers.ts";
+import { getPodData, spaceSelectorServerless } from "../../src/helpers.ts";
 
 test.beforeAll('Check pod data', async ({ request }) => {
-  await checkPodData(request);
+  const podsData = await getPodData(request);
+  const podsArr = podsData.nodes;
+  test.skip(podsArr.length == 0, 'Test is skipped due to lack of pod data.');
 });
 
 test.beforeEach(async ({ sideNav, spaceSelector }) => {

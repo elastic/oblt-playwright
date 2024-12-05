@@ -4,23 +4,20 @@ import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check APM data', async ({request}) => {
-  console.log(`... checking APM data.`);
   let response = await request.get('internal/apm/has_data', {
-      headers: {
-        "accept": "application/json",
-        "Authorization": apiKey,
-        "Content-Type": "application/json;charset=UTF-8",
-        "kbn-xsrf": "true",          
-        "x-elastic-internal-origin": "kibana"
-      },
-      data: {}
+    headers: {
+      "accept": "application/json",
+      "Authorization": apiKey,
+      "Content-Type": "application/json;charset=UTF-8",
+      "kbn-xsrf": "true",          
+      "x-elastic-internal-origin": "kibana"
+    },
+    data: {}
   })
   expect(response.status()).toBe(200);
-  const body = await response.text();
-  expect(body, 'Availability of APM data').toContain("true");
-  if (response.status() == 200) {
-    console.log(`✓ APM data is checked.`);
-  };
+  const body = JSON.parse(await response.text());
+  const hasData = body.hasData;
+  test.skip(!hasData == true, 'Test is skipped due to lack of APM data.');
 });
 
 test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {

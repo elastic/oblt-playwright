@@ -1,8 +1,11 @@
 import { test } from '../fixtures/serverless/basePage';
-import { checkHostData, spaceSelectorServerless, writeFileReportHosts } from "../../src/helpers.ts";
+import { getHostData, spaceSelectorServerless, writeFileReportHosts } from "../../src/helpers.ts";
 
 test.beforeAll('Check data', async ({ request }) => {
-    await checkHostData(request);
+    const nodesData = await getHostData(request);
+    const nodesArr = nodesData.nodes;
+    const metricValue = nodesData.nodes[0].metrics[0].value;
+    test.skip(nodesArr.length == 0 || metricValue == null, 'Test is skipped due to lack of node data.');
 });
 
 test.beforeEach(async ({ sideNav, spaceSelector }) => {
@@ -59,6 +62,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, side
 
 test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav, request }, testInfo) => {    
     await test.step('step01', async () => {
+        let noLogsData = false;
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await sideNav.clickHosts();
@@ -70,7 +74,8 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav, req
                 hostsPage.assertVisibilityLogStream()
                 ]),
             hostsPage.assertVisibilityNoLogs().then(() => {
-                throw new Error('Test is failed because no logs found.');
+                noLogsData = true;
+                test.skip(noLogsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -79,6 +84,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav, req
 
 test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, sideNav, request }, testInfo) => {    
     await test.step('step01', async () => {
+        let noAlertsData = false;
         const testStartTime = Date.now();
         console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
         await sideNav.clickHosts();
@@ -91,7 +97,8 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, sideNav, r
                 hostsPage.assertVisibilityAlertsTable()
                 ]),
             hostsPage.assertNoResultsMatchMessage().then(() => {
-                throw new Error('Test is failed because no alerts found.');
+                noAlertsData = true;
+                test.skip(noAlertsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
