@@ -48,10 +48,9 @@ export async function spaceSelectorServerless(sideNav: SideNav, spaceSelector: S
   };
 }
 
-export async function checkHostData(request: APIRequestContext) {
-  console.log(`... checking node data.`);
+export async function getHostData(request: APIRequestContext) {
   const currentTime = Date.now();
-  const rangeTime = currentTime - 1200000;
+  const rangeTime = currentTime - 86400000;
 
   let b = await request.post('api/metrics/snapshot', {
     headers: {
@@ -63,7 +62,7 @@ export async function checkHostData(request: APIRequestContext) {
     },
     data: {
       "filterQuery": "",
-      "metrics": [{ "type": "cpu" }],
+      "metrics": [{ "type": "memory" }],
       "nodeType": "host", "sourceId": "default",
       "accountId": "",
       "region": "",
@@ -75,15 +74,10 @@ export async function checkHostData(request: APIRequestContext) {
   });
   expect(b.status()).toBe(200);
   const jsonDataNode = JSON.parse(await b.text());
-  const nodesArr = jsonDataNode.nodes;
-  expect(nodesArr, 'The number of available nodes in the Inventory should not be less than 1.').not.toHaveLength(0);
-  if (b.status() == 200) {
-    console.log(`✓ Node data is checked.`);
-  }
+  return jsonDataNode;
 }
 
-export async function checkPodData(request: APIRequestContext) {
-  console.log(`... checking pod data.`);
+export async function getPodData(request: APIRequestContext) {
   const currentTime = Date.now();
   const rangeTime = currentTime - 1200000;
 
@@ -110,12 +104,10 @@ export async function checkPodData(request: APIRequestContext) {
   })
   expect(response.status()).toBe(200);
   const jsonData = JSON.parse(await response.text());
-  const nodesArr = jsonData.nodes;
-  expect(nodesArr, 'The number of available pods in the Inventory should not be less than 1.').not.toHaveLength(0);
-  console.log(`✓ Pod data is checked.`);
+  return jsonData;
 }
 
-export async function writeFileReportHosts(asyncResults: object[], request: APIRequestContext, testInfo: TestInfo, testStartTime: number, ) {
+export async function writeFileReportHosts(asyncResults: any, request: APIRequestContext, testInfo: TestInfo, testStartTime: number, ) {
   let versionNumber: string;
   let cluster_name: string;
   let cluster_uuid: string;
