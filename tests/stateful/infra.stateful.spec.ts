@@ -1,9 +1,10 @@
 import { test } from '../../tests/fixtures/stateful/basePage';
-import { checkPodData, spaceSelectorStateful } from "../../src/helpers.ts";
-let apiKey = process.env.API_KEY;
+import { getPodData, spaceSelectorStateful } from "../../src/helpers.ts";
 
 test.beforeAll('Check pod data', async ({request}) => {
-  await checkPodData(request);
+  const podsData = await getPodData(request);
+  const podsArr = podsData.nodes;
+  test.skip(podsArr.length == 0, 'Test is skipped due to lack of pod data.');
 });
 
 test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
