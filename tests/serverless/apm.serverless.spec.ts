@@ -1,6 +1,6 @@
 import { test } from '../../tests/fixtures/serverless/basePage';
 import { expect } from "@playwright/test";
-import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
+import { spaceSelectorServerless } from "../../src/helpers.ts";
 let apiKey = process.env.API_KEY;
 
 test.beforeAll('Check APM data', async ({request}) => {
@@ -25,11 +25,6 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
   await spaceSelectorServerless(sideNav, spaceSelector);
   await sideNav.clickApplications();
 });
-
-test.afterEach(async ({}, testInfo) => {
-  if (testInfo.status == testInfo.expectedStatus) {
-    console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
-}});
 
 test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications, servicesPage }, testInfo) => {
   const throughput = "throughput";
@@ -109,7 +104,7 @@ test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, ser
   });
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications }, testInfo) => {
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications, headerBar }, testInfo) => {
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies. Filters data by selected date picker option.`);
     await sideNav.clickDependencies();
@@ -119,25 +114,21 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
 
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Selects the dependency, then navigates to the "Operations" tab.`);
-    const [ index ] = await waitForOneOf([
-      dependenciesPage.dependencyTableLoaded(),
-      dependenciesPage.dependencyTableNotLoaded()
-      ]);
-    const tableLoaded = index === 0;
-    if (tableLoaded) {
-        await dependenciesPage.clickTableRow();
-        await dependenciesPage.assertVisibilityTable();
-        await dependenciesPage.openOperationsTab();
-        await Promise.race([
-          dependenciesPage.assertVisibilityTable(),
-          dependenciesPage.assertOperationsNotFound().then(() => {
-            throw new Error('Test is failed because dependency operations not found');
-          })
-        ]);
-      } else {
-        console.log('Dependencies table not loaded.');
-        throw new Error('Test is failed due to an error when loading dependencies table.');
-      }
+    await Promise.race([
+      headerBar.assertLoadingIndicator(),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed due to an error when loading data.');
+      })
+    ]);
+    await dependenciesPage.clickTableRow();
+    await dependenciesPage.assertVisibilityTable();
+    await dependenciesPage.openOperationsTab();
+    await Promise.race([
+      dependenciesPage.assertVisibilityTable(),
+      dependenciesPage.assertOperationsNotFound().then(() => {
+        throw new Error('Test is failed because dependency operations not found');
+      })
+    ]);
   });
 
   await test.step('step03', async () => {

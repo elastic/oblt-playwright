@@ -7,7 +7,7 @@ export default class HeaderBar {
         this.page = page;
     }
 
-    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
+    public readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
 
     public async assertLoadingIndicator() {
         await expect(this.loadingIndicator(), 'Loading indicator').toBeHidden();

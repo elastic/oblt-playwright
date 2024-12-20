@@ -1,0 +1,263 @@
+name: "Serverless - Logs"
+on:
+  schedule:
+    - cron: "0 * * * *"
+    - cron: "15 * * * *"
+    - cron: "30 * * * *"
+permissions:
+  contents: read
+
+jobs:
+  install:
+    timeout-minutes: 60
+    name: Install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+ 
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-node-modules
+        with:
+          path: |
+            node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+ 
+      - name: Cache Playwright binaries
+        uses: actions/cache@v4
+        id: cache-playwright
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+ 
+      - name: Install dependencies
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+ 
+      - name: Install Playwright Browsers
+        if: steps.cache-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+
+  test_1_day:
+      needs: install
+      name: Run tests (1 day)
+      timeout-minutes: 60
+      runs-on: ubuntu-latest
+      if: github.event.schedule == '0 * * * *'
+      outputs:
+        is_running: ${{ steps.set_output.outputs.is_running }}
+      steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Indicate running status
+        id: set_output
+        run: echo "is_running=true" >> $GITHUB_OUTPUT
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+          key: modules-${{ hashFiles('package-lock.json') }}
+  
+      - name: Cache Playwright
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+      
+      - name: Run Playwright tests
+        run: npx playwright test logs.serverless.spec.ts --project serverless
+        env:
+          KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
+          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+          API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+          TIME_UNIT: ${{ vars.TIME_UNIT }}
+          TIME_VALUE: ${{ vars.TIME_VALUE_X }}
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: playwright-report/
+          retention-days: 1
+
+  test_7_days:
+    needs: install
+    name: Run tests (7 days)
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '15 * * * *'
+    outputs:
+        is_running: ${{ steps.set_output.outputs.is_running }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Indicate running status
+      id: set_output
+      run: echo "is_running=true" >> $GITHUB_OUTPUT
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test logs.serverless.spec.ts --project serverless
+      env:
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: playwright-report/
+        retention-days: 1
+
+  test_14_days:
+    needs: install
+    name: Run tests (14 days)
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.schedule == '30 * * * *'
+    outputs:
+        is_running: ${{ steps.set_output.outputs.is_running }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Indicate running status
+      id: set_output
+      run: echo "is_running=true" >> $GITHUB_OUTPUT
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+ 
+    - name: Cache Playwright
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
+    
+    - name: Run Playwright tests
+      run: npx playwright test logs.serverless.spec.ts --project serverless
+      env:
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
+
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: playwright-report/
+        retention-days: 1
+
+  parse:
+    needs:
+      - test_1_day
+      - test_7_days
+      - test_14_days
+    if: always()
+    name: Parse test report
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Set environment variables
+      env:
+        TEST_1_DAY_IS_RUNNING: ${{ needs.test_1_day.outputs.is_running }}
+        TEST_7_DAYS_IS_RUNNING: ${{ needs.test_7_days.outputs.is_running }}
+        TEST_14_DAYS_IS_RUNNING: ${{ needs.test_14_days.outputs.is_running }}
+      run: |
+        if [[ "$TEST_1_DAY_IS_RUNNING" == "true" ]]; then
+          echo "TIME_VALUE=${{ vars.TIME_VALUE_X }}" >> $GITHUB_ENV
+        elif [[ "$TEST_7_DAYS_IS_RUNNING" == "true" ]]; then
+          echo "TIME_VALUE=${{ vars.TIME_VALUE_Y }}" >> $GITHUB_ENV
+        elif [[ "$TEST_14_DAYS_IS_RUNNING" == "true" ]]; then
+          echo "TIME_VALUE=${{ vars.TIME_VALUE_Z }}" >> $GITHUB_ENV
+        fi
+
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: |
+          node_modules
+        key: modules-${{ hashFiles('package-lock.json') }}
+  
+    - name: Download raw test report from artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: /home/runner/work/oblt-playwright
+        
+    - name: Parse raw report
+      run: |
+        echo "Using TIME_VALUE: $TIME_VALUE"
+        node utils/split_json_report.js
+      env:
+        REPORT_FILE: ${{ vars.REPORT_FILE }}
+        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
+        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+        TIME_UNIT: ${{ vars.TIME_UNIT }}
+      
+    - name: Upload test report
+      uses: actions/upload-artifact@v4
+      with:
+        name: perf-test-report
+        path: /home/runner/work/oblt-playwright/test-results
+        retention-days: 30
+
+  upload:
+    needs: parse
+    if: always()
+    name: Upload test reports to Elasticsearch
+    runs-on: ubuntu-latest
+    env:
+        REPORTING_CLUSTER_API_KEY: ${{ secrets.REPORTING_CLUSTER_API_KEY }}
+        REPORTING_CLUSTER_ES: ${{ secrets.REPORTING_CLUSTER_ES }}
+        REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+  
+    - name: Download raw test report from artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: perf-test-report
+        path: /home/runner/work/oblt-playwright
+        
+    - name: Upload test report to Elasticsearch
+      run: bash ./utils/upload_to_es.sh
