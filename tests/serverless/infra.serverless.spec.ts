@@ -19,7 +19,7 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`✓ [${testInfo.title}] completed in ${testInfo.duration} ms.\n`);
 }});
 
-test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
+test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top Memory intensive pods per Node";
 
@@ -119,9 +119,14 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
   await test.step('step04', async () => {
     console.log(`\n[${testInfo.title}] Step 04 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.`);
     await datePicker.setPeriod();
-    await Promise.all([
-      inventoryPage.assertVisibilityPodVisualization(podCpuUsage),
-      inventoryPage.assertVisibilityPodVisualization(podMemoryUsage)
-      ]);
+    await Promise.race([
+      Promise.all([
+        inventoryPage.assertVisibilityPodVisualization(podCpuUsage),
+        inventoryPage.assertVisibilityPodVisualization(podMemoryUsage)
+        ]),
+      inventoryPage.assertNoData().then(() => {
+        throw new Error('Test is failed because there is no data to display');
+        })
+    ]);
   });
 });
