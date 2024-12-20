@@ -1,4 +1,4 @@
-name: "Serverless - Hosts"
+name: "Serverless - Hosts (Azure)"
 on:
   schedule:
     - cron: "0 * * * *"

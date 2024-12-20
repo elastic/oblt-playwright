@@ -1,4 +1,4 @@
-name: "Serverless - APM"
+name: "Serverless - APM (Azure)"
 on:
   schedule:
     - cron: "0 * * * *"

@@ -1,4 +1,4 @@
-name: "Serverless - Logs"
+name: "Serverless - Logs (Azure)"
 on:
   schedule:
     - cron: "0 * * * *"

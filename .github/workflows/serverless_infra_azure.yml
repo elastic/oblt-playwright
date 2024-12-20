@@ -1,4 +1,4 @@
-name: "Serverless - Infrastructure Monitoring"
+name: "Serverless - Infrastructure Monitoring (Azure)"
 on:
   schedule:
     - cron: "0 * * * *"
