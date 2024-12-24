@@ -1,9 +1,10 @@
 name: "Serverless - Logs"
-on:
-  schedule:
-    - cron: "0 * * * *"
-    - cron: "15 * * * *"
-    - cron: "30 * * * *"
+on: workflow_dispatch
+# on:
+#   schedule:
+#     - cron: "0 * * * *"
+#     - cron: "15 * * * *"
+#     - cron: "30 * * * *"
 permissions:
   contents: read
 
