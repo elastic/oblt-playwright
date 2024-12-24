@@ -1,9 +1,5 @@
 name: "Serverless - Hosts (Azure)"
-on:
-  schedule:
-    - cron: "0 * * * *"
-    - cron: "15 * * * *"
-    - cron: "30 * * * *"
+on: workflow_dispatch
 permissions:
   contents: read
 
