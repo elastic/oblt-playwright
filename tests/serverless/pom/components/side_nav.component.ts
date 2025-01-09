@@ -12,7 +12,7 @@ export default class SideNav {
     }
 
     public readonly sideNav = () => this.page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]');
-    private readonly discover = () => this.page.locator('xpath=//a[@href="/app/last-used-logs-viewer"]');
+    private readonly discover = () => this.page.locator('xpath=//a[@id="discover"]');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
     private readonly applications = () => this.page.locator('xpath=//button//*[text()="Applications"]');
