@@ -1,11 +1,10 @@
 import { test } from '../../tests/fixtures/serverless/basePage';
 import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 
-test.beforeEach(async ({ discoverPage, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ sideNav, spaceSelector }) => {
   await sideNav.goto();
   await spaceSelectorServerless(sideNav, spaceSelector);
   await sideNav.clickDiscover();
-  await discoverPage.discoverTab().click();
 });
 
 test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications}) => {
