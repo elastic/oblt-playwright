@@ -1,5 +1,9 @@
 name: "Serverless - Infrastructure Monitoring (Azure)"
-on: workflow_dispatch
+on:
+  schedule:
+    - cron: "0 * * * *"
+    - cron: "15 * * * *"
+    - cron: "30 * * * *"
 permissions:
   contents: read
 
