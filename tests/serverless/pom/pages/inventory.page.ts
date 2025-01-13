@@ -27,6 +27,7 @@ export default class InventoryPage {
     private readonly flyoutInfraAssetDetailsCloseButton = () => this.page.locator('xpath=//div[@data-component-name="infraAssetDetailsFlyout"]//button[@data-test-subj="euiFlyoutCloseButton"]');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
     private readonly noDataToDisplay = () => this.page.locator('xpath=//*[text()="There is no data to display."]');
+    private readonly errorBoundaryFatalHeader = () => this.page.locator('xpath=//*[@data-test-subj="errorBoundaryFatalHeader"]');
 
     public async clickDismiss() {
         await this.dismiss().click();
@@ -111,5 +112,9 @@ export default class InventoryPage {
 
     public async assertNoData() {
         await expect(this.noDataToDisplay(), 'There is no data to display').toBeVisible();
+        }
+
+    public async assertBoundaryFatalHeader() {
+        await expect(this.errorBoundaryFatalHeader(), 'Unable to load page').toBeVisible();
         }
 }

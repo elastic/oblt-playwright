@@ -94,10 +94,15 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
     await datePicker.setPeriod();
-    await Promise.all([
-      inventoryPage.assertVisibilityVisualization(cpuUsage),
-      inventoryPage.assertVisibilityVisualization(memoryUsage)
-      ]);
+    await Promise.race([
+      Promise.all([
+        inventoryPage.assertVisibilityVisualization(cpuUsage),
+        inventoryPage.assertVisibilityVisualization(memoryUsage)
+        ]),
+        inventoryPage.assertBoundaryFatalHeader().then(() => {
+          throw new Error('Test is failed due to an error when loading data.');
+          })
+    ]);
   });
 
   await test.step('step03', async () => {
