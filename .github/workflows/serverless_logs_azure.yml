@@ -73,10 +73,10 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test logs.serverless.spec.ts --project serverless
         env:
-          KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
-          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
-          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
-          API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+          KIBANA_HOST: ${{ secrets.KIBANA_HOST_DEPLOYMENT_A }}
+          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_DEPLOYMENT_A }}
+          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_DEPLOYMENT_A }}
+          API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_A }}
           TIME_UNIT: ${{ vars.TIME_UNIT }}
           TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
@@ -120,10 +120,10 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test logs.serverless.spec.ts --project serverless
       env:
-        KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
-        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
-        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
-        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST_DEPLOYMENT_A }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_DEPLOYMENT_A }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_DEPLOYMENT_A }}
+        API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_A }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
         TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
 
@@ -167,10 +167,10 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test logs.serverless.spec.ts --project serverless
       env:
-        KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
-        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
-        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
-        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST_DEPLOYMENT_A }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_DEPLOYMENT_A }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_DEPLOYMENT_A }}
+        API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_A }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
         TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
 
@@ -227,8 +227,8 @@ jobs:
         node utils/split_json_report.js
       env:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
-        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
+        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_A }}
+        API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_A }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
       
     - name: Upload test report
