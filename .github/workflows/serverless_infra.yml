@@ -1,9 +1,9 @@
 name: "Serverless - Infrastructure Monitoring"
 on:
-  schedule:
-    - cron: "0 * * * *"
-    - cron: "15 * * * *"
-    - cron: "30 * * * *"
+  # schedule:
+  #   - cron: "0 * * * *"
+  #   - cron: "15 * * * *"
+  #   - cron: "30 * * * *"
 permissions:
   contents: read
 
