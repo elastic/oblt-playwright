@@ -69,6 +69,7 @@ jobs:
           REMOTE_CCS_CLUSTER: ${{ vars.REMOTE_CCS_CLUSTER_01 }}
           ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
           API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_B }}
+          RANGE: ${{ vars.RANGE }}
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -106,6 +107,7 @@ jobs:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
         API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_B }}
+        RANGE: ${{ vars.RANGE }}
       
     - name: Upload test report
       uses: actions/upload-artifact@v4
