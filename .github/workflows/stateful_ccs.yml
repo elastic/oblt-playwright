@@ -1,9 +1,7 @@
 name: "Stateful - APM (CCS)"
 on:
   # schedule:
-  #   - cron: "0 * * * *"
-  #   - cron: "15 * * * *"
-  #   - cron: "30 * * * *"
+  #   - cron: "*/15 * * * *"
   workflow_dispatch:
 permissions:
   contents: read
@@ -81,7 +79,7 @@ jobs:
 
   parse:
     needs: test
-    if: always()
+    if: success()
     name: Parse test report
     runs-on: ubuntu-latest
     steps:
@@ -118,7 +116,7 @@ jobs:
 
   upload:
     needs: parse
-    if: always()
+    if: success()
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
     env:

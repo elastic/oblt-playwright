@@ -34,7 +34,7 @@ test('APM service metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -90,7 +90,7 @@ test('APM service metrics', async ({ request }) => {
                             "fixed_interval": "1800s",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": "now-1d",
+                                "min": `${process.env.RANGE}`,
                                 "max": "now"
                             }
                         },
@@ -164,7 +164,7 @@ test('APM service metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -198,7 +198,7 @@ test('APM service metrics', async ({ request }) => {
                             "fixed_interval": "1800s",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": "now-1d",
+                                "min": `${process.env.RANGE}`,
                                 "max": "now"
                             }
                         },
@@ -271,7 +271,7 @@ test('APM service metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -289,7 +289,7 @@ test('APM service metrics', async ({ request }) => {
                             "fixed_interval": "1800s",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": "now-1d",
+                                "min": `${process.env.RANGE}`,
                                 "max": "now"
                             }
                         },
@@ -419,7 +419,7 @@ test('APM transaction metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -496,7 +496,7 @@ test('APM transaction metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -597,7 +597,7 @@ test('APM transaction metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -649,7 +649,7 @@ test('APM traces', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -785,7 +785,7 @@ test('APM traces', async ({ request }) => {
                                                 "range":
                                                 {
                                                     "@timestamp": {
-                                                        "gte": "now-1d",
+                                                        "gte": `${process.env.RANGE}`,
                                                         "lte": "now"
                                                     }
                                                 }
@@ -839,7 +839,7 @@ test('APM traces', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": "now-1d",
+                                                    "gte": `${process.env.RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
