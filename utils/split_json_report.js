@@ -76,7 +76,8 @@ async function parse() {
                     version: versionNumber,
                     build_date: build_date,
                     build_flavor: build_flavor,
-                    build_hash: build_hash
+                    build_hash: build_hash,
+                    ccs_range: process.env.RANGE
                   };
               const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;
               const outputPath = path.join(outputDirectory, fileName);
