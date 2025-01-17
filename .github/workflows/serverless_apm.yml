@@ -4,6 +4,7 @@ on:
   #   - cron: "0 * * * *"
   #   - cron: "15 * * * *"
   #   - cron: "30 * * * *"
+  workflow_dispatch:
 permissions:
   contents: read
 

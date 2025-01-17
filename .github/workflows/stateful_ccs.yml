@@ -4,6 +4,7 @@ on:
   #   - cron: "0 * * * *"
   #   - cron: "15 * * * *"
   #   - cron: "30 * * * *"
+  workflow_dispatch:
 permissions:
   contents: read
 
@@ -45,16 +46,11 @@ jobs:
       name: Run tests
       timeout-minutes: 60
       runs-on: ubuntu-latest
-      outputs:
-        is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Indicate running status
-        id: set_output
-        run: echo "is_running=true" >> $GITHUB_OUTPUT
       - name: Cache node_modules
         uses: actions/cache@v4
         with:
