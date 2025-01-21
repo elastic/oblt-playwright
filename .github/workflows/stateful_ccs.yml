@@ -66,7 +66,9 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test apm_ccs.api.spec.ts --project api
         env:
-          REMOTE_CCS_CLUSTER: ${{ vars.REMOTE_CCS_CLUSTER_01 }}
+          REMOTE_CCS_CLUSTER_01: ${{ vars.REMOTE_CCS_CLUSTER_01 }}
+          REMOTE_CCS_CLUSTER_02: ${{ vars.REMOTE_CCS_CLUSTER_02 }}
+          REMOTE_CCS_CLUSTER_03: ${{ vars.REMOTE_CCS_CLUSTER_03 }}
           ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
           API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_B }}
           RANGE: ${{ vars.RANGE }}
