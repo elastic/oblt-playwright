@@ -1,18 +1,20 @@
 import { test, expect } from '@playwright/test';
 
 // const remote_es_0_metrics = "metrics-apm*%2Capm-*/_async_search"
-const remote_es_1_metrics = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*/_async_search`
+// const remote_es_1_metrics = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*/_async_search`
 // const remote_es_2_metrics = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*/_async_search`
 // const remote_es_3_metrics = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:metrics-apm*%2Capm-*/_async_search`
+const remote_es_4_metrics = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_04}:metrics-apm*%2Capm-*/_async_search`
 
 // const remote_es_0_traces = "traces-apm*%2Capm-*/_search"
-const remote_es_1_traces = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*/_search`
+// const remote_es_1_traces = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*/_search`
 // const remote_es_2_traces = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*/_search`
 // const remote_es_3_traces = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:traces-apm*%2Capm-*/_search`
+const remote_es_4_traces = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_04}:traces-apm*%2Capm-*/_search`
 
 test('APM service metrics', async ({ request }) => {
     await test.step('query_01', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_metrics}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_metrics}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -147,7 +149,7 @@ test('APM service metrics', async ({ request }) => {
     });
 
     await test.step('query_02', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_metrics}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_metrics}`, {
             data: {
                 "track_total_hits": 1,
                 "size": 0,
@@ -254,7 +256,7 @@ test('APM service metrics', async ({ request }) => {
     });
 
     await test.step('query_03', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_metrics}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_metrics}`, {
             data: {
                 "track_total_hits": 1,
                 "size": 0,
@@ -355,7 +357,7 @@ test('APM service metrics', async ({ request }) => {
 
 test('APM transaction metrics', async ({ request }) => {
     await test.step('query_01', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_metrics}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_metrics}`, {
             data: {
                 "track_total_hits": 1,
                 "size": 0,
@@ -458,7 +460,7 @@ test('APM transaction metrics', async ({ request }) => {
     });
 
     await test.step('query_02', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_metrics}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_metrics}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -530,7 +532,7 @@ test('APM transaction metrics', async ({ request }) => {
     });
 
     await test.step('query_03', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_metrics}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_metrics}`, {
             data: {
                 "track_total_hits": true,
                 "query": {
@@ -637,7 +639,7 @@ test('APM transaction metrics', async ({ request }) => {
 
 test('APM traces', async ({ request }) => {
     await test.step('query_01', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_traces}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_traces}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -743,7 +745,7 @@ test('APM traces', async ({ request }) => {
     });
 
     await test.step('query_02', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_traces}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_traces}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -822,7 +824,7 @@ test('APM traces', async ({ request }) => {
     });
 
     await test.step('query_03', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_1_traces}`, {
+        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${remote_es_4_traces}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
