@@ -31,7 +31,7 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
   const errorRate = "errorRate";
 
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Services. Filters data by selected date picker option. Selects opbeans-go.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Sets period, then selects "opbeans-go" and asserts transaction tab visibility.`);
     await sideNav.clickServices();
     await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
@@ -57,7 +57,7 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
   });
   
   await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "Failed transaction correlations" tab. Filters the result by a particular field value.`);
+    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the "Failed transaction correlations" tab, asserts visualization visibility, then filters the result by a certain field value.`);
     await servicesPage.openFailedTransactionCorrelationsTab();
     await servicesPage.assertVisibilityCorrelationButton();
     await servicesPage.filterByFieldValue();
@@ -74,7 +74,7 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
 
 test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, servicesPage, tracesPage }, testInfo) => {
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Traces. Waits for top traces table to be loaded.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Sets period and waits for top traces table to be loaded.`);
     await sideNav.clickTraces();
     await datePicker.setPeriod();
     await Promise.race([
@@ -106,14 +106,14 @@ test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, ser
 
 test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications, headerBar }, testInfo) => {
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Observability > APM > Dependencies. Filters data by selected date picker option.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Dependencies section, then asserts dependencies table.`);
     await sideNav.clickDependencies();
     await dependenciesPage.assertVisibilityTable();
-    await datePicker.setPeriod();
   });
 
   await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Selects the dependency, then navigates to the "Operations" tab.`);
+    console.log(`\n[${testInfo.title}] Step 02 - Sets period, selects the dependency, then navigates to the "Operations" tab and asserts table visibility.`);
+    await datePicker.setPeriod();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
@@ -132,7 +132,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
   });
 
   await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the most impactful operation.`);
+    console.log(`\n[${testInfo.title}] Step 03 - Clicks on the most impactful operation and asserts timeline visibility.`);
     await dependenciesPage.clickTableRow();
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
@@ -143,13 +143,13 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
   });
 
   await test.step('step04', async () => {
-    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the transaction in the timeline to open the detailed view.`);
+    console.log(`\n[${testInfo.title}] Step 04 - Clicks on the transaction in the timeline and asserts tab panel visibility.`);
     await dependenciesPage.clickTimelineTransaction();
     await dependenciesPage.assertVisibilityTabPanel();
   });
 
-  await test.step('step06', async () => {
-    console.log(`\n[${testInfo.title}] Step 06 - Clicks on "Investigate", selects "Trace logs".`);
+  await test.step('step05', async () => {
+    console.log(`\n[${testInfo.title}] Step 05 - Selects "Trace logs", then asserts data grid row.`);
     await dependenciesPage.clickInvestigateButton();
     await dependenciesPage.clickTraceLogsButton();
     await discoverPage.assertVisibilityDataGridRow();

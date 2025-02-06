@@ -34,7 +34,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   });
 
   await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit.`);
+    console.log(`\n[${testInfo.title}] Step 02 - Sets period.`);
     await datePicker.clickDatePicker();
     await datePicker.fillTimeValue(process.env.TIME_VALUE);
     await datePicker.selectTimeUnit(process.env.TIME_UNIT);
@@ -91,7 +91,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
   });
   
   await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
+    console.log(`\n[${testInfo.title}] Step 03 - Sets period. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
     await page.evaluate("document.body.style.zoom=0.8");
     await datePicker.setPeriod();
     await Promise.all([
