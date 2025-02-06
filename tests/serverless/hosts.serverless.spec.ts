@@ -24,7 +24,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, side
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 01 - Sets period, asserts the loading time of elements.`);
         await sideNav.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
@@ -64,7 +64,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav, req
     await test.step('step01', async () => {
         let noLogsData = false;
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 01 - Sets period, asserts the loading time of elements.`);
         await sideNav.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
@@ -86,7 +86,7 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, sideNav, r
     await test.step('step01', async () => {
         let noAlertsData = false;
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 01 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 01 - Sets period, asserts the loading time of elements.`);
         await sideNav.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
@@ -154,7 +154,7 @@ test.skip('Hosts - Individual page - All elements', async ({ datePicker, hostsPa
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         const asyncResults = await Promise.race([
             Promise.all([
@@ -184,7 +184,7 @@ test.skip('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPa
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         await page.reload();
         const asyncResults = await Promise.all([
@@ -243,7 +243,7 @@ test.skip('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPag
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         const asyncResults = await Promise.race([
             Promise.all([
@@ -273,7 +273,7 @@ test.skip('Hosts - Individual page - Processes tab', async ({ datePicker, hostsP
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         await page.reload();
         const asyncResults = await Promise.race([
@@ -302,7 +302,7 @@ test.skip('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, 
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts the loading time of elements.`);
+        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
         await datePicker.setPeriod();
         const asyncResults = await Promise.race([
             Promise.all([

@@ -40,7 +40,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   });
 
   await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts visualizations visibility.`);
+    console.log(`\n[${testInfo.title}] Step 02 - Sets period, asserts visualizations visibility.`);
     await datePicker.clickDatePicker();
     await datePicker.fillTimeValue(process.env.TIME_VALUE);
     await datePicker.selectTimeUnit(process.env.TIME_UNIT);
@@ -77,7 +77,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
   const podMemoryUsage = "podMemoryUsage";
 
   await test.step('step01', async () => {
-    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Infrastructure > Inventory. Clicks on any displayed host to open the detailed view.`);
+    console.log(`\n[${testInfo.title}] Step 01 - Navigates to Infrastructure inventory, asserts waffle map, sorts by metric value and clicks on a host.`);
     await sideNav.clickInventory();
     await Promise.race([
       inventoryPage.assertWaffleMap(),
@@ -92,7 +92,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
   });
   
   await test.step('step02', async () => {
-    console.log(`\n[${testInfo.title}] Step 02 - Filters data by selected time unit. Asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
+    console.log(`\n[${testInfo.title}] Step 02 - Sets period, asserts "Host CPU Usage" & "Host Memory Usage" visualizations visibility.`);
     await datePicker.setPeriod();
     await Promise.race([
       Promise.all([
@@ -106,7 +106,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
   });
 
   await test.step('step03', async () => {
-    console.log(`\n[${testInfo.title}] Step 03 - Returns back to Infrastructure > Inventory. Selects "Pods" as "Show" option. Clicks on the tile of some pod, then clicks on the "Kubernetes Pod metrics" link.`);
+    console.log(`\n[${testInfo.title}] Step 03 - Selects "Pods" as "Show" option, asserts waffle map, then clicks on the tile of a pod.`);
     await inventoryPage.closeInfraAssetDetailsFlyout();
     await inventoryPage.switchInventoryToPodsView();
     await Promise.race([
@@ -122,7 +122,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
   });
 
   await test.step('step04', async () => {
-    console.log(`\n[${testInfo.title}] Step 04 - Filters data by selected date picker option. Asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.`);
+    console.log(`\n[${testInfo.title}] Step 04 - Sets period, asserts "Pod CPU Usage" & "Pod Memory Usage" visualization visibility.`);
     await datePicker.setPeriod();
     await Promise.race([
       Promise.all([
