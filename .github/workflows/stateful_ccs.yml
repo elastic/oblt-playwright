@@ -73,6 +73,7 @@ jobs:
           ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
           API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_B }}
           RANGE: ${{ vars.RANGE }}
+          REMOTE_CLUSTERS: ${{ vars.REMOTE_CLUSTERS }}
 
       - uses: actions/upload-artifact@v4
         if: always()

@@ -236,3 +236,32 @@ public async <methodName>(<parameters>) {
 | `<parameters>` | Example:<br><br>`assertVisibilityPodVisualization(title: string)` |
 | `<locatorFunction>` | Specify a locator function.<br><br>Examples:<br><br>`logsExplorerTab()` |
 | `<action>` | Specify an action to perform against a locator. See this [page](https://playwright.dev/docs/input) to check available actions.<br><br>Examples:<br><br>`click()`<br>`fill('error')` |
+
+# Get Elasticsearch-friendly JSON test report
+
+Playwright spits out JSON test reports that have nested structure, which not quite suitable for Elasticsearch - results for each test is a separate array with its own fields. The problem is nested field type is not supported in Kibana visualizations. To solve this, use [this script](https://github.com/elastic/oblt-playwright/blob/main/utils/split_json_report.ts) to flatten and split a report by each test:
+
+```
+node utils\split_json_report.ts
+```
+<details>
+<summary>Here is an example of how the outcome of that script might look like</summary>
+
+```
+{
+  "title": "Infrastructure - Cluster Overview dashboard",
+  "startTime": "2024-02-02T12:50:18.767Z",
+  "status": "passed",
+  "duration": 59414,
+  "step01": 4351,
+  "step02": 1064,
+  "step03": 24160,
+  "workerIndex": 1,
+  "retry": 0,
+  "errors": [],
+  "timeout": 300000
+}
+```
+</details>
+
+Resulting files stored in the same directory as the original report.

@@ -1,8 +1,9 @@
 # oblt-playwright
 
-Emulating end-user experience in different areas of Observability on clusters which are placed under significant load and evaluating whole-stack performance between different types of deployments. Most tests are designed to put together as many "heavy" areas (such as pages with multiple visualizations) as possible and navigate the user through several pages of a particular Kibana section, measuring the scenario duration.
+A test framework designed to assess whole-stack performance across various deployment types by mimicking the end-user experience in different Observability areas.
 
 ## Getting Started
+
 Install [Playwright](https://playwright.dev/docs/intro).
 
 Examine available [test scenarios and required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data_mapping.md).
@@ -69,32 +70,3 @@ To authorize access to Elasticsearch resources, pass your API key into `API_KEY`
 ```
 npx playwright test --project api
 ```
-
-## Get Elasticsearch-friendly JSON test report 
-
-Playwright spits out JSON test reports that have nested structure, which not quite suitable for Elasticsearch - results for each test is a separate array with its own fields. The problem is nested field type is not supported in Kibana visualizations. To solve this, use [this script](https://github.com/elastic/oblt-playwright/blob/main/utils/split_json_report.ts) to flatten and split a report by each test:
-
-```
-node utils\split_json_report.ts
-```
-<details>
-<summary>Here is an example of how the outcome of that script might look like</summary>
-
-```
-{
-  "title": "Infrastructure - Cluster Overview dashboard",
-  "startTime": "2024-02-02T12:50:18.767Z",
-  "status": "passed",
-  "duration": 59414,
-  "step01": 4351,
-  "step02": 1064,
-  "step03": 24160,
-  "workerIndex": 1,
-  "retry": 0,
-  "errors": [],
-  "timeout": 300000
-}
-```
-</details>
-
-Resulting files stored in the same directory as the original report.
