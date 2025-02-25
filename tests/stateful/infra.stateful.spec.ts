@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { getPodData, spaceSelectorStateful } from "../../src/helpers.ts";
 import { TIME_VALUE, TIME_UNIT } from '../../src/env';
 

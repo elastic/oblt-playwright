@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { expect } from "@playwright/test";
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 import { API_KEY } from '../../src/env';

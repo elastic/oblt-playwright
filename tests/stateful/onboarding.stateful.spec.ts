@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 import { REPORT_FILE } from '../../src/env';
 const fs = require('fs');

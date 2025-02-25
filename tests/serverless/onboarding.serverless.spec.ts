@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 import { REPORT_FILE } from '../../src/env';
 const fs = require('fs');

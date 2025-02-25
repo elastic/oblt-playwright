@@ -1,4 +1,4 @@
-import { test as serverless_auth } from '../src/fixtures/serverless/basePage';
+import { test as serverless_auth } from '../src/fixtures/serverless/page.fixtures';
 import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 import { waitForOneOf } from "../src/helpers.ts";

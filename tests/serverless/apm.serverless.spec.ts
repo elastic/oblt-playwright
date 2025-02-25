@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { expect } from "@playwright/test";
 import { spaceSelectorServerless } from "../../src/helpers.ts";
 import { API_KEY } from '../../src/env';
