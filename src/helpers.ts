@@ -1,11 +1,11 @@
 import { APIRequestContext, expect, Locator, TestInfo } from '@playwright/test';
-import { API_KEY, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT } from '../src/env';
+import { API_KEY, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT } from '../src/env.ts';
 import HeaderBar from '../tests/stateful/pom/components/header_bar.component';
 import SideNav from '../tests/serverless/pom/components/side_nav.component';
 import { SpaceSelector as SpaceSelectorStateful } from '../tests/stateful/pom/components/space_selector.component';
 import { SpaceSelector as SpaceSelectorServerless } from '../tests/serverless/pom/components/space_selector.component';
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
 const outputDirectory = "/home/runner/work/oblt-playwright/";
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
@@ -49,8 +49,8 @@ export async function spaceSelectorServerless(sideNav: SideNav, spaceSelector: S
 }
 
 export async function getHostData(request: APIRequestContext) {
-  const currentTime = Date.now();
-  const rangeTime = currentTime - 86400000;
+  const currentTime: number = Date.now();
+  const rangeTime: number = currentTime - 86400000;
 
   let b = await request.post('api/metrics/snapshot', {
     headers: {
@@ -78,8 +78,8 @@ export async function getHostData(request: APIRequestContext) {
 }
 
 export async function getPodData(request: APIRequestContext) {
-  const currentTime = Date.now();
-  const rangeTime = currentTime - 1200000;
+  const currentTime: number = Date.now();
+  const rangeTime: number = currentTime - 1200000;
 
   let response = await request.post('api/metrics/snapshot', {
     headers: {

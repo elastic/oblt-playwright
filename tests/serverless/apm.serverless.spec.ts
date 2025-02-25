@@ -1,7 +1,7 @@
-import { test } from '../../src/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { expect } from "@playwright/test";
 import { spaceSelectorServerless } from "../../src/helpers.ts";
-import { API_KEY } from '../../src/env';
+import { API_KEY } from '../../src/env.ts';
 
 test.beforeAll('Check APM data', async ({request}) => {
   let response = await request.get('internal/apm/has_data', {
@@ -27,8 +27,8 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
 });
 
 test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications, servicesPage }, testInfo) => {
-  const throughput = "throughput";
-  const errorRate = "errorRate";
+  const throughput: string = "throughput";
+  const errorRate: string = "errorRate";
 
   await test.step('step01', async () => {
     console.log(`\n[${testInfo.title}] Step 01 - Sets period, then selects "opbeans-go" and asserts transaction tab visibility.`);

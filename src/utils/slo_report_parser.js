@@ -1,4 +1,4 @@
-import { REPORT_FILE } from '../../src/env';
+import { REPORT_FILE } from '../../src/env.ts';
 const fs = require('fs');
 const path = require('path');
 
