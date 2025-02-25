@@ -1,5 +1,6 @@
-import { test } from '../../tests/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/basePage';
 import { getPodData, spaceSelectorStateful } from "../../src/helpers.ts";
+import { TIME_VALUE, TIME_UNIT } from '../../src/env';
 
 test.beforeAll('Check pod data', async ({request}) => {
   const podsData = await getPodData(request);
@@ -36,8 +37,8 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
   await test.step('step02', async () => {
     console.log(`\n[${testInfo.title}] Step 02 - Sets period.`);
     await datePicker.clickDatePicker();
-    await datePicker.fillTimeValue(process.env.TIME_VALUE);
-    await datePicker.selectTimeUnit(process.env.TIME_UNIT);
+    await datePicker.fillTimeValue(TIME_VALUE);
+    await datePicker.selectTimeUnit(TIME_UNIT);
     await datePicker.clickApplyButton();
   });
 

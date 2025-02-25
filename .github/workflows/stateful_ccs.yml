@@ -106,7 +106,7 @@ jobs:
         path: /home/runner/work/oblt-playwright
         
     - name: Parse raw report
-      run: node utils/split_json_report.js
+      run: node ./src/utils/split_json_report.js
       env:
         REPORT_FILE: ${{ vars.REPORT_FILE }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
@@ -142,4 +142,4 @@ jobs:
         path: /home/runner/work/oblt-playwright
         
     - name: Upload test report to Elasticsearch
-      run: bash ./utils/upload_to_es.sh
+      run: bash ./src/utils/upload_to_es.sh

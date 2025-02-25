@@ -1,8 +1,9 @@
-import { test } from '../fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/basePage';
 import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
+import { REPORT_FILE } from '../../src/env';
 const fs = require('fs');
 const path = require('path');
-const inputFilePath = process.env.REPORT_FILE;
+const inputFilePath = REPORT_FILE;
 const outputDirectory = path.dirname(inputFilePath);
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {

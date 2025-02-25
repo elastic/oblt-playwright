@@ -1,14 +1,15 @@
 import { test as ess_auth, expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 import { waitForOneOf } from "../src/helpers.ts";
+import { KIBANA_HOST, KIBANA_USERNAME, KIBANA_PASSWORD } from '../src/env';
 
 ess_auth('Authentication', async ({page}) => {
-  await page.goto(process.env.KIBANA_HOST);
+  await page.goto(KIBANA_HOST);
   console.log(`...waiting for login page elements to appear.`);
   await page.getByRole('button', { name: 'Log in with Elasticsearch' }).click();
-  await page.getByLabel('Username').fill(process.env.KIBANA_USERNAME);
+  await page.getByLabel('Username').fill(KIBANA_USERNAME);
   await page.getByLabel('Password', { exact: true }).click();
-  await page.getByLabel('Password', { exact: true }).fill(process.env.KIBANA_PASSWORD);
+  await page.getByLabel('Password', { exact: true }).fill(KIBANA_PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
 
   const [ index ] = await waitForOneOf([

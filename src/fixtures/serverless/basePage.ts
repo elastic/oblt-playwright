@@ -1,18 +1,18 @@
 import { test as base } from "@playwright/test";
-import DashboardPage from "../../serverless/pom/pages/dashboard.page";
-import DatePicker from "../../serverless/pom/components/date_picker.component";
-import DependenciesPage from "../../serverless/pom/pages/dependencies.page";
-import HeaderBar from "../../serverless/pom/components/header_bar.component";
-import HostsPage from "../../serverless/pom/pages/hosts.page";
-import InventoryPage from "../../serverless/pom/pages/inventory.page";
-import DiscoverPage from "../../serverless/pom/pages/discover.page";
-import ManagementPage from "../../serverless/pom/pages/management.page";
-import Notifications from "../../serverless/pom/components/notifications.component";
-import OnboardingPage from "../../serverless/pom/pages/onboarding.page";
-import ServicesPage from "../../serverless/pom/pages/services.page";
-import SideNav from "../../serverless/pom/components/side_nav.component";
-import { SpaceSelector } from "../../serverless/pom/components/space_selector.component";
-import TracesPage from "../../serverless/pom/pages/traces.page";
+import DashboardPage from "../../../tests/serverless/pom/pages/dashboard.page";
+import DatePicker from "../../../tests/serverless/pom/components/date_picker.component";
+import DependenciesPage from "../../../tests/serverless/pom/pages/dependencies.page";
+import HeaderBar from "../../../tests/serverless/pom/components/header_bar.component";
+import HostsPage from "../../../tests/serverless/pom/pages/hosts.page";
+import InventoryPage from "../../../tests/serverless/pom/pages/inventory.page";
+import DiscoverPage from "../../../tests/serverless/pom/pages/discover.page";
+import ManagementPage from "../../../tests/serverless/pom/pages/management.page";
+import Notifications from "../../../tests/serverless/pom/components/notifications.component";
+import OnboardingPage from "../../../tests/serverless/pom/pages/onboarding.page";
+import ServicesPage from "../../../tests/serverless/pom/pages/services.page";
+import SideNav from "../../../tests/serverless/pom/components/side_nav.component";
+import { SpaceSelector } from "../../../tests/serverless/pom/components/space_selector.component";
+import TracesPage from "../../../tests/serverless/pom/pages/traces.page";
 
 
 export const test = base.extend<{

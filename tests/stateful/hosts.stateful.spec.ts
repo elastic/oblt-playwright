@@ -1,4 +1,4 @@
-import { test } from '../fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
 import { getHostData, spaceSelectorStateful, writeFileReportHosts } from "../../src/helpers.ts";
 

@@ -1,4 +1,4 @@
-import { test } from '../../tests/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/basePage';
 import { spaceSelectorServerless } from "../../src/helpers.ts";
 
 test.beforeAll(async ({browser}) => {
@@ -14,7 +14,7 @@ test.beforeAll(async ({browser}) => {
   const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
   if (noItems) {
     await page.getByRole('button', { name: 'Import' }).click();
-    await page.locator('xpath=//input[@type="file"]').setInputFiles('./tests/fixtures/dashboards/dashboards.ndjson');
+    await page.locator('xpath=//input[@type="file"]').setInputFiles('../../src/dashboards/dashboards.ndjson');
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
   } else {
