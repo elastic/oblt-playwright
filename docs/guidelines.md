@@ -2,7 +2,7 @@
 
 Use the following code as a basis for a new test file:
 ```
-import {test} from '../../tests/fixtures/serverless/basePage';
+import {test} from '../../tests/fixtures/serverless/page.fixtures.ts';
 
 test.beforeEach(async ({ sideNav }) => {
   await sideNav.goto();

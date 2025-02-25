@@ -1,10 +1,9 @@
-import { test } from '../../src/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
-import { REPORT_FILE } from '../../src/env';
-const fs = require('fs');
-const path = require('path');
-const inputFilePath = REPORT_FILE;
-const outputDirectory = path.dirname(inputFilePath);
+import { REPORT_FILE } from '../../src/env.ts';
+import * as fs from 'fs';
+import * as path from 'path';
+const outputDirectory = path.dirname(REPORT_FILE);
 
 test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
     await sideNav.goto();
@@ -15,10 +14,10 @@ test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
 test('Auto-detect logs and metrics', async ({ headerBar, onboardingPage, page }) => {
     const fileName = 'code_snippet_logs_auto_detect.sh';
     const outputPath = path.join(outputDirectory, fileName);
-    let maxRetries = 3;
-    let retries = 0;
-    let codeBlockAppeared = false;
-    let clipboardData;
+    let maxRetries: number = 3;
+    let retries: number = 0;
+    let codeBlockAppeared: boolean = false;
+    let clipboardData: string;
 
     const [ a ] = await waitForOneOf([
         onboardingPage.useCaseLogs(),

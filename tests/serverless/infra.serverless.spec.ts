@@ -1,7 +1,7 @@
-import { test } from '../../src/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { expect } from "@playwright/test";
 import { getPodData, spaceSelectorServerless } from "../../src/helpers.ts";
-import { TIME_VALUE, TIME_UNIT } from '../../src/env';
+import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 
 test.beforeAll('Check pod data', async ({ request }) => {
   const podsData = await getPodData(request);

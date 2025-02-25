@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { spaceSelectorServerless } from "../../src/helpers.ts";
 
 test.beforeAll(async ({browser}) => {

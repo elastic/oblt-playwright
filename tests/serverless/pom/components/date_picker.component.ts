@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import { TIME_VALUE, TIME_UNIT } from '../../../../src/env';
+import { TIME_VALUE, TIME_UNIT } from '../../../../src/env.ts';
 
 export default class DatePicker {
     page: Page;

@@ -1,4 +1,4 @@
-import { API_KEY, ELASTICSEARCH_HOST, REPORT_FILE } from '../../src/env';
+import { API_KEY, ELASTICSEARCH_HOST, REPORT_FILE } from '../../src/env.ts';
 const fs = require('fs');
 const path = require('path');
 const inputFilePath = REPORT_FILE;

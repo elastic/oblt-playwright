@@ -1,10 +1,9 @@
-import { test } from '../../src/fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
-import { REPORT_FILE } from '../../src/env';
-const fs = require('fs');
-const path = require('path');
-const inputFilePath = REPORT_FILE;
-const outputDirectory = path.dirname(inputFilePath);
+import { REPORT_FILE } from '../../src/env.ts';
+import * as fs from 'fs';
+import * as path from 'path';
+const outputDirectory = path.dirname(REPORT_FILE);
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
     await sideNav.goto();
@@ -15,9 +14,9 @@ test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
 test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
     const fileName = 'code_snippet_logs_auto_detect.sh';
     const outputPath = path.join(outputDirectory, fileName);
-    let maxRetries = 3;
-    let retries = 0;
-    let codeBlockAppeared = false;
+    let maxRetries: number = 3;
+    let retries: number = 0;
+    let codeBlockAppeared: boolean = false;
 
     await onboardingPage.selectCollectLogs();
     await onboardingPage.selectLogsAutoDetect();
@@ -44,7 +43,7 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
     };
     await onboardingPage.assertVisibilityCodeBlock();
     await onboardingPage.copyToClipboard();
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+    let clipboardData: string = await page.evaluate("navigator.clipboard.readText()");
     fs.writeFileSync(outputPath, clipboardData);
     await onboardingPage.assertReceivedDataIndicator();
 });
@@ -52,9 +51,9 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
 test('Kubernetes', async ({ onboardingPage, page }) => {
     const fileName = 'code_snippet_kubernetes.sh';
     const outputPath = path.join(outputDirectory, fileName);
-    let maxRetries = 3;
-    let retries = 0;
-    let codeBlockAppeared = false;
+    let maxRetries: number = 3;
+    let retries: number = 0;
+    let codeBlockAppeared: boolean = false;
 
     await onboardingPage.selectMonitorInfrastructure();
     await onboardingPage.selectKubernetes();
@@ -81,7 +80,7 @@ test('Kubernetes', async ({ onboardingPage, page }) => {
     };
     await onboardingPage.assertVisibilityCodeBlock();
     await onboardingPage.copyToClipboard();
-    let clipboardData = await page.evaluate("navigator.clipboard.readText()");
+    let clipboardData: string = await page.evaluate("navigator.clipboard.readText()");
     fs.writeFileSync(outputPath, clipboardData);
     await onboardingPage.assertReceivedDataIndicator();
 });

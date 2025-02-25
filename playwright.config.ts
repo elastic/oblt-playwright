@@ -1,10 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import { API_KEY } from './src/env.ts';
 import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-let apiKey = process.env.API_KEY;
 
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 
@@ -126,7 +125,7 @@ export default defineConfig({
       use: {
         extraHTTPHeaders: {
           "accept": "application/json",
-          "Authorization": apiKey,
+          "Authorization": API_KEY,
           "Content-Type": "application/json;charset=UTF-8",
           "kbn-xsrf": "true",          
           "x-elastic-internal-origin": "kibana"
