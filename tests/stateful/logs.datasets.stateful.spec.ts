@@ -1,4 +1,4 @@
-import { test } from '../../tests/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/basePage';
 import { spaceSelectorStateful } from "../../src/helpers.ts";
 
 test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {

@@ -101,7 +101,7 @@ jobs:
         path: /home/runner/work/oblt-playwright
         
     - name: Parse raw report
-      run: node utils/slo_report_parser.js
+      run: node ./src/utils/slo_report_parser.js
 
     - name: Remove raw test report
       run: rm -r /home/runner/work/oblt-playwright/test-results/results.json
@@ -135,4 +135,4 @@ jobs:
         path: /home/runner/work/oblt-playwright
         
     - name: Upload test report to Elasticsearch
-      run: bash ./utils/upload_to_es.sh
+      run: bash ./src/utils/upload_to_es.sh

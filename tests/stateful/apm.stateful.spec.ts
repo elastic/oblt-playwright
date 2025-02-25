@@ -1,13 +1,13 @@
-import { test } from '../../tests/fixtures/stateful/basePage';
+import { test } from '../../src/fixtures/stateful/basePage';
 import { expect } from "@playwright/test";
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
-let apiKey = process.env.API_KEY;
+import { API_KEY } from '../../src/env';
 
 test.beforeAll('Check APM data', async ({request}) => {
   let response = await request.get('internal/apm/has_data', {
     headers: {
       "accept": "application/json",
-      "Authorization": apiKey,
+      "Authorization": API_KEY,
       "Content-Type": "application/json;charset=UTF-8",
       "kbn-xsrf": "true",          
       "x-elastic-internal-origin": "kibana"

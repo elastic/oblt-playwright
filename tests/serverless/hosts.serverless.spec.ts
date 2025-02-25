@@ -1,4 +1,4 @@
-import { test } from '../fixtures/serverless/basePage';
+import { test } from '../../src/fixtures/serverless/basePage';
 import { getHostData, spaceSelectorServerless, writeFileReportHosts } from "../../src/helpers.ts";
 
 test.beforeAll('Check data', async ({ request }) => {

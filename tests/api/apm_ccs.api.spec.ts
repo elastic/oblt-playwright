@@ -1,20 +1,21 @@
 import { test, expect } from '@playwright/test';
+import { ELASTICSEARCH_HOST, REMOTE_CLUSTERS, REMOTE_CCS_CLUSTER_01, REMOTE_CCS_CLUSTER_02, REMOTE_CCS_CLUSTER_03, REMOTE_CCS_CLUSTER_04, RANGE } from '../../src/env';
 
-const envVar = process.env.REMOTE_CLUSTERS;
+const envVar = REMOTE_CLUSTERS;
 let metrics: string;
 let traces: string;
 
 const metrics_remote_clusters_0 = "metrics-apm*%2Capm-*/_async_search"
-const metrics_remote_clusters_1 = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*/_async_search`
-const metrics_remote_clusters_2 = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*/_async_search`
-const metrics_remote_clusters_3 = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:metrics-apm*%2Capm-*/_async_search`
-const metrics_remote_clusters_4 = `${process.env.REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:metrics-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_04}:metrics-apm*%2Capm-*/_async_search`
+const metrics_remote_clusters_1 = `${REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*/_async_search`
+const metrics_remote_clusters_2 = `${REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*/_async_search`
+const metrics_remote_clusters_3 = `${REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_03}:metrics-apm*%2Capm-*/_async_search`
+const metrics_remote_clusters_4 = `${REMOTE_CCS_CLUSTER_01}:metrics-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_02}:metrics-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_03}:metrics-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_04}:metrics-apm*%2Capm-*/_async_search`
 
 const traces_remote_clusters_0 = "traces-apm*%2Capm-*/_search"
-const traces_remote_clusters_1 = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*/_search`
-const traces_remote_clusters_2 = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*/_search`
-const traces_remote_clusters_3 = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:traces-apm*%2Capm-*/_search`
-const traces_remote_clusters_4 = `${process.env.REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_03}:traces-apm*%2Capm-*,${process.env.REMOTE_CCS_CLUSTER_04}:traces-apm*%2Capm-*/_search`
+const traces_remote_clusters_1 = `${REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*/_search`
+const traces_remote_clusters_2 = `${REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*/_search`
+const traces_remote_clusters_3 = `${REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_03}:traces-apm*%2Capm-*/_search`
+const traces_remote_clusters_4 = `${REMOTE_CCS_CLUSTER_01}:traces-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_02}:traces-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_03}:traces-apm*%2Capm-*,${REMOTE_CCS_CLUSTER_04}:traces-apm*%2Capm-*/_search`
 
 switch (envVar) {
     case "0":
@@ -43,7 +44,7 @@ switch (envVar) {
 
 test('APM service metrics', async ({ request }) => {
     await test.step('query_01', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${metrics}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${metrics}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -75,7 +76,7 @@ test('APM service metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -131,7 +132,7 @@ test('APM service metrics', async ({ request }) => {
                             "fixed_interval": "1800s",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": `${process.env.RANGE}`,
+                                "min": `${RANGE}`,
                                 "max": "now"
                             }
                         },
@@ -178,7 +179,7 @@ test('APM service metrics', async ({ request }) => {
     });
 
     await test.step('query_02', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${metrics}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${metrics}`, {
             data: {
                 "track_total_hits": 1,
                 "size": 0,
@@ -205,7 +206,7 @@ test('APM service metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -239,7 +240,7 @@ test('APM service metrics', async ({ request }) => {
                             "fixed_interval": "1800s",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": `${process.env.RANGE}`,
+                                "min": `${RANGE}`,
                                 "max": "now"
                             }
                         },
@@ -285,7 +286,7 @@ test('APM service metrics', async ({ request }) => {
     });
 
     await test.step('query_03', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${metrics}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${metrics}`, {
             data: {
                 "track_total_hits": 1,
                 "size": 0,
@@ -312,7 +313,7 @@ test('APM service metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -330,7 +331,7 @@ test('APM service metrics', async ({ request }) => {
                             "fixed_interval": "1800s",
                             "min_doc_count": 0,
                             "extended_bounds": {
-                                "min": `${process.env.RANGE}`,
+                                "min": `${RANGE}`,
                                 "max": "now"
                             }
                         },
@@ -386,7 +387,7 @@ test('APM service metrics', async ({ request }) => {
 
 test('APM transaction metrics', async ({ request }) => {
     await test.step('query_01', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${metrics}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${metrics}`, {
             data: {
                 "track_total_hits": 1,
                 "size": 0,
@@ -460,7 +461,7 @@ test('APM transaction metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -489,7 +490,7 @@ test('APM transaction metrics', async ({ request }) => {
     });
 
     await test.step('query_02', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${metrics}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${metrics}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -537,7 +538,7 @@ test('APM transaction metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -561,7 +562,7 @@ test('APM transaction metrics', async ({ request }) => {
     });
 
     await test.step('query_03', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${metrics}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${metrics}`, {
             data: {
                 "track_total_hits": true,
                 "query": {
@@ -638,7 +639,7 @@ test('APM transaction metrics', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -668,7 +669,7 @@ test('APM transaction metrics', async ({ request }) => {
 
 test('APM traces', async ({ request }) => {
     await test.step('query_01', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${traces}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${traces}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -690,7 +691,7 @@ test('APM traces', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }
@@ -774,7 +775,7 @@ test('APM traces', async ({ request }) => {
     });
 
     await test.step('query_02', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${traces}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${traces}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -826,7 +827,7 @@ test('APM traces', async ({ request }) => {
                                                 "range":
                                                 {
                                                     "@timestamp": {
-                                                        "gte": `${process.env.RANGE}`,
+                                                        "gte": `${RANGE}`,
                                                         "lte": "now"
                                                     }
                                                 }
@@ -853,7 +854,7 @@ test('APM traces', async ({ request }) => {
     });
 
     await test.step('query_03', async () => {
-        let response = await request.post(`${process.env.ELASTICSEARCH_HOST}/${traces}`, {
+        let response = await request.post(`${ELASTICSEARCH_HOST}/${traces}`, {
             data: {
                 "track_total_hits": false,
                 "size": 0,
@@ -880,7 +881,7 @@ test('APM traces', async ({ request }) => {
                                         {
                                             "range": {
                                                 "@timestamp": {
-                                                    "gte": `${process.env.RANGE}`,
+                                                    "gte": `${RANGE}`,
                                                     "lte": "now"
                                                 }
                                             }

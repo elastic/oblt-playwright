@@ -1,17 +1,17 @@
 {
-  "name": "playwright-test",
+  "name": "oblt-playwright",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {},
   "keywords": [],
-  "author": "",
+  "author": "Andrei Bialenik",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.47.2",
+    "@playwright/test": "^1.50.1",
     "@types/node": "^22.5.5"
   },
   "dependencies": {
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.4.7"
   }
 }

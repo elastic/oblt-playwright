@@ -1,8 +1,7 @@
-require('dotenv').config();
+import { API_KEY, ELASTICSEARCH_HOST, REPORT_FILE } from '../../src/env';
 const fs = require('fs');
 const path = require('path');
-const apiKey = process.env.API_KEY;
-const inputFilePath = process.env.REPORT_FILE;
+const inputFilePath = REPORT_FILE;
 const rawData = fs.readFileSync(inputFilePath);
 const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;
@@ -10,11 +9,11 @@ const outputDirectory = path.dirname(inputFilePath);
 const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
 
 async function fetchClusterData() {
-  const jsonDataCluster = await fetch(`${process.env.ELASTICSEARCH_HOST}`, {
+  const jsonDataCluster = await fetch(`${ELASTICSEARCH_HOST}`, {
     method: 'GET',
     headers: {
       "accept": "*/*",
-        "Authorization": apiKey,
+        "Authorization": API_KEY,
         "kbn-xsrf": "reporting"
     }
   }).then(response => {

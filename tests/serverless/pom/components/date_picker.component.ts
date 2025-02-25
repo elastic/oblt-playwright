@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test";
+import { TIME_VALUE, TIME_UNIT } from '../../../../src/env';
 
 export default class DatePicker {
     page: Page;
@@ -58,8 +59,8 @@ export default class DatePicker {
 
     public async setPeriod() {
         await this.clickDatePicker();
-        await this.fillTimeValue(process.env.TIME_VALUE);
-        await this.selectTimeUnit(process.env.TIME_UNIT);
+        await this.fillTimeValue(TIME_VALUE);
+        await this.selectTimeUnit(TIME_UNIT);
         await this.clickApplyButton();
     }
 }

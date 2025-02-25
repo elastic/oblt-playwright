@@ -1,8 +1,8 @@
-require('dotenv').config();
+import { REPORT_FILE } from '../../src/env';
 const fs = require('fs');
 const path = require('path');
 
-const inputFilePath = process.env.REPORT_FILE;
+const inputFilePath = REPORT_FILE;
 const rawData = fs.readFileSync(inputFilePath);
 const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;

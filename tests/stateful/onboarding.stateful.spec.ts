@@ -1,8 +1,9 @@
-import { test } from '../fixtures/stateful/basePage.ts';
+import { test } from '../../src/fixtures/stateful/basePage';
 import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
+import { REPORT_FILE } from '../../src/env';
 const fs = require('fs');
 const path = require('path');
-const inputFilePath = process.env.REPORT_FILE;
+const inputFilePath = REPORT_FILE;
 const outputDirectory = path.dirname(inputFilePath);
 
 test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {

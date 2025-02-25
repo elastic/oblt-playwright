@@ -1,11 +1,11 @@
 import { APIRequestContext, expect, Locator, TestInfo } from '@playwright/test';
+import { API_KEY, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT } from '../src/env';
 import HeaderBar from '../tests/stateful/pom/components/header_bar.component';
 import SideNav from '../tests/serverless/pom/components/side_nav.component';
 import { SpaceSelector as SpaceSelectorStateful } from '../tests/stateful/pom/components/space_selector.component';
 import { SpaceSelector as SpaceSelectorServerless } from '../tests/serverless/pom/components/space_selector.component';
 const fs = require('fs');
 const path = require('path');
-const apiKey = process.env.API_KEY;
 const outputDirectory = "/home/runner/work/oblt-playwright/";
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
@@ -55,7 +55,7 @@ export async function getHostData(request: APIRequestContext) {
   let b = await request.post('api/metrics/snapshot', {
     headers: {
       "accept": "application/json",
-      "Authorization": apiKey,
+      "Authorization": API_KEY,
       "Content-Type": "application/json;charset=UTF-8",
       "kbn-xsrf": "true",
       "x-elastic-internal-origin": "kibana"
@@ -84,7 +84,7 @@ export async function getPodData(request: APIRequestContext) {
   let response = await request.post('api/metrics/snapshot', {
     headers: {
       "accept": "application/json",
-      "Authorization": apiKey,
+      "Authorization": API_KEY,
       "Content-Type": "application/json;charset=UTF-8",
       "kbn-xsrf": "true",
       "x-elastic-internal-origin": "kibana"
@@ -112,10 +112,10 @@ export async function writeFileReportHosts(asyncResults: any, request: APIReques
   let cluster_name: string;
   let cluster_uuid: string;
 
-  let a = await request.get(`${process.env.ELASTICSEARCH_HOST}`, {
+  let a = await request.get(`${ELASTICSEARCH_HOST}`, {
     headers: {
       "accept": "*/*",
-      "Authorization": apiKey,
+      "Authorization": API_KEY,
       "kbn-xsrf": "reporting",
       }
     }
@@ -137,7 +137,7 @@ export async function writeFileReportHosts(asyncResults: any, request: APIReques
     cluster_uuid: cluster_uuid,
     version: versionNumber,
     date: testStartTime,
-    time_window: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
+    time_window: `Last ${TIME_VALUE} ${TIME_UNIT}`,
     measurements: resultsObj
     };
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
