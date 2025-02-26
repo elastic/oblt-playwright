@@ -14,7 +14,7 @@ test.beforeAll(async ({browser}) => {
   const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
   if (noItems) {
     await page.getByRole('button', { name: 'Import' }).click();
-    await page.locator('xpath=//input[@type="file"]').setInputFiles('../../src/dashboards/dashboards.ndjson');
+    await page.locator('xpath=//input[@type="file"]').setInputFiles('../../src/data/dashboards/dashboards.ndjson');
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
   } else {
