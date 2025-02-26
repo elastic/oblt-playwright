@@ -1,19 +1,18 @@
 import { test as base } from "@playwright/test";
-import DashboardPage from "../../../tests/serverless/pom/pages/dashboard.page";
-import DatePicker from "../../../tests/serverless/pom/components/date_picker.component";
-import DependenciesPage from "../../../tests/serverless/pom/pages/dependencies.page";
-import HeaderBar from "../../../tests/serverless/pom/components/header_bar.component";
-import HostsPage from "../../../tests/serverless/pom/pages/hosts.page";
-import InventoryPage from "../../../tests/serverless/pom/pages/inventory.page";
-import DiscoverPage from "../../../tests/serverless/pom/pages/discover.page";
-import ManagementPage from "../../../tests/serverless/pom/pages/management.page";
-import Notifications from "../../../tests/serverless/pom/components/notifications.component";
-import OnboardingPage from "../../../tests/serverless/pom/pages/onboarding.page";
-import ServicesPage from "../../../tests/serverless/pom/pages/services.page";
-import SideNav from "../../../tests/serverless/pom/components/side_nav.component";
-import { SpaceSelector } from "../../../tests/serverless/pom/components/space_selector.component";
-import TracesPage from "../../../tests/serverless/pom/pages/traces.page";
-
+import DashboardPage from "../../pom/serverless/pages/dashboard.page";
+import DatePicker from "../../pom/serverless/components/date_picker.component";
+import DependenciesPage from "../../pom/serverless/pages/dependencies.page";
+import HeaderBar from "../../pom/serverless/components/header_bar.component";
+import HostsPage from "../../pom/serverless/pages/hosts.page";
+import InventoryPage from "../../pom/serverless/pages/inventory.page";
+import DiscoverPage from "../../pom/serverless/pages/discover.page";
+import ManagementPage from "../../pom/serverless/pages/management.page";
+import Notifications from "../../pom/serverless/components/notifications.component";
+import OnboardingPage from "../../pom/serverless/pages/onboarding.page";
+import ServicesPage from "../../pom/serverless/pages/services.page";
+import SideNav from "../../pom/serverless/components/side_nav.component";
+import SpaceSelector from "../../pom/serverless/components/space_selector.component";
+import TracesPage from "../../pom/serverless/pages/traces.page";
 
 export const test = base.extend<{
     dashboardPage: DashboardPage, 

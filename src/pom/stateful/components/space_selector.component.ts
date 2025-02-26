@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 
-export class SpaceSelector {
+export default class SpaceSelector {
     page: Page;
 
     constructor(page: Page) {

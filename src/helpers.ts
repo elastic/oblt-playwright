@@ -1,9 +1,9 @@
 import { APIRequestContext, expect, Locator, TestInfo } from '@playwright/test';
 import { API_KEY, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT } from '../src/env.ts';
-import HeaderBar from '../tests/stateful/pom/components/header_bar.component';
-import SideNav from '../tests/serverless/pom/components/side_nav.component';
-import { SpaceSelector as SpaceSelectorStateful } from '../tests/stateful/pom/components/space_selector.component';
-import { SpaceSelector as SpaceSelectorServerless } from '../tests/serverless/pom/components/space_selector.component';
+import SpaceSelectorStateful from './pom/stateful/components/space_selector.component';
+import SpaceSelectorServerless from './pom/serverless/components/space_selector.component';
+import HeaderBar from './pom/stateful/components/header_bar.component';
+import SideNav from './pom/serverless/components/side_nav.component';
 import * as fs from 'fs';
 import * as path from 'path';
 const outputDirectory = "/home/runner/work/oblt-playwright/";
