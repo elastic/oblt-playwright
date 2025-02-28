@@ -1,18 +1,43 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { expect } from "@playwright/test";
 import { getHostData, spaceSelectorStateful, writeFileReportHosts } from "../../src/helpers.ts";
+import { logger } from '../../src/logger.ts';
+
+let resultsContainer: string[] = [`\nTest results:`];
 
 test.beforeAll('Check data', async ({ request }) => {
+    logger.info('Checking if host data is available');
     const nodesData = await getHostData(request);
     const nodesArr = nodesData.nodes;
     const metricValue = nodesData.nodes[0].metrics[0].value;
-    test.skip(nodesArr.length == 0 || metricValue == null, 'Test is skipped due to lack of node data.');
+    test.skip(nodesArr.length == 0 || metricValue == null, 'Test is skipped: No node data is available');
 });
 
 test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
     await sideNav.goto();
+    logger.info('Selecting the default Kibana space');
     await spaceSelectorStateful(headerBar, spaceSelector);
     await sideNav.clickObservabilitySolutionLink();
+});
+
+test.afterEach('Log test results', async ({}, testInfo) => {
+    if (testInfo.status == 'passed') {
+    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
+    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
+    } else if (testInfo.status == 'failed') {
+        logger.error(`Test "${testInfo.title}" failed`);
+        resultsContainer.push(`Test "${testInfo.title}" failed`);
+    }
+});
+
+test.afterAll('Log test suite summary', async ({}, testInfo) => {
+    if (testInfo.status == 'skipped') {
+        logger.warn(`Test "${testInfo.title}" skipped`);
+        resultsContainer.push(`Test "${testInfo.title}" skipped`);
+        }
+    resultsContainer.forEach((result) => {
+    console.log(`${result}\n`);
+    });
 });
 
 test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page, request }, testInfo) => {
@@ -25,11 +50,12 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
   
     await test.step('step01', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 01 - Sets period. Asserts the loading time of elements.`);
+        logger.info('Navigating to Hosts page');
         await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await page.evaluate("document.body.style.zoom=0.9");
+        logger.info('Asserting the visibility of elements on the Hosts page');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertHostsNumber(),
@@ -42,19 +68,24 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
             hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                logger.error(`Test is failed because "${cpuUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                logger.error(`Test is failed because "${normalizedLoadKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                logger.error(`Test is failed because "${memoryUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                logger.error(`Test is failed because "${diskUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed because Hosts data failed to load.');
+                logger.error('Test is failed because Hosts data failed to load');
+                throw new Error('Test is failed because Hosts data failed to load');
             })
         ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -65,17 +96,21 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilit
     await test.step('step01', async () => {
         let noLogsData = false;
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 01 - Sets period. Asserts the loading time of elements.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
+        logger.info('Navigating to the "Logs" tab');
         await hostsPage.clickLogsTab();
+        logger.info('Asserting visibility of the "Logs" stream');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityLogStream()
                 ]),
             hostsPage.assertVisibilityNoLogs().then(() => {
                 noLogsData = true;
+                logger.warn('Test is skipped due to lack of logs data');
                 test.skip(noLogsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
@@ -87,11 +122,14 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabil
     await test.step('step01', async () => {
         let noAlertsData = false;
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 01 - Sets period. Asserts the loading time of elements.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
+        logger.info('Navigating to the "Alerts" tab');
         await hostsPage.clickAlertsTab();
+        logger.info('Asserting visibility of the "Alerts" chart and table');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityAlertsChart(),
@@ -99,6 +137,7 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabil
                 ]),
             hostsPage.assertNoResultsMatchMessage().then(() => {
                 noAlertsData = true;
+                logger.warn('Test is skipped due to lack of alerts data');
                 test.skip(noAlertsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
@@ -120,9 +159,10 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, n
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
 
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to individual host page.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await page.evaluate("document.body.style.zoom=0.9");
+        logger.info('Asserting the visibility of elements on the Hosts page');
         await Promise.race([
             Promise.all([
                 hostsPage.assertHostsNumber(),
@@ -135,28 +175,35 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, n
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
             hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                logger.error(`Test is failed because "${cpuUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                logger.error(`Test is failed because "${normalizedLoadKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                logger.error(`Test is failed because "${memoryUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                logger.error(`Test is failed because "${diskUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed because Hosts data failed to load.');
+                logger.error('Test is failed because Hosts data failed to load');
+                throw new Error('Test is failed because Hosts data failed to load');
             })
         ]);
+        logger.info('Clicking on a host in the table');
         await hostsPage.clickTableCellHosts();
     });
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
+        logger.info('Asserting the visibility of elements on the Hosts page');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityVisualization(cpuUsageKPI),
@@ -167,7 +214,8 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, n
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed due to an error when loading data.');
+                logger.error('Test is failed due to an error when loading data');
+                throw new Error('Test is failed due to an error when loading data');
                 })
             ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -176,18 +224,22 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, n
 
 test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, observabilityPage, page, request }, testInfo) => {
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metadata tab.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
+        logger.info('Asserting visibility of the "Hosts" table');
         await hostsPage.assertVisibilityHostsTable(),
+        logger.info('Clicking on a host in the table');
         await hostsPage.clickTableCellHosts();
+        logger.info('Navigating to the "Metadata" tab');
         await hostsPage.openHostsMetadataTab();
     });
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         await page.reload();
+        logger.info('Asserting visibility of the "Metadata" table');
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityHostsMetadataTable()
             ]);
@@ -208,9 +260,10 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
     const memoryUsageBreakdown = "infraAssetDetailsMetricChartmemoryUsageBreakdown";
 
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Metrics tab.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await page.evaluate("document.body.style.zoom=0.9");
+        logger.info('Asserting the visibility of elements on the Hosts page');
         await Promise.race([
             Promise.all([
                 hostsPage.assertHostsNumber(),
@@ -223,29 +276,37 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
             hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                logger.error(`Test is failed because "${cpuUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                logger.error(`Test is failed because "${normalizedLoadKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                logger.error(`Test is failed because "${memoryUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                logger.error(`Test is failed because "${diskUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed because Hosts data failed to load.');
+                logger.error('Test is failed because Hosts data failed to load');
+                throw new Error('Test is failed because Hosts data failed to load');
             })
         ]);
+        logger.info('Clicking on the first host in the table');
         await hostsPage.clickTableCellHosts();
+        logger.info('Navigating to the "Metrics" tab');
         await hostsPage.openHostsMetricsTab();
     });
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
+        logger.info('Asserting visibility of the "Metrics" tab elements');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityVisualizationMetricsTab(cpuUsage),
@@ -256,7 +317,8 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
                 hostsPage.assertVisibilityVisualizationMetricsTab(memoryUsageBreakdown), 
                 ]),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed due to an error when loading data.');
+                logger.error('Test is failed due to an error when loading data');
+                throw new Error('Test is failed due to an error when loading data');
                 })
             ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -265,27 +327,33 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
 
 test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page, request }, testInfo) => {
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Processes tab.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
+        logger.info('Asserting visibility of the "Hosts" table');
         await hostsPage.assertVisibilityHostsTable(),
+        logger.info('Clicking on the first host in the table');
         await hostsPage.clickTableCellHosts();
+        logger.info('Navigating to the "Processes" tab');
         await hostsPage.openHostsProcessesTab();
     });
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         await page.reload();
+        logger.info('Asserting visibility of the "Processes" table');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityHostsProcessesTable()
             ]),
             hostsPage.assertProcessesNotFound().then(() => {
+                logger.error('Test failed because no processes found.');
                 throw new Error('Test failed because no processes found.');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed due to an error when loading data.');
+                logger.error('Test is failed due to an error when loading data');
+                throw new Error('Test is failed due to an error when loading data');
             })
           ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -294,11 +362,15 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
 
 test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, notifications, observabilityPage, request }, testInfo) => {
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Profiling tab.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
+        logger.info('Asserting visibility of the "Hosts" table');
         await hostsPage.assertVisibilityHostsTable(),
+        logger.info('Clicking on the first host in the table');
         await hostsPage.clickTableCellHosts();
+        logger.info('Asserting visibility of the "Metrics" tab');
         await expect(hostsPage.hostsMetricsTab()).toBeVisible();
+        logger.info('Navigating to the "Profiling" tab');
         const profilingTabVisibility = await hostsPage.hostsProfilingTab().isVisible();
         test.skip(!profilingTabVisibility, 'Skipping test due to absence of Profiling tab');
         await hostsPage.openHostsProfilingTab();
@@ -306,18 +378,21 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
         await datePicker.assertVisibilityDatePickerHostsProfiling();
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriodProfiling();
+        logger.info('Asserting visibility of the profiling flamegraph');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityProfilingFlamegraph()
             ]),
             hostsPage.assertAddProfilingButton().then(() => {
-                throw new Error('Test failed because profiling is not set up.');
+                logger.error('Test failed because profiling is not set up');
+                throw new Error('Test failed because profiling is not set up');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed due to an error when loading data.');
+                logger.error('Test is failed due to an error when loading data');
+                throw new Error('Test is failed due to an error when loading data');
             })
           ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
@@ -326,26 +401,32 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
 
 test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, notifications, observabilityPage, request }, testInfo) => {
     await test.step('step01', async () => {
-        console.log(`\n[${testInfo.title}] Step 01 - Navigates to Logs tab.`);
+        logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
+        logger.info('Asserting visibility of the "Hosts" table');
         await hostsPage.assertVisibilityHostsTable(),
+        logger.info('Clicking on the first host in the table');
         await hostsPage.clickTableCellHosts();
+        logger.info('Navigating to the "Logs" tab');
         await hostsPage.openHostsLogsTab();
     });
 
     await test.step('step02', async () => {
         const testStartTime = Date.now();
-        console.log(`\n[${testInfo.title}] Step 02 - Sets period. Asserts the loading time of elements.`);
+        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
+        logger.info('Asserting visibility of the "Logs" stream');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityHostsLogsTabStream()
             ]),
             hostsPage.assertLogsNotFound().then(() => {
-                throw new Error('Test failed because no logs found.');
+                logger.error('Test failed because no logs found');
+                throw new Error('Test failed because no logs found');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed due to an error when loading data.');
+                logger.error('Test is failed due to an error when loading data');
+                throw new Error('Test is failed due to an error when loading data');
               })
           ]);
         await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);

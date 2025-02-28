@@ -12,6 +12,7 @@
     "@types/node": "^22.13.5"
   },
   "dependencies": {
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "winston": "^3.17.0"
   }
 }

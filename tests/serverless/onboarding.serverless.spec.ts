@@ -3,12 +3,37 @@ import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
 import { REPORT_FILE } from '../../src/env.ts';
 import * as fs from 'fs';
 import * as path from 'path';
+import { logger } from '../../src/logger.ts';
+
 const outputDirectory = path.dirname(REPORT_FILE);
+let resultsContainer: string[] = [`\nTest results:`];
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
     await sideNav.goto();
+    logger.info('Selecting the default Kibana space');
     await spaceSelectorServerless(sideNav, spaceSelector);
+    logger.info('Navigating to the "Onboarding" section');
     await page.goto('/app/observabilityOnboarding');
+});
+
+test.afterEach('Log test results', async ({}, testInfo) => {
+  if (test.info().status == 'passed') {
+    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
+    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
+  } else if (test.info().status == 'failed') {
+    logger.error(`Test "${testInfo.title}" failed`);
+    resultsContainer.push(`Test "${testInfo.title}" failed`);
+  }
+});
+
+test.afterAll('Log test suite summary', async ({}, testInfo) => {
+  if (testInfo.status == 'skipped') {
+      logger.warn(`Test "${testInfo.title}" skipped`);
+      resultsContainer.push(`Test "${testInfo.title}" skipped`);
+      }
+  resultsContainer.forEach((result) => {
+    console.log(`${result}\n`);
+  });
 });
 
 test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
@@ -18,14 +43,17 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
     let retries: number = 0;
     let codeBlockAppeared: boolean = false;
 
+    logger.info('Selecting "Collect logs", then "Logs auto-detect"');
     await onboardingPage.selectCollectLogs();
     await onboardingPage.selectLogsAutoDetect();
+    logger.info('Waiting for the code block to appear');
     const [ c ] = await waitForOneOf([
         onboardingPage.codeBlock(),
         onboardingPage.contentNotLoaded()
         ]);
     const codeNotLoaded = c === 1;
     if (codeNotLoaded) {
+        logger.warn('Code block not loaded. Retrying...');
         while (retries < maxRetries) {
             try {
                 onboardingPage.clickRetry();
@@ -34,17 +62,22 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
                 break;
             } catch (error) {
                 retries++;
-                console.log(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
+                logger.warn(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
             }
         }
         if (!codeBlockAppeared) {
-            throw new Error('Page content not loaded after 3 attempts.');
+            logger.error('Page content not loaded after 3 attempts');
+            throw new Error('Page content not loaded after 3 attempts');
         }
     };
+    logger.info('Asserting visibility of the code block');
     await onboardingPage.assertVisibilityCodeBlock();
+    logger.info('Copying the code block to the clipboard');
     await onboardingPage.copyToClipboard();
     let clipboardData: string = await page.evaluate("navigator.clipboard.readText()");
+    logger.info('Writing the clipboard data to a file');
     fs.writeFileSync(outputPath, clipboardData);
+    logger.info('Asserting the received data indicator');
     await onboardingPage.assertReceivedDataIndicator();
 });
 
@@ -55,14 +88,17 @@ test('Kubernetes', async ({ onboardingPage, page }) => {
     let retries: number = 0;
     let codeBlockAppeared: boolean = false;
 
+    logger.info('Selecting "Monitor infrastructure", then "Kubernetes"');
     await onboardingPage.selectMonitorInfrastructure();
     await onboardingPage.selectKubernetes();
+    logger.info('Waiting for the code block to appear');
     const [ c ] = await waitForOneOf([
         onboardingPage.codeBlock(),
         onboardingPage.contentNotLoaded()
         ]);
     const codeNotLoaded = c === 1;
     if (codeNotLoaded) {
+        logger.warn('Code block not loaded. Retrying...');
         while (retries < maxRetries) {
             try {
                 onboardingPage.clickRetry();
@@ -71,16 +107,21 @@ test('Kubernetes', async ({ onboardingPage, page }) => {
                 break;
             } catch (error) {
                 retries++;
-                console.log(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
+                logger.warn(`Code block visibility assertion attempt ${retries} failed. Retrying...`);
             }
         }
         if (!codeBlockAppeared) {
-            throw new Error('Page content not loaded after 3 attempts.');
+            logger.error('Page content not loaded after 3 attempts');
+            throw new Error('Page content not loaded after 3 attempts');
         }
     };
+    logger.info('Asserting visibility of the code block');
     await onboardingPage.assertVisibilityCodeBlock();
+    logger.info('Copying the code block to the clipboard');
     await onboardingPage.copyToClipboard();
     let clipboardData: string = await page.evaluate("navigator.clipboard.readText()");
+    logger.info('Writing the clipboard data to a file');
     fs.writeFileSync(outputPath, clipboardData);
+    logger.info('Asserting the received data indicator');
     await onboardingPage.assertReceivedDataIndicator();
 });
