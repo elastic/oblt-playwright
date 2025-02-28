@@ -13,6 +13,7 @@ export default class DatePicker {
     private readonly timeValue  = () => this.page.locator('xpath=//input[@aria-label="Time value"]');
     private readonly timeUnit = () => this.page.locator('xpath=//*[@aria-label="Time unit"]');
     private readonly applyButton = () => this.page.locator('xpath=//span[contains(text(), "Apply")]');
+    private readonly refreshButton = () => this.page.getByTestId('superDatePickerApplyTimeButton');
     private readonly selectedDate = () => this.page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER });
 
     public async assertVisibilityDatePicker() {
@@ -41,6 +42,10 @@ export default class DatePicker {
 
     public async clickApplyButton() {
         await this.applyButton().click();
+    }
+
+    public async clickRefreshButton() {
+        await this.refreshButton().click();
     }
 
     public async selectDate() {

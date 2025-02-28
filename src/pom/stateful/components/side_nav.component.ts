@@ -13,7 +13,7 @@ export default class SideNav {
 
     private readonly toggleNavButton = () => this.page.getByTestId('toggleNavButton');
     private readonly homeLink = () => this.page.getByTestId('homeLink');
-    private readonly discover = () => this.page.locator('xpath=//span[@title="Discover"]');
+    private readonly discover = () => this.page.getByTestId('observability-nav-observability-logs-explorer-discover');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly observability = () => this.page.locator('xpath=//span[contains(@class,"euiAccordion__buttonContent")]//a[contains(text(),"Observability")]');
     private readonly observabilitySolutionLink = () => this.page.locator('xpath=//div[@data-test-subj="homSolutionPanel homSolutionPanel_observability"]//a[contains(text(),"Observability")]');

@@ -20,7 +20,7 @@ export default class SideNav {
     private readonly traces = () => this.page.getByRole('link', { name: 'Traces' });
     private readonly dependencies = () => this.page.getByRole('link', { name: 'Dependencies' });
     private readonly infrastructure = () => this.page.locator('xpath=//button//*[text()="Infrastructure"]');
-    private readonly inventory = () => this.page.locator('xpath=//*[contains(text(),"Infrastructure inventory")]');
+    private readonly inventory = () => this.page.locator('xpath=//*[contains(text(),"Infrastructure Inventory")]');
     private readonly hosts = () => this.page.getByRole('link', { name: 'Hosts' });
     private readonly projectSettings = () => this.page.locator('xpath=//button[@aria-controls="project_settings_project_nav"][2]');
     private readonly projectManagement = () => this.page.locator('xpath=//span[contains(text(),"Management")]');

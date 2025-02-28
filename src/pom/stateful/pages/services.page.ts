@@ -17,6 +17,7 @@ export default class ServicesPage {
     private readonly filterByFieldValueButton = () => this.page.getByRole('button', { name: 'Field value', exact: true });
     private readonly investigateButton = () => this.page.getByRole('button', { name: 'Investigate' });
     private readonly investigateHostLogsButton = () => this.page.getByRole('link', { name: 'Host logs' });
+    private readonly investigateViewInDiscover = () => this.page.getByRole('link', { name: 'View transaction in Discover' });
     private readonly errorDistributionChart = () => this.page.getByTestId('errorDistribution');
 
     public async assertVisibilityServiceOpbeansGo() {
@@ -69,6 +70,10 @@ export default class ServicesPage {
 
     public async clickInvestigate() {
         await this.investigateButton().click();
+        }
+
+    public async clickViewInDiscoverButton() {
+        await this.investigateViewInDiscover().click();
         }
 
     public async clickHostLogsButton() {

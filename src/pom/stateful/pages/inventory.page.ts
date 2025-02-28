@@ -109,7 +109,7 @@ export default class InventoryPage {
 
     public async assertVisibilityVisualization(title: string) {
         const startTime = performance.now();
-        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"][@data-render-complete="true"]`), `"${title}" visualization should be visible`).toBeVisible();
+        await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]/div[@data-render-complete="true"]`), `"${title}" visualization should be visible`).toBeVisible();
         const endTime = performance.now();
         const elapsedTime = (endTime - startTime) / 1000;
         const result = {[title]: elapsedTime};

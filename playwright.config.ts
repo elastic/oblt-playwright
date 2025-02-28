@@ -12,13 +12,13 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  // workers: 4,
-  reporter: [[process.env.CI ? 'json' : 'json'], ["json", { outputFile: "playwright-report/results.json" }]],
+  workers: process.env.CI ? 1 : 1,
+  reporter: [['list', { printSteps: true }], ['json', { outputFile: "playwright-report/results.json" }]],
   timeout: 800000,
   expect: {timeout: 800000},
 
   use: {
+    browserName: 'chromium',
     baseURL: process.env.KIBANA_HOST,
     trace: 'on-first-retry',
     testIdAttribute: 'data-test-subj',
@@ -35,12 +35,6 @@ export default defineConfig({
       testMatch: 'stateful.auth.ts',
       use: {
         viewport: {width: 1920, height: 1080},
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        }
       }
     },
     {
@@ -49,12 +43,6 @@ export default defineConfig({
       use: {
         testIdAttribute: 'data-test-id',
         viewport: {width: 1920, height: 1080},
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        }
       },
     },
     {
@@ -64,12 +52,6 @@ export default defineConfig({
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
         testIdAttribute: 'data-test-subj',
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        }
       },
     },
     {
@@ -79,12 +61,6 @@ export default defineConfig({
         viewport: {width: 1920, height: 1080},
         storageState: STORAGE_STATE,
         testIdAttribute: 'data-test-subj',
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        }
       },
     },
     {
@@ -94,12 +70,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        },
       },
       dependencies: ['stateful_auth'],
     },
@@ -110,12 +80,6 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
-        launchOptions: {
-          logger: {
-            isEnabled: () => true,
-            log: (name, severity, message) => console.log(`[${severity}] ${name} ${message}`)
-          }
-        },
       },
       dependencies: ['serverless_auth'],
     },

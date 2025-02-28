@@ -7,7 +7,6 @@ import DiscoverPage from "../../pom/stateful/pages/discover.page";
 import HeaderBar from "../../pom/stateful/components/header_bar.component";
 import HostsPage from "../../pom/stateful/pages/hosts.page";
 import InventoryPage from "../../pom/stateful/pages/inventory.page";
-import LogsExplorerPage from "../../pom/stateful/pages/logs_explorer.page";
 import Notifications from "../../pom/stateful/components/notifications.component";
 import ObservabilityPage from "../../pom/stateful/pages/observability.page";
 import OnboardingPage from "../../pom/stateful/pages/onboarding.page";
@@ -24,8 +23,7 @@ export const test = base.extend<{
     discoverPage: DiscoverPage,
     headerBar: HeaderBar,
     hostsPage: HostsPage, 
-    inventoryPage: InventoryPage, 
-    logsExplorerPage: LogsExplorerPage,
+    inventoryPage: InventoryPage,
     notifications: Notifications, 
     observabilityPage: ObservabilityPage,
     onboardingPage: OnboardingPage, 
@@ -65,10 +63,6 @@ export const test = base.extend<{
         
         inventoryPage: async({page}, use) => {
             await use(new InventoryPage(page));
-        },
-
-        logsExplorerPage: async({page}, use) => {
-            await use(new LogsExplorerPage(page));
         },
 
         notifications: async({page}, use) => {

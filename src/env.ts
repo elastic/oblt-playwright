@@ -6,6 +6,7 @@ export const API_KEY = `${process.env.API_KEY}`;
 export const TIME_UNIT = `${process.env.TIME_UNIT}`;
 export const TIME_VALUE = `${process.env.TIME_VALUE}`;
 export const REPORT_FILE = `${process.env.REPORT_FILE}`;
+export const CI = `${process.env.CI}`;
 
 /*
 A set of variables used in cross-cluster search test.

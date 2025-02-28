@@ -8,8 +8,8 @@ export default class ObservabilityPage {
     }
 
     private readonly alerts = () => this.page.getByTestId('observability-nav-observability-overview-alerts');
-    private readonly explorer = () => this.page.getByTestId('observability-nav-observability-logs-explorer-explorer');
-    private readonly services = () => this.page.getByTestId('observability-nav-apm-services');
+    private readonly discover = () => this.page.locator('xpath=//a[@data-nav-id="discover"]');
+    private readonly services = () => this.page.getByTestId('observability-nav-apm-service_inventory');
     private readonly traces = () => this.page.getByTestId('observability-nav-apm-traces');
     private readonly dependencies = () => this.page.getByTestId('observability-nav-apm-dependencies');
     private readonly inventory = () => this.page.getByTestId('observability-nav-metrics-infrastructure_inventory');
@@ -20,8 +20,8 @@ export default class ObservabilityPage {
         await this.alerts().click();
     }
 
-    public async clickExplorer() {
-        await this.explorer().click();
+    public async clickDiscover() {
+        await this.discover().click();
     }
 
     public async clickServices() {
