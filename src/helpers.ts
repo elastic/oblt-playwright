@@ -125,11 +125,11 @@ export async function checkApmData(request: APIRequestContext): Promise<boolean>
 }
 
 export async function fetchClusterData() {
-  const jsonDataCluster: object = await fetch(`${process.env.ELASTICSEARCH_HOST}`, {
+  const jsonDataCluster: object = await fetch(ELASTICSEARCH_HOST, {
     method: 'GET',
     headers: {
       "accept": "*/*",
-        "Authorization": process.env.API_KEY,
+        "Authorization": API_KEY,
         "kbn-xsrf": "reporting"
     }
   }).then(response => {
@@ -167,7 +167,7 @@ export async function writeJsonReport(clusterData: any, testInfo: TestInfo, test
   const reportData = {
     title: testInfo.title,
     startTime: testStartTime,
-    period: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
+    period: `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
     duration: {"test": testInfo.duration, ...stepsObject},
     errors: testInfo.errors,
