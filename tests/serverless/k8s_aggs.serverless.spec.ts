@@ -1,5 +1,9 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { spaceSelectorServerless } from "../../src/helpers.ts";
+import { fetchClusterData, spaceSelectorServerless, writeJsonReport } from "../../src/helpers.ts";
+import { logger } from '../../src/logger.ts';
+
+let clusterData: any;
+const testStartTime: number = Date.now();
 
 test.beforeAll(async ({browser}) => {
   const context = await browser.newContext();
@@ -21,12 +25,19 @@ test.beforeAll(async ({browser}) => {
     console.log('Dashboards already exist.')
   }
   await context.close();
+
+  logger.info('Fetching cluster data');
+  clusterData = await fetchClusterData();
 });
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
   await page.goto('/');
   await spaceSelectorServerless(sideNav, spaceSelector);
   await page.goto('/app/dashboards');
+});
+
+test.afterEach('Write file report', async ({}, testInfo) => {
+  await writeJsonReport(clusterData, testInfo, testStartTime);
 });
 
 test('Average container CPU core usage', async ({ page, dashboardPage, datePicker }) => {

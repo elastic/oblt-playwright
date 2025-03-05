@@ -1,26 +1,12 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { expect } from "@playwright/test";
-import { spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
-import { API_KEY } from '../../src/env.ts';
+import { checkApmData, spaceSelectorStateful, waitForOneOf } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let resultsContainer: string[] = [`\nTest results:`];
 
-test.beforeAll('Check APM data', async ({request}) => {
+test.beforeAll('Check APM data', async ({ request }) => {
   logger.info('Checking if APM data is available');
-  let response = await request.get('internal/apm/has_data', {
-    headers: {
-      "accept": "application/json",
-      "Authorization": API_KEY,
-      "Content-Type": "application/json;charset=UTF-8",
-      "kbn-xsrf": "true",          
-      "x-elastic-internal-origin": "kibana"
-    },
-    data: {}
-  })
-  expect(response.status()).toBe(200);
-  const body = JSON.parse(await response.text());
-  const hasData = body.hasData;
+  const hasData = await checkApmData(request);
   test.skip(!hasData == true, 'Test is skipped: No APM data is available');
 });
 

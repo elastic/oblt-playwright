@@ -33,17 +33,6 @@ export const logger = winston.createLogger({
           return `${timestamp} [${level}]: ${message}`;
         })
       )
-    }),
-    new winston.transports.File({
-      level: 'record',
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss',
-        }),
-        customFileFormat
-      ),
-      filename: './playwright-report/perf_results.log'
     })
   ],
 });

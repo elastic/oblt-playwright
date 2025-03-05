@@ -6,7 +6,8 @@ import HeaderBar from './pom/stateful/components/header_bar.component';
 import SideNav from './pom/serverless/components/side_nav.component';
 import * as fs from 'fs';
 import * as path from 'path';
-const outputDirectory = CI ? '/home/runner/work/oblt-playwright/' : './playwright-report';
+
+const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : './playwright-report';
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
 
@@ -107,38 +108,75 @@ export async function getPodData(request: APIRequestContext) {
   return jsonData;
 }
 
-export async function writeFileReportHosts(asyncResults: any, request: APIRequestContext, testInfo: TestInfo, testStartTime: number, ) {
-  let versionNumber: string;
-  let cluster_name: string;
-  let cluster_uuid: string;
+export async function checkApmData(request: APIRequestContext): Promise<boolean> {
+  let response = await request.get('internal/apm/has_data', {
+    headers: {
+      "accept": "application/json",
+      "Authorization": API_KEY,
+      "Content-Type": "application/json;charset=UTF-8",
+      "kbn-xsrf": "true",          
+      "x-elastic-internal-origin": "kibana"
+    },
+    data: {}
+  })
+  expect(response.status()).toBe(200);
+  const body = JSON.parse(await response.text());
+  return body.hasData;
+}
 
-  let a = await request.get(`${ELASTICSEARCH_HOST}`, {
+export async function fetchClusterData() {
+  const jsonDataCluster: object = await fetch(`${process.env.ELASTICSEARCH_HOST}`, {
+    method: 'GET',
     headers: {
       "accept": "*/*",
-      "Authorization": API_KEY,
-      "kbn-xsrf": "reporting",
-      }
+        "Authorization": process.env.API_KEY,
+        "kbn-xsrf": "reporting"
     }
-  );
-  expect(a.status()).toBe(200);
-  const jsonDataCluster = JSON.parse(await a.text());
-  versionNumber = jsonDataCluster.version.number;
-  cluster_name = jsonDataCluster.cluster_name;
-  cluster_uuid = jsonDataCluster.cluster_uuid;
+  }).then(response => {
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return response.text();
+  }).then(json => {
+    return JSON.parse(json);
+  });
+  return jsonDataCluster;
+}
 
-  const resultsObj = asyncResults.reduce((acc, obj) => {
-    return { ...acc, ...obj };
-    }, {});
-  const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}.json`;
+export async function writeJsonReport(clusterData: any, testInfo: TestInfo, testStartTime: number, stepsData?: [], hostsMeasurements?: any) {
+  let build_flavor: any = clusterData.version.build_flavor;
+  let cluster_name: any = clusterData.cluster_name;
+  let version: any = clusterData.version.number;
+  let hostsObject: {} = {};
+  let stepsObject: {} = {};
+
+  const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
   const outputPath = path.join(outputDirectory, fileName);
+
+  if (stepsData) {
+    stepsObject = stepsData.reduce((acc, item) => 
+    Object.assign(acc, item), {});
+  };
+
+  if (hostsMeasurements) {
+    hostsObject = hostsMeasurements.reduce((acc, obj) => {
+    return { ...acc, ...obj };
+    }, {})
+  };
+
   const reportData = {
-    name: testInfo.title,
+    title: testInfo.title,
+    startTime: testStartTime,
+    period: `Last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`,
+    status: testInfo.status,
+    duration: {"test": testInfo.duration, ...stepsObject},
+    errors: testInfo.errors,
+    timeout: testInfo.timeout,
     cluster_name: cluster_name,
-    cluster_uuid: cluster_uuid,
-    version: versionNumber,
-    date: testStartTime,
-    time_window: `Last ${TIME_VALUE} ${TIME_UNIT}`,
-    measurements: resultsObj
-    };
+    version: version,
+    build_flavor: build_flavor,
+    measurements: hostsMeasurements ? hostsObject : null,
+  };
+    
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
 }

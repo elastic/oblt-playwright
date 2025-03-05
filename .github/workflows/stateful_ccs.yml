@@ -75,53 +75,16 @@ jobs:
           RANGE: ${{ vars.RANGE }}
           REMOTE_CLUSTERS: ${{ vars.REMOTE_CLUSTERS }}
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
-          path: playwright-report/
+          name: perf-test-report
+          path: /home/runner/work/oblt-playwright/test-results
           retention-days: 1
 
-  parse:
-    needs: test
-    if: success()
-    name: Parse test report
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
-
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-        key: modules-${{ hashFiles('package-lock.json') }}
-  
-    - name: Download raw test report from artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: /home/runner/work/oblt-playwright
-        
-    - name: Parse raw report
-      run: node ./src/utils/split_json_report.js
-      env:
-        REPORT_FILE: ${{ vars.REPORT_FILE }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
-        API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_B }}
-        RANGE: ${{ vars.RANGE }}
-      
-    - name: Upload test report
-      uses: actions/upload-artifact@v4
-      with:
-        name: perf-test-report
-        path: /home/runner/work/oblt-playwright/test-results
-        retention-days: 30
-
   upload:
-    needs: parse
+    needs: test
     if: success()
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest

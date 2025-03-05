@@ -68,53 +68,16 @@ jobs:
     - name: Run SLO transforms performance tests
       run: npx playwright test slos.api.spec.ts
       
-    - uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: test-results
-        path: playwright-report
-        retention-days: 1
-
-  parse:
-    needs: test
-    name: Parse raw test report
-    if: success()
-    runs-on: ubuntu-latest
-    env:
-        REPORT_FILE: ${{ secrets.REPORT_FILE }}
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 18
-
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-        key: modules-${{ hashFiles('package-lock.json') }}
-  
-    - name: Download raw test report from artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: /home/runner/work/oblt-playwright
-        
-    - name: Parse raw report
-      run: node ./src/utils/slo_report_parser.js
-
-    - name: Remove raw test report from artifacts
-      run: rm -rf /home/runner/work/oblt-playwright/test-results/results.json
-      
-    - name: Upload test report
+    - name: Upload test reports
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: perf-test-report
         path: /home/runner/work/oblt-playwright/test-results
-        retention-days: 90
+        retention-days: 1
 
   upload:
-    needs: parse
+    needs: test
     name: Upload test reports to Elasticsearch
     if: success()
     runs-on: ubuntu-latest

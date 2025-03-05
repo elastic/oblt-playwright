@@ -1,9 +1,10 @@
 name: "Serverless - Hosts"
 on:
-  # schedule:
+  schedule:
   #   - cron: "0 * * * *"
   #   - cron: "15 * * * *"
   #   - cron: "30 * * * *"
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 permissions:
   contents: read
@@ -94,7 +95,7 @@ jobs:
     name: Run tests (7 days)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.schedule == '15 * * * *'
+    if: github.event.schedule == '*/10 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -178,72 +179,19 @@ jobs:
         TIME_UNIT: ${{ vars.TIME_UNIT }}
         TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload test reports
+      uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-results
-        path: playwright-report/
+        name: perf-test-report
+        path: /home/runner/work/oblt-playwright/test-results
         retention-days: 1
 
-  parse:
+  upload:
     needs:
       - test_1_day
       - test_7_days
       - test_14_days
-    if: always()
-    name: Parse test report
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: 20
-
-    - name: Set environment variables
-      env:
-        TEST_1_DAY_IS_RUNNING: ${{ needs.test_1_day.outputs.is_running }}
-        TEST_7_DAYS_IS_RUNNING: ${{ needs.test_7_days.outputs.is_running }}
-        TEST_14_DAYS_IS_RUNNING: ${{ needs.test_14_days.outputs.is_running }}
-      run: |
-        if [[ "$TEST_1_DAY_IS_RUNNING" == "true" ]]; then
-          echo "TIME_VALUE=${{ vars.TIME_VALUE_X }}" >> $GITHUB_ENV
-        elif [[ "$TEST_7_DAYS_IS_RUNNING" == "true" ]]; then
-          echo "TIME_VALUE=${{ vars.TIME_VALUE_Y }}" >> $GITHUB_ENV
-        elif [[ "$TEST_14_DAYS_IS_RUNNING" == "true" ]]; then
-          echo "TIME_VALUE=${{ vars.TIME_VALUE_Z }}" >> $GITHUB_ENV
-        fi
-
-    - name: Cache node_modules
-      uses: actions/cache@v4
-      with:
-        path: |
-          node_modules
-        key: modules-${{ hashFiles('package-lock.json') }}
-  
-    - name: Download raw test report from artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: /home/runner/work/oblt-playwright
-        
-    - name: Parse raw report
-      run: |
-        echo "Using TIME_VALUE: $TIME_VALUE"
-        node ./src/utils/split_json_report.js
-      env:
-        REPORT_FILE: ${{ vars.REPORT_FILE }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
-        API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
-        TIME_UNIT: ${{ vars.TIME_UNIT }}
-      
-    - name: Upload test report
-      uses: actions/upload-artifact@v4
-      with:
-        name: perf-test-report
-        path: /home/runner/work/oblt-playwright/test-results
-        retention-days: 30
-
-  upload:
-    needs: parse
     if: always()
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest

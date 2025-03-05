@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
+import { fetchClusterData, spaceSelectorServerless, waitForOneOf, writeJsonReport } from "../../src/helpers.ts";
 import { REPORT_FILE } from '../../src/env.ts';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -7,6 +7,13 @@ import { logger } from '../../src/logger.ts';
 
 const outputDirectory = path.dirname(REPORT_FILE);
 let resultsContainer: string[] = [`\nTest results:`];
+let clusterData: any;
+const testStartTime: number = Date.now();
+
+test.beforeAll('Fetch cluster data', async ({}) => {
+  logger.info('Fetching cluster data');
+  clusterData = await fetchClusterData();
+});
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
     await sideNav.goto();
@@ -24,11 +31,12 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     logger.error(`Test "${testInfo.title}" failed`);
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
+
+  await writeJsonReport(clusterData, testInfo, testStartTime);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
   if (testInfo.status == 'skipped') {
-      logger.warn(`Test "${testInfo.title}" skipped`);
       resultsContainer.push(`Test "${testInfo.title}" skipped`);
       }
   resultsContainer.forEach((result) => {
@@ -66,7 +74,6 @@ test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {
             }
         }
         if (!codeBlockAppeared) {
-            logger.error('Page content not loaded after 3 attempts');
             throw new Error('Page content not loaded after 3 attempts');
         }
     };
@@ -111,7 +118,6 @@ test('Kubernetes', async ({ onboardingPage, page }) => {
             }
         }
         if (!codeBlockAppeared) {
-            logger.error('Page content not loaded after 3 attempts');
             throw new Error('Page content not loaded after 3 attempts');
         }
     };
