@@ -1,7 +1,8 @@
-import { API_KEY, ELASTICSEARCH_HOST, REPORT_FILE } from '../../src/env.ts';
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const inputFilePath = REPORT_FILE;
+
+const inputFilePath = process.env.REPORT_FILE;
 const rawData = fs.readFileSync(inputFilePath);
 const jsonData = JSON.parse(rawData);
 const testSuites = jsonData.suites;
@@ -9,11 +10,11 @@ const outputDirectory = path.dirname(inputFilePath);
 const currentDate = new Date().toISOString().replace(/:/g, '_').split('.')[0] + 'Z';
 
 async function fetchClusterData() {
-  const jsonDataCluster = await fetch(`${ELASTICSEARCH_HOST}`, {
+  const jsonDataCluster = await fetch(`${process.env.ELASTICSEARCH_HOST}`, {
     method: 'GET',
     headers: {
       "accept": "*/*",
-        "Authorization": API_KEY,
+        "Authorization": process.env.API_KEY,
         "kbn-xsrf": "reporting"
     }
   }).then(response => {
@@ -28,19 +29,13 @@ async function fetchClusterData() {
 }
 
 async function parse() {
-  let build_date;
   let build_flavor;
-  let build_hash;
   let cluster_name;
-  let cluster_uuid;
   let versionNumber;
 
   await fetchClusterData().then(data => {
-    build_date = data.version.build_date;
     build_flavor = data.version.build_flavor;
-    build_hash = data.version.build_hash;
     cluster_name = data.cluster_name;
-    cluster_uuid = data.cluster_uuid;
     versionNumber = data.version.number;
   });
 
@@ -71,11 +66,8 @@ async function parse() {
                     errorData: result.error,
                     timeout: test.timeout,
                     cluster_name: cluster_name,
-                    cluster_uuid: cluster_uuid,
                     version: versionNumber,
-                    build_date: build_date,
                     build_flavor: build_flavor,
-                    build_hash: build_hash,
                     ccs_range: process.env.RANGE
                   };
               const fileName = `${currentDate}_${spec.title.replace(/\s/g, "_").toLowerCase()}.json`;

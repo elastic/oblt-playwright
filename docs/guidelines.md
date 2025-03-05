@@ -2,27 +2,57 @@
 
 Use the following code as a basis for a new test file:
 ```
-import {test} from '../../tests/fixtures/serverless/page.fixtures.ts';
+import { test } from '../../tests/fixtures/serverless/page.fixtures.ts';
+import { fetchClusterData, spaceSelectorServerless, writeJsonReport } from "../../src/helpers.ts";
 
-test.beforeEach(async ({ sideNav }) => {
+let clusterData: any;
+const testStartTime: number = Date.now();
+
+test.beforeAll('Fetch cluster data', async ({}) => {
+  clusterData = await fetchClusterData();
+});
+
+test.beforeEach(async ({ sideNav, spaceSelector }) => {
   await sideNav.goto();
+  await spaceSelectorServerless(sideNav, spaceSelector);
   await sideNav.<test section>;
 });
 
+test.afterEach('Log test results', async ({}, testInfo) => {
+  const stepsData = (testInfo as any).stepsData;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepsData);
+});
+
 test('<test name>', async ({page, <fixtures>}) => { 
+    let steps: object[] = [];
+
     await test.step('<step name>', async () => {
+        const stepStartTime = performance.now();
+
         // Put your code here
         await <page>.<method>;
         await <page>.<method>;
+
+        const stepDuration = performance.now() - stepStartTime;
+        steps.push({"step01": stepDuration});
     });
+    (testInfo as any).stepsData = steps;
 });
 
 test('<test name>', async ({page, <fixtures>}) => {
+    let steps: object[] = [];
+
     await test.step('<step name>', async () => {
+        const stepStartTime = performance.now();
+
         // Put your code here
         await <page>.<method>;
         await <page>.<method>;
+
+        const stepDuration = performance.now() - stepStartTime;
+        steps.push({"step01": stepDuration});
     });
+    (testInfo as any).stepsData = steps;
 });
 ```
 |   | Tip |
@@ -236,32 +266,3 @@ public async <methodName>(<parameters>) {
 | `<parameters>` | Example:<br><br>`assertVisibilityPodVisualization(title: string)` |
 | `<locatorFunction>` | Specify a locator function.<br><br>Examples:<br><br>`logsExplorerTab()` |
 | `<action>` | Specify an action to perform against a locator. See this [page](https://playwright.dev/docs/input) to check available actions.<br><br>Examples:<br><br>`click()`<br>`fill('error')` |
-
-# Get Elasticsearch-friendly JSON test report
-
-Playwright spits out JSON test reports that have nested structure, which not quite suitable for Elasticsearch - results for each test is a separate array with its own fields. The problem is nested field type is not supported in Kibana visualizations. To solve this, use [this script](https://github.com/elastic/oblt-playwright/blob/main/utils/split_json_report.ts) to flatten and split a report by each test:
-
-```
-node utils\split_json_report.ts
-```
-<details>
-<summary>Here is an example of how the outcome of that script might look like</summary>
-
-```
-{
-  "title": "Infrastructure - Cluster Overview dashboard",
-  "startTime": "2024-02-02T12:50:18.767Z",
-  "status": "passed",
-  "duration": 59414,
-  "step01": 4351,
-  "step02": 1064,
-  "step03": 24160,
-  "workerIndex": 1,
-  "retry": 0,
-  "errors": [],
-  "timeout": 300000
-}
-```
-</details>
-
-Resulting files stored in the same directory as the original report.

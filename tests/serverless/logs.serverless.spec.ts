@@ -1,8 +1,15 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { spaceSelectorServerless, waitForOneOf } from "../../src/helpers.ts";
+import { fetchClusterData, spaceSelectorServerless, waitForOneOf, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let resultsContainer: string[] = [`\nTest results:`];
+let clusterData: any;
+const testStartTime: number = Date.now();
+
+test.beforeAll('Fetch cluster data', async ({}) => {
+  logger.info('Fetching cluster data');
+  clusterData = await fetchClusterData();
+});
 
 test.beforeEach(async ({ discoverPage, sideNav, spaceSelector }) => {
   logger.info('Selecting the default Kibana space');
@@ -22,11 +29,13 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     logger.error(`Test "${testInfo.title}" failed`);
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
+
+  const stepsData = (testInfo as any).stepsData;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepsData);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
   if (testInfo.status == 'skipped') {
-      logger.warn(`Test "${testInfo.title}" skipped`);
       resultsContainer.push(`Test "${testInfo.title}" skipped`);
       }
   resultsContainer.forEach((result) => {
@@ -34,8 +43,12 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
   });
 });
 
-test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications}) => {
+test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications}, testInfo) => {
+  let steps: object[] = [];
+
   await test.step('step01', async () => {
+    const stepStartTime = performance.now();
+
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -46,15 +59,22 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        logger.error('Test is failed due to an error when loading data');
         throw new Error('Test is failed due to an error when loading data');
         })
     ]);
+    
+    const stepDuration = performance.now() - stepStartTime;
+    steps.push({"step01": stepDuration});
   });
+  (testInfo as any).stepsData = steps;
 });
 
-test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications}) => { 
+test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications}, testInfo) => {
+  let steps: object[] = [];
+
   await test.step('step01', async () => {
+    const stepStartTime = performance.now();
+
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -65,13 +85,17 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         headerBar.assertLoadingIndicator()
       ]),
     notifications.assertErrorFetchingResource().then(() => {
-      logger.error('Test is failed due to an error when loading data');
       throw new Error('Test is failed due to an error when loading data');
       })
     ]);
+
+    const stepDuration = performance.now() - stepStartTime;
+    steps.push({"step01": stepDuration});
   });
 
   await test.step('step02', async () => {
+    const stepStartTime = performance.now();
+
     logger.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
     await discoverPage.clickFieldStatsTab();
     await Promise.race([
@@ -80,15 +104,22 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        logger.error('Test is failed due to an error when loading data');
         throw new Error('Test is failed due to an error when loading data');
         })
     ]);
+
+    const stepDuration = performance.now() - stepStartTime;
+    steps.push({"step02": stepDuration});
   });
+  (testInfo as any).stepsData = steps;
 });
 
-test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications}) => { 
+test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications}, testInfo) => {
+  let steps: object[] = [];
+
   await test.step('step01', async () => {
+    const stepStartTime = performance.now();
+
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -99,13 +130,17 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
         headerBar.assertLoadingIndicator()
       ]),
     notifications.assertErrorFetchingResource().then(() => {
-      logger.error('Test is failed due to an error when loading data');
       throw new Error('Test is failed due to an error when loading data');
       })
     ]);
+
+    const stepDuration = performance.now() - stepStartTime;
+    steps.push({"step01": stepDuration});
   });
 
   await test.step('step02', async () => {
+    const stepStartTime = performance.now();
+
     logger.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
     await discoverPage.clickPatternsTab();
     const [ index ] = await waitForOneOf([
@@ -122,8 +157,11 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       await discoverPage.assertVisibilityCanvas();
       await discoverPage.assertVisibilityDataGridRow();
       } else {
-        logger.error('Test is failed due to an error when loading categories');
         throw new Error('Test is failed due to an error when loading categories');
       }
+
+    const stepDuration = performance.now() - stepStartTime;
+    steps.push({"step02": stepDuration});
   });
+  (testInfo as any).stepsData = steps;
 });

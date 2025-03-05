@@ -6,9 +6,9 @@ import { KIBANA_HOST, KIBANA_USERNAME, KIBANA_PASSWORD } from '../src/env.ts';
 import { logger } from '../src/logger.ts';
 
 serverless_auth('Authentication', async ({page}) => {
-  logger.info(`Navigating to Kibana host`);
+  logger.info('Navigating to Kibana host');
   await page.goto(KIBANA_HOST);
-  logger.info('Waiting for login page elements to appear, filling in the username and password fields');
+  logger.info('Waiting for login page elements to appear, filling credentials');
   await page.getByTestId('login-username').click();
   await page.getByTestId('login-username').fill(KIBANA_USERNAME);
   await page.getByTestId('login-password').click();
