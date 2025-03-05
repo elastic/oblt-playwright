@@ -210,7 +210,7 @@ jobs:
     - name: Download raw test report from artifacts
       uses: actions/download-artifact@v4
       with:
-        path: /home/runner/work/oblt-playwright/test-results
+        path: /home/runner/work/oblt-playwright
         
     - name: Upload test report to Elasticsearch
       run: bash ./src/utils/upload_to_es.sh
