@@ -7,7 +7,7 @@ import SideNav from './pom/serverless/components/side_nav.component';
 import * as fs from 'fs';
 import * as path from 'path';
 
-const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : './playwright-report';
+const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/test-results' : './playwright-report';
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
 
