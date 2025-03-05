@@ -4,7 +4,7 @@ on:
   #   - cron: "0 * * * *"
   #   - cron: "15 * * * *"
   #   - cron: "30 * * * *"
-    - cron: "*/10 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 permissions:
   contents: read
@@ -83,11 +83,12 @@ jobs:
           TIME_UNIT: ${{ vars.TIME_UNIT }}
           TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: playwright-report/
+          path: /home/runner/work/oblt-playwright
           retention-days: 1
 
   test_7_days:
@@ -95,7 +96,7 @@ jobs:
     name: Run tests (7 days)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.schedule == '*/10 * * * *'
+    if: github.event.schedule == '*/15 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -131,11 +132,12 @@ jobs:
         TIME_UNIT: ${{ vars.TIME_UNIT }}
         TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
 
-    - uses: actions/upload-artifact@v4
+    - name: Upload test reports
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: test-results
-        path: playwright-report/
+        path: /home/runner/work/oblt-playwright
         retention-days: 1
 
   test_14_days:
@@ -183,8 +185,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: perf-test-report
-          path: /home/runner/work/oblt-playwright/test-results
+          name: test-results
+          path: /home/runner/work/oblt-playwright
           retention-days: 1
 
   upload:
@@ -208,7 +210,6 @@ jobs:
     - name: Download raw test report from artifacts
       uses: actions/download-artifact@v4
       with:
-        name: perf-test-report
         path: /home/runner/work/oblt-playwright
         
     - name: Upload test report to Elasticsearch
