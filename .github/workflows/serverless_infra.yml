@@ -88,7 +88,7 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: /home/runner/work/oblt-playwright/test-results
+          path: /home/runner/work/oblt-playwright/
           retention-days: 1
 
   test_7_days:
@@ -137,7 +137,7 @@ jobs:
       if: always()
       with:
         name: test-results
-        path: /home/runner/work/oblt-playwright/test-results
+        path: /home/runner/work/oblt-playwright/
         retention-days: 1
 
   test_14_days:
@@ -186,7 +186,7 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: /home/runner/work/oblt-playwright/test-results
+          path: /home/runner/work/oblt-playwright/
           retention-days: 1
 
   upload:
@@ -210,7 +210,7 @@ jobs:
     - name: Download raw test report from artifacts
       uses: actions/download-artifact@v4
       with:
-        path: /home/runner/work/oblt-playwright
+        path: /home/runner/work/oblt-playwright/
         
     - name: Upload test report to Elasticsearch
       run: bash ./src/utils/upload_to_es.sh
