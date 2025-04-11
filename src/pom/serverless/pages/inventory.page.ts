@@ -12,8 +12,8 @@ export default class InventoryPage {
     private readonly metricMemoryUsage = () => this.page.locator('xpath=//div[@data-test-subj="infraInventoryMetricsContextMenu"]//span[contains(text(), "Memory usage")]');
     private readonly sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
     private readonly sortWaffleByValue = () => this.page.getByTestId('waffleSortByValue');
-    private readonly nodesWaffleMap = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]');
-    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[2]/span[1]//*[@data-test-subj="nodeContainer"][1]');
+    private readonly nodesWaffleMap = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[3]');
+    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[3]/span[1]//*[@data-test-subj="nodeContainer"][1]');
     private readonly inventorySwitcher = () => this.page.getByTestId('openInventorySwitcher');
     private readonly inventorySwitcherPods = () => this.page.getByTestId('goToPods');
     private readonly tableView = () => this.page.locator('xpath=//button[@title="Table view"]');

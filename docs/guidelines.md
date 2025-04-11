@@ -3,7 +3,7 @@
 Use the following code as a basis for a new test file:
 ```
 import { test } from '../../tests/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorServerless, writeJsonReport } from "../../src/helpers.ts";
+import { fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
 
 let clusterData: any;
 const testStartTime: number = Date.now();
@@ -19,40 +19,40 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  const stepsData = (testInfo as any).stepsData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepsData);
+  const stepDuration = (testInfo as any).stepDuration;
+  const stepStart = (testInfo as any).stepStart;
+  const stepEnd = (testInfo as any).stepEnd;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
 });
 
 test('<test name>', async ({page, <fixtures>}) => { 
-    let steps: object[] = [];
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
 
-    await test.step('<step name>', async () => {
-        const stepStartTime = performance.now();
-
+    await testStep('<step_name>>', stepStart, stepEnd, stepDuration, page, async () => {
         // Put your code here
         await <page>.<method>;
         await <page>.<method>;
-
-        const stepDuration = performance.now() - stepStartTime;
-        steps.push({"step01": stepDuration});
     });
-    (testInfo as any).stepsData = steps;
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
 test('<test name>', async ({page, <fixtures>}) => {
-    let steps: object[] = [];
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
 
-    await test.step('<step name>', async () => {
-        const stepStartTime = performance.now();
-
+    await testStep('<step_name>>', stepStart, stepEnd, stepDuration, page, async () => {
         // Put your code here
         await <page>.<method>;
         await <page>.<method>;
-
-        const stepDuration = performance.now() - stepStartTime;
-        steps.push({"step01": stepDuration});
     });
-    (testInfo as any).stepsData = steps;
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 ```
 |   | Tip |

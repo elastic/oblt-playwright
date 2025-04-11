@@ -1,4 +1,4 @@
-import { APIRequestContext, expect, Locator, TestInfo } from '@playwright/test';
+import { APIRequestContext, expect, Locator, Page, TestInfo } from '@playwright/test';
 import { API_KEY, CI, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT } from '../src/env.ts';
 import SpaceSelectorStateful from './pom/stateful/components/space_selector.component';
 import SpaceSelectorServerless from './pom/serverless/components/space_selector.component';
@@ -143,18 +143,38 @@ export async function fetchClusterData() {
   return jsonDataCluster;
 }
 
-export async function writeJsonReport(clusterData: any, testInfo: TestInfo, testStartTime: number, stepsData?: [], hostsMeasurements?: any) {
+export async function writeJsonReport(
+  clusterData: any, 
+  testInfo: TestInfo, 
+  testStartTime: number, 
+  stepDuration?: [], 
+  stepStart?:[], 
+  stepEnd?:[], 
+  hostsMeasurements?: any
+  ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
   let version: any = clusterData.version.number;
   let hostsObject: {} = {};
-  let stepsObject: {} = {};
+  let stepDurationObj: {} = {};
+  let stepStartObj: {} = {};
+  let stepEndObj: {} = {};
 
   const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
   const outputPath = path.join(outputDirectory, fileName);
 
-  if (stepsData) {
-    stepsObject = stepsData.reduce((acc, item) => 
+  if (stepDuration) {
+    stepDurationObj = stepDuration.reduce((acc, item) => 
+    Object.assign(acc, item), {});
+  };
+
+  if (stepStart) {
+    stepStartObj = stepStart.reduce((acc, item) => 
+    Object.assign(acc, item), {});
+  };
+
+  if (stepEnd) {
+    stepEndObj = stepEnd.reduce((acc, item) => 
     Object.assign(acc, item), {});
   };
 
@@ -166,10 +186,11 @@ export async function writeJsonReport(clusterData: any, testInfo: TestInfo, test
 
   const reportData = {
     title: testInfo.title,
-    startTime: testStartTime,
+    startTime: {"test": testStartTime, ...stepStartObj},
+    endTime: {...stepEndObj},
     period: `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
-    duration: {"test": testInfo.duration, ...stepsObject},
+    duration: {"test": testInfo.duration, ...stepDurationObj},
     errors: testInfo.errors,
     timeout: testInfo.timeout,
     cluster_name: cluster_name,
@@ -179,4 +200,29 @@ export async function writeJsonReport(clusterData: any, testInfo: TestInfo, test
   };
     
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
+}
+
+type StepFunction = (...args: any[]) => Promise<any>;
+
+export async function testStep<T extends StepFunction>(
+  stepName: string,
+  stepStart: object[],
+  stepEnd: object[],
+  stepDuration: object[],
+  page: Page,
+  stepFunction: T,
+  ...args: Parameters<T>
+): Promise<ReturnType<T>> {
+  stepStart.push({[stepName]: Date.now()});
+  const startTimePerf = performance.now();
+  try {
+    const result = await stepFunction.apply(null, [page, ...args]);
+    const endTimePerf = performance.now();
+    const duration = endTimePerf - startTimePerf;
+    stepEnd.push({[stepName]: Date.now()});
+    stepDuration.push({[stepName]: duration});
+    return result;
+  } catch (error) {
+    throw error;
+  }
 }
