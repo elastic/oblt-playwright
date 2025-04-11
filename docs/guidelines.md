@@ -30,7 +30,7 @@ test('<test name>', async ({page, <fixtures>}) => {
     let stepStart: object[] = [];
     let stepEnd: object[] = [];
 
-    await testStep('<step_name>>', stepStart, stepEnd, stepDuration, page, async () => {
+    await testStep('<step_name>', stepStart, stepEnd, stepDuration, page, async () => {
         // Put your code here
         await <page>.<method>;
         await <page>.<method>;
