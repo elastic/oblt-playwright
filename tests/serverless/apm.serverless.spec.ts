@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { checkApmData, fetchClusterData, spaceSelectorServerless, writeJsonReport } from '../../src/helpers.ts';
+import { checkApmData, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from '../../src/helpers.ts';
 import { logger } from '../../src/logger.ts';
 
 let resultsContainer: string[] = [`\nTest results:`];
@@ -31,8 +31,10 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepsData = (testInfo as any).stepsData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepsData);
+  const stepDuration = (testInfo as any).stepDuration;
+  const stepStart = (testInfo as any).stepStart;
+  const stepEnd = (testInfo as any).stepEnd;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -44,14 +46,14 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
   });
 });
 
-test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications, page, servicesPage }, testInfo) => {
   const throughput: string = "throughput";
   const errorRate: string = "errorRate";
-  let steps: object[] = [];
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-    
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {   
     logger.info('Navigating to the "Services" section');
     await sideNav.clickServices();
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and selecting the "opbeans-go" service`);
@@ -64,14 +66,9 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
         throw new Error('Test is failed due to an error when loading data');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
   
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to the "Transactions" tab and asserting visibility of the "Throughput" visualization');
     await servicesPage.openTransactionsTab();
     await servicesPage.assertVisibilityVisualization(throughput);
@@ -83,14 +80,9 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
         throw new Error('Test is failed because transaction errors not found');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
   
-  await test.step('step03', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step03', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Clicking on the "Failed transaction correlations" tab');
     await servicesPage.openFailedTransactionCorrelationsTab();
     logger.info('Asserting visibility of the "Correlation" button');
@@ -98,32 +90,26 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
     logger.info('Filtering data by correlation value and field value');
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step03": stepDuration});
   });
   
-  await test.step('step04', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step04', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Clicking on the "Investigate" button and navigating to Discover');
     await servicesPage.clickInvestigate();
     await servicesPage.clickViewInDiscoverButton();
     logger.info('Asserting visibility of the canvas');
     await discoverPage.assertVisibilityCanvas();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step04": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });
 
-test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, servicesPage, tracesPage }, testInfo) => {
-  let steps: object[] = [];
+test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, page, servicesPage, tracesPage }, testInfo) => {
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-    
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to the "Traces" section');
     await sideNav.clickTraces();
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and waiting for the top traces table to be loaded`);
@@ -134,25 +120,15 @@ test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, ser
         throw new Error('Test is failed due to an error when loading data');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
   
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Opening the "Explorer" tab and filtering data by http.response.status_code : 502');
     await tracesPage.openExplorerTab();
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
   
-  await test.step('step03', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step03', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Clicking on the "View related error" in the timeline and asserting related errors');
     await Promise.race([
       tracesPage.assertRelatedError(),
@@ -163,30 +139,24 @@ test('APM - Traces', async ({ datePicker, headerBar, sideNav, notifications, ser
     logger.info('Clicking on the related error and asserting visibility of the error distribution chart');
     await tracesPage.clickRelatedError();
     await servicesPage.assertVisibilityErrorDistributionChart();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step03": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications, headerBar }, testInfo) => {
-  let steps: object[] = [];
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, discoverPage, notifications, page, headerBar }, testInfo) => {
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to the "Dependencies" section and asserting visibility of dependencies table');
     await sideNav.clickDependencies();
     await dependenciesPage.assertVisibilityTable();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
 
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of dependencies table`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -206,14 +176,9 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
         throw new Error('Test is failed because dependency operations not found');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
 
-  await test.step('step03', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step03', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Clicking on the most impactful operation and asserting visibility of the timeline');
     await dependenciesPage.clickTableRow();
     await Promise.race([
@@ -222,33 +187,22 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, sideNav, disco
         throw new Error('Test is failed due to an error when loading data');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step03": stepDuration});
   });
 
-  await test.step('step04', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step04', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Clicking on the transaction in the timeline and asserting visibility of the tab panel');
     await dependenciesPage.clickTimelineTransaction();
     await dependenciesPage.assertVisibilityTabPanel();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step04": stepDuration});
   });
 
-  await test.step('step05', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step05', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Clicking on the "Investigate" button and navigating to Trace logs');
     await dependenciesPage.clickInvestigateButton();
     await dependenciesPage.clickTraceLogsButton();
     logger.info('Asserting visibility of the data grid row');
     await discoverPage.assertVisibilityDataGridRow();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step05": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });

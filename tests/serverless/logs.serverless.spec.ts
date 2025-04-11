@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorServerless, waitForOneOf, writeJsonReport } from "../../src/helpers.ts";
+import { fetchClusterData, spaceSelectorServerless, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let resultsContainer: string[] = [`\nTest results:`];
@@ -30,8 +30,10 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepsData = (testInfo as any).stepsData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepsData);
+  const stepDuration = (testInfo as any).stepDuration;
+  const stepStart = (testInfo as any).stepStart;
+  const stepEnd = (testInfo as any).stepEnd;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -43,12 +45,12 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
   });
 });
 
-test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications}, testInfo) => {
-  let steps: object[] = [];
+test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -62,19 +64,18 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
         throw new Error('Test is failed due to an error when loading data');
         })
     ]);
-    
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications}, testInfo) => {
-  let steps: object[] = [];
+test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -88,14 +89,9 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       throw new Error('Test is failed due to an error when loading data');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
 
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
     await discoverPage.clickFieldStatsTab();
     await Promise.race([
@@ -107,19 +103,18 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         throw new Error('Test is failed due to an error when loading data');
         })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications}, testInfo) => {
-  let steps: object[] = [];
+test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -133,14 +128,9 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       throw new Error('Test is failed due to an error when loading data');
       })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
 
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
     await discoverPage.clickPatternsTab();
     const [ index ] = await waitForOneOf([
@@ -159,9 +149,8 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       } else {
         throw new Error('Test is failed due to an error when loading categories');
       }
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });

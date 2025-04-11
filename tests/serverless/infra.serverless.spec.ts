@@ -1,6 +1,6 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { expect } from "@playwright/test";
-import { getPodData, fetchClusterData, spaceSelectorServerless, writeJsonReport } from "../../src/helpers.ts";
+import { expect, Page } from "@playwright/test";
+import { getPodData, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
@@ -34,8 +34,10 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepsData = (testInfo as any).stepsData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepsData);
+  const stepDuration = (testInfo as any).stepDuration;
+  const stepStart = (testInfo as any).stepStart;
+  const stepEnd = (testInfo as any).stepEnd;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -50,11 +52,11 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
 test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top Memory intensive pods per Node";
-  let steps: object[] = [];
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to Dashboards');
     await sideNav.clickDashboards();
     await dashboardPage.assertVisibilityHeading();
@@ -70,14 +72,9 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
       ]);
     logger.info('Clicking on the "Cluster Overview" dashboard');
     await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
 
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-    
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.clickDatePicker();
     await datePicker.fillTimeValue(TIME_VALUE);
@@ -106,23 +103,22 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
         throw new Error('Test is failed due to an error when loading data');
         })
       ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }, testInfo) => {
+test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sideNav }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsKPImemoryUsage";
   const podCpuUsage = "podCpuUsage";
   const podMemoryUsage = "podMemoryUsage";
-  let steps: object[] = [];
+  let stepDuration: object[] = [];
+  let stepStart: object[] = [];
+  let stepEnd: object[] = [];
 
-  await test.step('step01', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info('Navigating to Infrastructure inventory');
     await sideNav.clickInventory();
     logger.info('Asserting visibility of the waffle map');
@@ -137,14 +133,9 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
     await inventoryPage.sortByMetricValue();
     await inventoryPage.memoryUsage();
     await inventoryPage.clickNodeWaffleContainer();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step01": stepDuration});
   });
   
-  await test.step('step02', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.setPeriod();
     logger.info('Asserting visibility of the "Host CPU Usage" and "Host Memory Usage" visualizations');
@@ -157,14 +148,9 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
           throw new Error('Test is failed due to an error when loading data');
           })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step02": stepDuration});
   });
 
-  await test.step('step03', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step03', stepStart, stepEnd, stepDuration, page, async () => {
     await inventoryPage.closeInfraAssetDetailsFlyout();
     logger.info('Switching to Pods view');
     await inventoryPage.switchInventoryToPodsView();
@@ -180,14 +166,9 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
     await inventoryPage.switchToTableView();
     await inventoryPage.clickTableCell();
     await inventoryPage.clickPopoverK8sMetrics();
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step03": stepDuration});
   });
 
-  await test.step('step04', async () => {
-    const stepStartTime = performance.now();
-
+  await testStep('step04', stepStart, stepEnd, stepDuration, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.setPeriod();
     logger.info('Asserting visibility of the "Pod CPU Usage" and "Pod Memory Usage" visualizations');
@@ -200,9 +181,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, sideNav }
         throw new Error('Test is failed because there is no data to display in the pod visualization');
         })
     ]);
-
-    const stepDuration = performance.now() - stepStartTime;
-    steps.push({"step04": stepDuration});
   });
-  (testInfo as any).stepsData = steps;
+  (testInfo as any).stepDuration = stepDuration;
+  (testInfo as any).stepStart = stepStart;
+  (testInfo as any).stepEnd = stepEnd;
 });
