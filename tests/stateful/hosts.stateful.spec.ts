@@ -1,16 +1,21 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { expect } from "@playwright/test";
-import { getHostData, spaceSelectorStateful, writeFileReportHosts } from "../../src/helpers.ts";
+import { fetchClusterData, getHostData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let resultsContainer: string[] = [`\nTest results:`];
+let clusterData: any;
+const testStartTime: number = Date.now();
 
 test.beforeAll('Check data', async ({ request }) => {
-    logger.info('Checking if host data is available');
+    logger.info('Checking if host data is available in the last 24 hours');
     const nodesData = await getHostData(request);
     const nodesArr = nodesData.nodes;
     const metricValue = nodesData.nodes[0].metrics[0].value;
+    console.log(nodesData.nodes[0].metrics)
     test.skip(nodesArr.length == 0 || metricValue == null, 'Test is skipped: No node data is available');
+    logger.info('Fetching cluster data');
+    clusterData = await fetchClusterData();
 });
 
 test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
@@ -28,6 +33,12 @@ test.afterEach('Log test results', async ({}, testInfo) => {
         logger.error(`Test "${testInfo.title}" failed`);
         resultsContainer.push(`Test "${testInfo.title}" failed`);
     }
+
+    const stepDuration = (testInfo as any).stepDuration;
+    const stepStart = (testInfo as any).stepStart;
+    const stepEnd = (testInfo as any).stepEnd;
+    const hostsMeasurements = (testInfo as any).hostsMeasurements;
+    await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd, hostsMeasurements);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -40,16 +51,18 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
     });
 });
 
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page, request }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "hostsView-metricChart-cpuUsage";
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
   
-    await test.step('step01', async () => {
-        const testStartTime = Date.now();
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to Hosts page');
         await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
@@ -88,14 +101,20 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
                 throw new Error('Test is failed because Hosts data failed to load');
             })
         ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilityPage, request }, testInfo) => {    
-    await test.step('step01', async () => {
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {    
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
+    
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         let noLogsData = false;
-        const testStartTime = Date.now();
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
@@ -114,14 +133,20 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilit
                 test.skip(noLogsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabilityPage, request }, testInfo) => {    
-    await test.step('step01', async () => {
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {    
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
+    
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         let noAlertsData = false;
-        const testStartTime = Date.now();
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await hostsPage.setHostsLimit500();
@@ -141,8 +166,11 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabil
                 test.skip(noAlertsData, "Test is skipped due to lack of alerts data.")
             })
         ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
 /*
@@ -150,15 +178,18 @@ All the individual host tests are not the best fit for the performance compariso
 It would only be suitable in case when hosts in all the environments being compared have collected data within the selected time period. 
 */
 
-test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page, request }, testInfo) => {
+test.skip('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
     const diskUsageKPI = "infraAssetDetailsKPIdiskUsage";
     const cpuUsage = "infraAssetDetailsMetricChartcpuUsage";
     const normalizedLoad = "infraAssetDetailsMetricChartnormalizedLoad1m";
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
 
-    await test.step('step01', async () => {
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await page.evaluate("document.body.style.zoom=0.9");
@@ -199,8 +230,7 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, n
         await hostsPage.clickTableCellHosts();
     });
 
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
+    await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         logger.info('Asserting the visibility of elements on the Hosts page');
@@ -218,12 +248,19 @@ test('Hosts - Individual page - All elements', async ({ datePicker, hostsPage, n
                 throw new Error('Test is failed due to an error when loading data');
                 })
             ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+            (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, observabilityPage, page, request }, testInfo) => {
-    await test.step('step01', async () => {
+test.skip('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
+    
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         logger.info('Asserting visibility of the "Hosts" table');
@@ -234,8 +271,7 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, o
         await hostsPage.openHostsMetadataTab();
     });
 
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
+    await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         await page.reload();
@@ -243,11 +279,14 @@ test('Hosts - Individual page - Metadata tab', async ({ datePicker, hostsPage, o
         const asyncResults = await Promise.all([
             hostsPage.assertVisibilityHostsMetadataTable()
             ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page, request }, testInfo) => {
+test.skip('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -258,8 +297,11 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
     const loadBreakdown = "infraAssetDetailsMetricChartloadBreakdown";
     const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
     const memoryUsageBreakdown = "infraAssetDetailsMetricChartmemoryUsageBreakdown";
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
 
-    await test.step('step01', async () => {
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         await page.evaluate("document.body.style.zoom=0.9");
@@ -302,8 +344,7 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
         await hostsPage.openHostsMetricsTab();
     });
 
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
+    await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         logger.info('Asserting visibility of the "Metrics" tab elements');
@@ -321,12 +362,19 @@ test('Hosts - Individual page - Metrics tab', async ({ datePicker, hostsPage, no
                 throw new Error('Test is failed due to an error when loading data');
                 })
             ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page, request }, testInfo) => {
-    await test.step('step01', async () => {
+test.skip('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
+    
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         logger.info('Asserting visibility of the "Hosts" table');
@@ -337,8 +385,7 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
         await hostsPage.openHostsProcessesTab();
     });
 
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
+    await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         await page.reload();
@@ -356,12 +403,19 @@ test('Hosts - Individual page - Processes tab', async ({ datePicker, hostsPage, 
                 throw new Error('Test is failed due to an error when loading data');
             })
           ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, notifications, observabilityPage, request }, testInfo) => {
-    await test.step('step01', async () => {
+test.skip('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
+    
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         logger.info('Asserting visibility of the "Hosts" table');
@@ -376,8 +430,7 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
         await hostsPage.openHostsProfilingTab();
     });
 
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
+    await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
         await datePicker.assertVisibilityDatePickerHostsProfiling();
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriodProfiling();
@@ -395,12 +448,19 @@ test('Hosts - Individual page - Profiling tab', async ({ datePicker, hostsPage, 
                 throw new Error('Test is failed due to an error when loading data');
             })
           ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });
 
-test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, notifications, observabilityPage, request }, testInfo) => {
-    await test.step('step01', async () => {
+test.skip('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
+    let stepDuration: object[] = [];
+    let stepStart: object[] = [];
+    let stepEnd: object[] = [];
+    
+    await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info('Navigating to the "Hosts" page');
         await observabilityPage.clickHosts();
         logger.info('Asserting visibility of the "Hosts" table');
@@ -411,8 +471,7 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, notif
         await hostsPage.openHostsLogsTab();
     });
 
-    await test.step('step02', async () => {
-        const testStartTime = Date.now();
+    await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
         logger.info('Asserting visibility of the "Logs" stream');
@@ -429,6 +488,9 @@ test('Hosts - Individual page - Logs tab', async ({ datePicker, hostsPage, notif
                 throw new Error('Test is failed due to an error when loading data');
               })
           ]);
-        await writeFileReportHosts(asyncResults, request, testInfo, testStartTime);
+        (testInfo as any).hostsMeasurements = asyncResults;
     });
+    (testInfo as any).stepDuration = stepDuration;
+    (testInfo as any).stepStart = stepStart;
+    (testInfo as any).stepEnd = stepEnd;
 });

@@ -72,8 +72,8 @@ test('APM - Services', async ({ datePicker, sideNav, discoverPage, notifications
     logger.info('Navigating to the "Transactions" tab and asserting visibility of the "Throughput" visualization');
     await servicesPage.openTransactionsTab();
     await servicesPage.assertVisibilityVisualization(throughput);
+    logger.info('Selecting the most impactful transaction and asserting visibility of the "Error rate" visualization');
     await servicesPage.selectMostImpactfulTransaction();
-    logger.info('Asserting visibility of the "Error rate" visualization');
     await Promise.race([
       servicesPage.assertVisibilityVisualization(errorRate),
       servicesPage.assertTransactionErrorsNotFound().then(() => {

@@ -8,6 +8,8 @@ export default class ServicesPage {
     }
 
     private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
+    private readonly searchBar = () => this.page.getByTestId('apmUnifiedSearchBar');
+    private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
     private readonly opbeansGo = () => this.page.locator('xpath=//span[contains(text(),"opbeans-go")]');
     private readonly servicesTransactionsTab = () => this.page.getByTestId('transactionsTab');
     private readonly transactionErrorsNotFound = () => this.page.locator('xpath=//div[@data-test-subj="topErrorsForTransactionTable"]//*[text()="No errors found for this transaction group"]');
@@ -26,6 +28,9 @@ export default class ServicesPage {
         }
     
     public async selectServiceOpbeansGo() {
+        await this.searchBar().click();
+        await this.searchBar().fill(`service.name: "opbeans-go"`);
+        await this.querySubmitButton().click();
         await this.opbeansGo().click();
         }
 

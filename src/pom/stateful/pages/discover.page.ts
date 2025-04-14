@@ -11,8 +11,9 @@ export default class DiscoverPage {
     private readonly dataGridRow = () => this.page.locator('xpath=//div[@data-grid-row-index="0"]');
     private readonly dataViewSwitcher = () => this.page.getByTestId('discover-dataView-switch-link');
     private readonly dataView = () => this.page.getByTestId('discover-dataView-switch-link');
+    private readonly dataViewInput = () => this.page.locator('xpath=//*[@data-test-subj="changeDataViewPopover"]//input');
     private readonly dataViewLogs = () => this.page.locator('xpath=//li[@value="logs-*"]');
-    private readonly dataViewMetrics = () => this.page.locator('xpath=//li[@value="logs-*"]');
+    private readonly dataViewMetrics = () => this.page.locator('xpath=//li[@value="metrics-*"]');
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly toggleErrorMessage = () => this.page.getByTestId('field-error.log.message');
     private readonly toggleTopValue = () => this.page.locator('xpath=//div[@data-test-subj="dscFieldStats-topValues-bucket"][1]//button[1]');
@@ -45,6 +46,7 @@ export default class DiscoverPage {
 
     public async selectLogsDataView() {
         await this.dataView().click();
+        await this.dataViewInput().fill('logs-*');
         await this.dataViewLogs().click();
         }
 

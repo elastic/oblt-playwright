@@ -1,6 +1,6 @@
 # oblt-playwright
 
-A test framework for assessing the performance of Observability solution across various deployment types from the end-user perspective.
+A test framework for assessing the search performance of Elastic Observability solution across various deployment types from the end-user perspective, supporting the last released version.
 
 ## Getting Started
 
