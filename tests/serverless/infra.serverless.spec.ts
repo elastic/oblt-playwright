@@ -9,7 +9,7 @@ let clusterData: any;
 const testStartTime: number = Date.now();
 
 test.beforeAll('Check pod data', async ({ request }) => {
-  logger.info('Checking if pod data is available');
+  logger.info('Checking if pod data is available in the last 24 hours');
   const podsData = await getPodData(request);
   const podsArr = podsData.nodes;
   test.skip(podsArr.length == 0, 'Test is skipped: No pod data is available');
@@ -65,13 +65,13 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await dashboardPage.searchDashboard('Cluster Overview');
     await page.keyboard.press('Enter');
     await Promise.race([
-      expect(page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" })).toBeVisible(),
+      expect(page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]')).toBeVisible(),
       dashboardPage.assertNoDashboard().then(() => {
         throw new Error('Test is failed because no dashboard found');
         })
       ]);
     logger.info('Clicking on the "Cluster Overview" dashboard');
-    await page.getByRole('link', { name: "[Metrics Kubernetes] Cluster Overview" }).click();
+    await page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]').click();
   });
 
   await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {

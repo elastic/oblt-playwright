@@ -16,7 +16,7 @@ export default class SideNav {
     private readonly discover = () => this.page.getByTestId('observability-nav-observability-logs-explorer-discover');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly observability = () => this.page.locator('xpath=//span[contains(@class,"euiAccordion__buttonContent")]//a[contains(text(),"Observability")]');
-    private readonly observabilitySolutionLink = () => this.page.locator('xpath=//div[@data-test-subj="homSolutionPanel homSolutionPanel_observability"]//a[contains(text(),"Observability")]');
+    private readonly observabilitySolutionLink = () => this.page.locator('xpath=//*[@data-test-subj="homeApp"]//a[contains(text(),"Observability")]');
     private readonly apm = () => this.page.getByRole('link', { name: 'APM' });
     private readonly alerts = () => this.page.getByTestId('observability-nav-observability-overview-alerts');
     private readonly infrastructure = () => this.page.getByRole('link', { name: 'Infrastructure' });

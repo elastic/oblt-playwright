@@ -51,7 +51,7 @@ export async function spaceSelectorServerless(sideNav: SideNav, spaceSelector: S
 
 export async function getHostData(request: APIRequestContext) {
   const currentTime: number = Date.now();
-  const rangeTime: number = currentTime - 86400000;
+  const startTime: number = currentTime - 86400000;
 
   let b = await request.post('api/metrics/snapshot', {
     headers: {
@@ -64,11 +64,12 @@ export async function getHostData(request: APIRequestContext) {
     data: {
       "filterQuery": "",
       "metrics": [{ "type": "memory" }],
-      "nodeType": "host", "sourceId": "default",
+      "nodeType": "host", 
+      "sourceId": "default",
       "accountId": "",
       "region": "",
       "groupBy": [],
-      "timerange": { "interval": "1m", "to": currentTime, "from": rangeTime, "lookbackSize": 5 },
+      "timerange": { "interval": "1m", "to": currentTime, "from": startTime, "lookbackSize": 5 },
       "includeTimeseries": true,
       "dropPartialBuckets": true
     }
@@ -80,7 +81,7 @@ export async function getHostData(request: APIRequestContext) {
 
 export async function getPodData(request: APIRequestContext) {
   const currentTime: number = Date.now();
-  const rangeTime: number = currentTime - 1200000;
+  const startTime: number = currentTime - 86400000;
 
   let response = await request.post('api/metrics/snapshot', {
     headers: {
@@ -98,7 +99,7 @@ export async function getPodData(request: APIRequestContext) {
       "accountId": "",
       "region": "",
       "groupBy": [],
-      "timerange": { "interval": "1m", "to": currentTime, "from": rangeTime, "lookbackSize": 5 },
+      "timerange": { "interval": "1m", "to": currentTime, "from": startTime, "lookbackSize": 5 },
       "includeTimeseries": true,
       "dropPartialBuckets": true
     }
@@ -202,17 +203,15 @@ export async function writeJsonReport(
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
 }
 
-type StepFunction = (...args: any[]) => Promise<any>;
-
-export async function testStep<T extends StepFunction>(
+export async function testStep(
   stepName: string,
   stepStart: object[],
   stepEnd: object[],
   stepDuration: object[],
   page: Page,
-  stepFunction: T,
-  ...args: Parameters<T>
-): Promise<ReturnType<T>> {
+  stepFunction: any,
+  ...args: any[]
+): Promise<any> {
   stepStart.push({[stepName]: Date.now()});
   const startTimePerf = performance.now();
   try {

@@ -7,7 +7,7 @@ let clusterData: any;
 const testStartTime: number = Date.now();
 
 test.beforeAll('Check data', async ({ request }) => {
-    logger.info('Checking if Hosts data is available');
+    logger.info('CChecking if host data is available in the last 24 hours');
     const nodesData = await getHostData(request);
     const nodesArr = nodesData.nodes;
     const metricValue = nodesData.nodes[0].metrics[0].value;
