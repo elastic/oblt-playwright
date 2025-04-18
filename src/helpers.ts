@@ -130,8 +130,8 @@ export async function fetchClusterData() {
     method: 'GET',
     headers: {
       "accept": "*/*",
-        "Authorization": API_KEY,
-        "kbn-xsrf": "reporting"
+      "Authorization": API_KEY,
+      "kbn-xsrf": "reporting"
     }
   }).then(response => {
     if (!response.ok) {
@@ -147,56 +147,36 @@ export async function fetchClusterData() {
 export async function writeJsonReport(
   clusterData: any, 
   testInfo: TestInfo, 
-  testStartTime: number, 
-  stepDuration?: [], 
-  stepStart?:[], 
-  stepEnd?:[], 
+  testStartTime: number,
+  stepData?: object[],
   hostsMeasurements?: any
   ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
   let version: any = clusterData.version.number;
   let hostsObject: {} = {};
-  let stepDurationObj: {} = {};
-  let stepStartObj: {} = {};
-  let stepEndObj: {} = {};
 
   const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
   const outputPath = path.join(outputDirectory, fileName);
 
-  if (stepDuration) {
-    stepDurationObj = stepDuration.reduce((acc, item) => 
-    Object.assign(acc, item), {});
-  };
-
-  if (stepStart) {
-    stepStartObj = stepStart.reduce((acc, item) => 
-    Object.assign(acc, item), {});
-  };
-
-  if (stepEnd) {
-    stepEndObj = stepEnd.reduce((acc, item) => 
-    Object.assign(acc, item), {});
-  };
-
   if (hostsMeasurements) {
     hostsObject = hostsMeasurements.reduce((acc, obj) => {
-    return { ...acc, ...obj };
-    }, {})
-  };
+      return { ...acc, ...obj };
+    }, {});
+  }
 
   const reportData = {
     title: testInfo.title,
-    startTime: {"test": testStartTime, ...stepStartObj},
-    endTime: {...stepEndObj},
+    startTime: testStartTime,
     period: `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
-    duration: {"test": testInfo.duration, ...stepDurationObj},
+    duration: testInfo.duration,
     errors: testInfo.errors,
     timeout: testInfo.timeout,
     cluster_name: cluster_name,
     version: version,
     build_flavor: build_flavor,
+    steps: stepData ? stepData : null,
     measurements: hostsMeasurements ? hostsObject : null,
   };
     
@@ -204,22 +184,27 @@ export async function writeJsonReport(
 }
 
 export async function testStep(
-  stepName: string,
-  stepStart: object[],
-  stepEnd: object[],
-  stepDuration: object[],
+  title: string,
+  stepData: object[],
   page: Page,
   stepFunction: any,
   ...args: any[]
 ): Promise<any> {
-  stepStart.push({[stepName]: Date.now()});
+  const start = Date.now();
   const startTimePerf = performance.now();
   try {
     const result = await stepFunction.apply(null, [page, ...args]);
     const endTimePerf = performance.now();
+    const end = Date.now();
     const duration = endTimePerf - startTimePerf;
-    stepEnd.push({[stepName]: Date.now()});
-    stepDuration.push({[stepName]: duration});
+
+    stepData.push({
+        title,
+        start,
+        end,
+        duration
+    });
+
     return result;
   } catch (error) {
     throw error;

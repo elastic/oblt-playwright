@@ -32,10 +32,8 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepDuration = (testInfo as any).stepDuration;
-  const stepStart = (testInfo as any).stepStart;
-  const stepEnd = (testInfo as any).stepEnd;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
+  const stepData = (testInfo as any).stepData;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -49,11 +47,9 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
 });
 
 test('Logs Explorer - All logs', async ({datePicker, discoverPage, page}, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
     await datePicker.setPeriod();
     logger.info('Asserting visibility of the chart, canvas, and data grid row');
@@ -61,17 +57,13 @@ test('Logs Explorer - All logs', async ({datePicker, discoverPage, page}, testIn
     await discoverPage.assertVisibilityCanvas();
     await discoverPage.assertVisibilityDataGridRow();
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });
 
 test('Logs Explorer - Field Statistics', async ({datePicker, discoverPage, page}, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
     await datePicker.setPeriod();
     logger.info('Asserting visibility of the chart, canvas, and data grid row')
@@ -80,23 +72,19 @@ test('Logs Explorer - Field Statistics', async ({datePicker, discoverPage, page}
     await discoverPage.assertVisibilityDataGridRow();
   });
 
-  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Field Statistics" tab');
     await discoverPage.clickFieldStatsTab();
     logger.info('Asserting visibility of the field statistics document count');
     await discoverPage.assertVisibilityFieldStatsDocCount();
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });
 
 test('Logs Explorer - Patterns', async ({datePicker, discoverPage, page}, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
     await datePicker.setPeriod();
     logger.info('Asserting visibility of the chart, canvas, and data grid row');
@@ -105,7 +93,7 @@ test('Logs Explorer - Patterns', async ({datePicker, discoverPage, page}, testIn
     await discoverPage.assertVisibilityDataGridRow();
   });
 
-  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Patterns" tab');
     await discoverPage.clickPatternsTab();
     logger.info('Asserting visibility of the patterns row toggle');
@@ -126,7 +114,5 @@ test('Logs Explorer - Patterns', async ({datePicker, discoverPage, page}, testIn
         throw new Error('Test is failed due to an error when loading categories');
       }
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 })
