@@ -28,10 +28,8 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepDuration = (testInfo as any).stepDuration;
-  const stepStart = (testInfo as any).stepStart;
-  const stepEnd = (testInfo as any).stepEnd;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
+  const stepData = (testInfo as any).stepData;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -45,11 +43,9 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
 });
 
 test('Data Set Quality', async ({ datasetsPage, page }, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info('Checking the visibility of quality statistics');
     await datasetsPage.assertVisibilityQualityStatistics();
     logger.info('Checking the visibility of statistics');
@@ -57,7 +53,5 @@ test('Data Set Quality', async ({ datasetsPage, page }, testInfo) => {
     logger.info('Checking the visibility of the table');
     await datasetsPage.assertVisibilityTable();
     });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });

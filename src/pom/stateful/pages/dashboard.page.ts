@@ -31,6 +31,7 @@ export default class DashboardPage {
     public async searchDashboard(input: string) {
         await this.searchBox().click();
         await this.searchBox().fill(input);
+        await this.page.keyboard.press('Enter');
         }
 
     public async clickTags() {

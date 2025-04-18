@@ -1,14 +1,19 @@
 import { Page } from '@playwright/test';
-import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
+import { getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
-import DashboardPage from '../../src/pom/serverless/pages/dashboard.page.ts';
-import DatePicker from '../../src/pom/serverless/components/date_picker.component.ts';
+import DashboardPage from '../../src/pom/stateful/pages/dashboard.page.ts';
+import DatePicker from '../../src/pom/stateful/components/date_picker.component.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
 
-test.beforeAll(async ({ browser }) => {
+test.beforeAll(async ({ browser, request }) => {
+  logger.info('Checking if pod data is available');
+  const podsData = await getPodData(request);
+  const podsArr = podsData.nodes;
+  test.skip(podsArr.length == 0, 'Test is skipped: No pod data is available');
+
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto('/app/management/kibana/objects');
@@ -20,7 +25,7 @@ test.beforeAll(async ({ browser }) => {
   if (noItems) {
     logger.info('Importing dashboards...');
     await page.getByRole('button', { name: 'Import' }).click();
-    await page.locator('xpath=//input[@type="file"]').setInputFiles('../../src/data/dashboards/dashboards.ndjson');
+    await page.locator('xpath=//input[@type="file"]').setInputFiles('./src/data/dashboards/dashboards.ndjson');
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
   } else {
@@ -32,9 +37,10 @@ test.beforeAll(async ({ browser }) => {
   clusterData = await fetchClusterData();
 });
 
-test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
-  await page.goto('/');
-  await spaceSelectorServerless(sideNav, spaceSelector);
+test.beforeEach(async ({ headerBar, page, sideNav, spaceSelector }) => {
+  await sideNav.goto();
+  logger.info('Selecting the default Kibana space');
+  await spaceSelectorStateful(headerBar, spaceSelector);
   await page.goto('/app/dashboards');
 });
 

@@ -30,10 +30,8 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepDuration = (testInfo as any).stepDuration;
-  const stepStart = (testInfo as any).stepStart;
-  const stepEnd = (testInfo as any).stepEnd;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
+  const stepData = (testInfo as any).stepData;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -46,11 +44,9 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
 });
 
 test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -65,17 +61,13 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
         })
     ]);
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });
 
 test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -91,7 +83,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
     ]);
   });
 
-  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
     await discoverPage.clickFieldStatsTab();
     await Promise.race([
@@ -104,17 +96,13 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         })
     ]);
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });
 
 test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -130,7 +118,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
     ]);
   });
 
-  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
     await discoverPage.clickPatternsTab();
     const [ index ] = await waitForOneOf([
@@ -150,7 +138,5 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
         throw new Error('Test is failed due to an error when loading categories');
       }
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });

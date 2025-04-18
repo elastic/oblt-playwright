@@ -33,10 +33,8 @@ test.afterEach('Log test results', async ({}, testInfo) => {
     resultsContainer.push(`Test "${testInfo.title}" failed`);
   }
 
-  const stepDuration = (testInfo as any).stepDuration;
-  const stepStart = (testInfo as any).stepStart;
-  const stepEnd = (testInfo as any).stepEnd;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepDuration, stepStart, stepEnd);
+  const stepData = (testInfo as any).stepData;
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
 });
 
 test.afterAll('Log test suite summary', async ({}, testInfo) => {
@@ -52,23 +50,20 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
 test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top Memory intensive pods per Node";
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
 
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to Dashboards');
     await page.goto('/app/dashboards');
     await dashboardPage.assertVisibilityHeading();
     await dashboardPage.assertVisibilityTable();
     logger.info('Searching for the "Cluster Overview" dashboard');
     await dashboardPage.searchDashboard('Cluster Overview');
-    await page.keyboard.press('Enter');
     logger.info('Clicking on the "Cluster Overview" dashboard');
     await page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]').click();
   });
 
-  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step02', stepData, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.clickDatePicker();
     await datePicker.fillTimeValue(TIME_VALUE);
@@ -99,9 +94,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
         })
       ]);
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });
 
 test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabilityPage, page }, testInfo) => {
@@ -109,11 +102,9 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
   const memoryUsage = "infraAssetDetailsMetricChartmemoryUsage";
   const podCpuUsage = "podCpuUsage";
   const podMemoryUsage = "podMemoryUsage";
-  let stepDuration: object[] = [];
-  let stepStart: object[] = [];
-  let stepEnd: object[] = [];
+  let stepData: object[] = [];
   
-  await testStep('step01', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Inventory" section');
     await observabilityPage.clickInventory();
     logger.info('Asserting visibility of the waffle map');
@@ -131,7 +122,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
     await inventoryPage.clickNodeWaffleContainer();
   });
   
-  await testStep('step02', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step02', stepData, page, async () => {
     await page.evaluate("document.body.style.zoom=0.8");
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.setPeriod();
@@ -142,7 +133,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
     ]);
   });
 
-  await testStep('step03', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step03', stepData, page, async () => {
     await inventoryPage.closeInfraAssetDetailsFlyout();
     logger.info('Switching to Pods view');
     await inventoryPage.switchInventoryToPodsView();
@@ -161,7 +152,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
     await inventoryPage.clickPopoverK8sMetrics();
   });
 
-  await testStep('step04', stepStart, stepEnd, stepDuration, page, async () => {
+  await testStep('step04', stepData, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.setPeriod();
     logger.info('Asserting visibility of the "Pod CPU Usage" and "Pod Memory Usage" visualizations');
@@ -170,7 +161,5 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, observabi
       inventoryPage.assertVisibilityPodVisualization(podMemoryUsage)
       ]);
   });
-  (testInfo as any).stepDuration = stepDuration;
-  (testInfo as any).stepStart = stepStart;
-  (testInfo as any).stepEnd = stepEnd;
+  (testInfo as any).stepData = stepData;
 });

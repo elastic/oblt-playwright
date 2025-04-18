@@ -39,7 +39,6 @@ KIBANA_PASSWORD =
 TIME_UNIT = 'Minutes'
 TIME_VALUE = 15
 API_KEY = 'ApiKey ...'
-REPORT_FILE = ../test-results/results.json
 ```
 
 ### Create alerting rules
