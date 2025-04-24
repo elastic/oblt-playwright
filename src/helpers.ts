@@ -199,10 +199,11 @@ export async function testStep(
     const duration = endTimePerf - startTimePerf;
 
     stepData.push({
-        title,
+        [title]: {
         start,
         end,
         duration
+      }
     });
 
     return result;

@@ -56,7 +56,12 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
   await testStep('step02', stepData, page, async () => {
     logger.info('Setting the search period of last ' + process.env.TIME_VALUE + ' ' + process.env.TIME_UNIT + ' and asserting the visualization: ' + title);
     await datePicker.setPeriod();
-    await dashboardPage.assertVisibilityVisualization(title);
+    await Promise.race([
+      dashboardPage.assertVisibilityVisualization(title),
+      dashboardPage.assertNoData(title).then(() => {
+        throw new Error('Test is failed due to not available data');
+      })
+    ])
   });
   return stepData;
 }

@@ -46,7 +46,7 @@ test.afterAll('Log test suite summary', async ({}, testInfo) => {
   });
 });
 
-test('Logs Explorer - All logs', async ({datePicker, discoverPage, page}, testInfo) => {
+test('Discover - All logs', async ({datePicker, discoverPage, page}, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
@@ -60,7 +60,7 @@ test('Logs Explorer - All logs', async ({datePicker, discoverPage, page}, testIn
   (testInfo as any).stepData = stepData;
 });
 
-test('Logs Explorer - Field Statistics', async ({datePicker, discoverPage, page}, testInfo) => {
+test('Discover - Field Statistics', async ({datePicker, discoverPage, page}, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
@@ -81,7 +81,7 @@ test('Logs Explorer - Field Statistics', async ({datePicker, discoverPage, page}
   (testInfo as any).stepData = stepData;
 });
 
-test('Logs Explorer - Patterns', async ({datePicker, discoverPage, page}, testInfo) => {
+test('Discover - Patterns', async ({datePicker, discoverPage, page}, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
