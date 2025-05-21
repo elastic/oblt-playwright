@@ -2,7 +2,6 @@ import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { fetchClusterData, getHostData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
-let resultsContainer: string[] = [`\nTest results:`];
 let clusterData: any;
 const testStartTime: number = Date.now();
 
@@ -20,33 +19,15 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
     await sideNav.goto();
     logger.info('Selecting the default Kibana space')
     await spaceSelectorServerless(sideNav, spaceSelector);
-    await sideNav.clickInfrastructure();
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  if (test.info().status == 'passed') {
-    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-  } else if (test.info().status == 'failed') {
-    logger.error(`Test "${testInfo.title}" failed`);
-    resultsContainer.push(`Test "${testInfo.title}" failed`);
-  }
-
   const hostsMeasurements = (testInfo as any).hostsMeasurements;
   const stepData = (testInfo as any).stepData;
   await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
 });
 
-test.afterAll('Log test suite summary', async ({}, testInfo) => {
-  if (testInfo.status == 'skipped') {
-      resultsContainer.push(`Test "${testInfo.title}" skipped`);
-      }
-  resultsContainer.forEach((result) => {
-    console.log(`${result}\n`);
-  });
-});
-
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, sideNav, notifications, page }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -57,7 +38,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, side
   
     await testStep('step01', stepData, page, async () => {
         logger.info('Navigating to the "Hosts" section');
-        await sideNav.clickHosts();
+        await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
@@ -95,13 +76,13 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, side
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav, page}, testInfo) => {  
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testInfo) => {  
     let stepData: object[] = [];
 
     await testStep('step01', stepData, page, async () => {
         let noLogsData = false;
         logger.info('Navigating to the "Hosts" section');
-        await sideNav.clickHosts();
+        await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
@@ -122,13 +103,13 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, sideNav, pag
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page, sideNav }, testInfo) => {
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, testInfo) => {
     let stepData: object[] = [];
 
     await testStep('step01', stepData, page, async () => {
         let noAlertsData = false;
         logger.info('Navigating to the "Hosts" section');
-        await sideNav.clickHosts();
+        await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();

@@ -4,7 +4,6 @@ import { getPodData, fetchClusterData, spaceSelectorServerless, testStep, writeJ
 import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
-let resultsContainer: string[] = [`\nTest results:`];
 let clusterData: any;
 const testStartTime: number = Date.now();
 
@@ -21,30 +20,11 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
   await sideNav.goto();
   logger.info('Selecting the default Kibana space')
   await spaceSelectorServerless(sideNav, spaceSelector);
-  logger.info('Navigating to the "Infrastructure" section');
-  await sideNav.clickInfrastructure();
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  if (test.info().status == 'passed') {
-    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-  } else if (test.info().status == 'failed') {
-    logger.error(`Test "${testInfo.title}" failed`);
-    resultsContainer.push(`Test "${testInfo.title}" failed`);
-  }
-
   const stepData = (testInfo as any).stepData;
   await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
-});
-
-test.afterAll('Log test suite summary', async ({}, testInfo) => {
-  if (testInfo.status == 'skipped') {
-      resultsContainer.push(`Test "${testInfo.title}" skipped`);
-      }
-  resultsContainer.forEach((result) => {
-    console.log(`${result}\n`);
-  });
 });
 
 test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
@@ -68,6 +48,8 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     logger.info('Clicking on the "Cluster Overview" dashboard');
     await page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]').click();
   });
+
+  await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
@@ -111,7 +93,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to Infrastructure inventory');
-    await sideNav.clickInventory();
+    await page.goto('/app/metrics/inventory');
     logger.info('Asserting visibility of the waffle map');
     await Promise.race([
       inventoryPage.assertWaffleMap(),
@@ -125,6 +107,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
     await inventoryPage.memoryUsage();
     await inventoryPage.clickNodeWaffleContainer();
   });
+
+  await page.waitForTimeout(30000);
   
   await testStep('step02', stepData, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
@@ -140,6 +124,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
           })
     ]);
   });
+
+  await page.waitForTimeout(30000);
 
   await testStep('step03', stepData, page, async () => {
     await inventoryPage.closeInfraAssetDetailsFlyout();
@@ -158,6 +144,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
     await inventoryPage.clickTableCell();
     await inventoryPage.clickPopoverK8sMetrics();
   });
+
+  await page.waitForTimeout(10000);
 
   await testStep('step04', stepData, page, async () => {
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
