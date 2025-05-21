@@ -6,7 +6,6 @@ import * as path from 'path';
 import { logger } from '../../src/logger.ts';
 
 const outputDirectory = path.dirname(REPORT_FILE);
-let resultsContainer: string[] = [`\nTest results:`];
 let clusterData: any;
 const testStartTime: number = Date.now();
 
@@ -24,24 +23,7 @@ test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  if (test.info().status == 'passed') {
-    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-  } else if (test.info().status == 'failed') {
-    logger.error(`Test "${testInfo.title}" failed`);
-    resultsContainer.push(`Test "${testInfo.title}" failed`);
-  }
-
   await writeJsonReport(clusterData, testInfo, testStartTime);
-});
-
-test.afterAll('Log test suite summary', async ({}, testInfo) => {
-  if (testInfo.status == 'skipped') {
-      resultsContainer.push(`Test "${testInfo.title}" skipped`);
-      }
-  resultsContainer.forEach((result) => {
-    console.log(`${result}\n`);
-  });
 });
 
 test('Auto-detect logs and metrics', async ({ onboardingPage, page }) => {

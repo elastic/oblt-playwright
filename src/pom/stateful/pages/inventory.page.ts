@@ -13,7 +13,7 @@ export default class InventoryPage {
     private readonly sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
     private readonly sortWaffleByValue = () => this.page.getByTestId('waffleSortByValue');
     private readonly nodesWaffleMap = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[3]');
-    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[3]//span[1]//div[@data-test-subj="nodeContainer"]');
+    private readonly nodesWaffleMapContainer = () => this.page.locator('xpath=//div[@data-test-subj="waffleMap"]/div[1]/div[1]/div[3]//span[1]//*[@data-test-subj="nodeContainer"]');
     private readonly inventorySwitcher = () => this.page.getByTestId('openInventorySwitcher');
     private readonly inventorySwitcherPods = () => this.page.getByTestId('goToPods');
     private readonly tableView = () => this.page.locator('xpath=//button[@title="Table view"]');

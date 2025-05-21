@@ -2,7 +2,6 @@ import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { fetchClusterData, spaceSelectorServerless, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
-let resultsContainer: string[] = [`\nTest results:`];
 let clusterData: any;
 const testStartTime: number = Date.now();
 
@@ -11,36 +10,19 @@ test.beforeAll('Fetch cluster data', async ({}) => {
   clusterData = await fetchClusterData();
 });
 
-test.beforeEach(async ({ discoverPage, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
   logger.info('Selecting the default Kibana space');
   await sideNav.goto();
   await spaceSelectorServerless(sideNav, spaceSelector);
   logger.info('Navigating to the "Discover" section');
-  await sideNav.clickDiscover();
+  await page.goto('/app/discover');
   logger.info('Selecting the "Logs" data view');
   await discoverPage.selectLogsDataView();
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  if (test.info().status == 'passed') {
-    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-  } else if (test.info().status == 'failed') {
-    logger.error(`Test "${testInfo.title}" failed`);
-    resultsContainer.push(`Test "${testInfo.title}" failed`);
-  }
-
   const stepData = (testInfo as any).stepData;
   await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
-});
-
-test.afterAll('Log test suite summary', async ({}, testInfo) => {
-  if (testInfo.status == 'skipped') {
-      resultsContainer.push(`Test "${testInfo.title}" skipped`);
-      }
-  resultsContainer.forEach((result) => {
-    console.log(`${result}\n`);
-  });
 });
 
 test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
@@ -83,6 +65,8 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
     ]);
   });
 
+  await page.waitForTimeout(30000);
+
   await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
     await discoverPage.clickFieldStatsTab();
@@ -117,6 +101,8 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       })
     ]);
   });
+
+  await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');

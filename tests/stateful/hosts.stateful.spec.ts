@@ -2,7 +2,6 @@ import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { fetchClusterData, getHostData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
-let resultsContainer: string[] = [`\nTest results:`];
 let clusterData: any;
 const testStartTime: number = Date.now();
 
@@ -20,34 +19,15 @@ test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
     await sideNav.goto();
     logger.info('Selecting the default Kibana space');
     await spaceSelectorStateful(headerBar, spaceSelector);
-    await sideNav.clickObservabilitySolutionLink();
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-    if (testInfo.status == 'passed') {
-    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    } else if (testInfo.status == 'failed') {
-        logger.error(`Test "${testInfo.title}" failed`);
-        resultsContainer.push(`Test "${testInfo.title}" failed`);
-    }
-
     const hostsMeasurements = (testInfo as any).hostsMeasurements;
     const stepData = (testInfo as any).stepData;
     await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
 });
 
-test.afterAll('Log test suite summary', async ({}, testInfo) => {
-    if (testInfo.status == 'skipped') {
-        logger.warn(`Test "${testInfo.title}" skipped`);
-        resultsContainer.push(`Test "${testInfo.title}" skipped`);
-        }
-    resultsContainer.forEach((result) => {
-    console.log(`${result}\n`);
-    });
-});
-
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, observabilityPage, page }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -58,7 +38,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
   
     await testStep('step01', stepData, page, async () => {
         logger.info('Navigating to Hosts page');
-        await observabilityPage.clickHosts();
+        await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
         await datePicker.setPeriod();
         await page.evaluate("document.body.style.zoom=0.9");
@@ -100,13 +80,13 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {    
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page }, testInfo) => {    
     let stepData: object[] = [];
     
     await testStep('step01', stepData, page, async () => {
         let noLogsData = false;
         logger.info('Navigating to the "Hosts" page');
-        await observabilityPage.clickHosts();
+        await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();
@@ -128,13 +108,13 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, observabilit
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, observabilityPage, page }, testInfo) => {    
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, testInfo) => {    
     let stepData: object[] = [];
     
     await testStep('step01', stepData, page, async () => {
         let noAlertsData = false;
         logger.info('Navigating to the "Hosts" page');
-        await observabilityPage.clickHosts();
+        await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
         logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
         await datePicker.setPeriod();

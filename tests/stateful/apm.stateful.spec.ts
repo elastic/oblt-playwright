@@ -2,7 +2,6 @@ import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
 import { checkApmData, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
-let resultsContainer: string[] = [`\nTest results:`];
 let clusterData: any;
 const testStartTime: number = Date.now();
 
@@ -18,41 +17,21 @@ test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
   await sideNav.goto();
   logger.info('Selecting the default Kibana space');
   await spaceSelectorStateful(headerBar, spaceSelector);
-  logger.info('Navigating to the Observability section');
-  await sideNav.clickObservabilitySolutionLink();
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  if (test.info().status == 'passed') {
-    logger.info(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-    resultsContainer.push(`Test "${testInfo.title}" completed in ${testInfo.duration} ms`);
-  } else if (test.info().status == 'failed') {
-    logger.error(`Test "${testInfo.title}" failed`);
-    resultsContainer.push(`Test "${testInfo.title}" failed`);
-  }
-
   const stepData = (testInfo as any).stepData;
   await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
 });
 
-test.afterAll('Log test suite summary', async ({}, testInfo) => {
-  if (testInfo.status == 'skipped') {
-      logger.warn(`Test "${testInfo.title}" skipped`);
-      resultsContainer.push(`Test "${testInfo.title}" skipped`);
-      }
-  resultsContainer.forEach((result) => {
-    console.log(`${result}\n`);
-  });
-});
-
-test('APM - Services', async ({ datePicker, discoverPage, notifications, observabilityPage, page, servicesPage }, testInfo) => {
+test('APM - Services', async ({ datePicker, discoverPage, notifications, page, servicesPage }, testInfo) => {
   const throughput = "throughput";
   const errorRate = "errorRate";
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Services" section');
-    await observabilityPage.clickServices();
+    await page.goto('/app/apm/services');
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and selecting the "opbeans-go" service`);
     await datePicker.setPeriod();
     await servicesPage.selectServiceOpbeansGo();
@@ -65,6 +44,8 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, observa
       })
     ]);
   });
+
+  await page.waitForTimeout(30000);
   
   await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Transactions" tab and asserting visibility of the "Throughput" visualization');
@@ -79,6 +60,8 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, observa
       })
     ]);
   });
+
+  await page.waitForTimeout(30000);
   
   await testStep('step03', stepData, page, async () => {
     logger.info('Clicking on the "Failed transaction correlations" tab');
@@ -89,6 +72,8 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, observa
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
   });
+
+  await page.waitForTimeout(30000);
   
   await testStep('step04', stepData, page, async () => {
     logger.info('Clicking on the "Investigate" button and navigating to Discover');
@@ -100,12 +85,12 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, observa
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Traces', async ({ datePicker, headerBar, notifications, observabilityPage, page, servicesPage, tracesPage }, testInfo) => {
+test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servicesPage, tracesPage }, testInfo) => {
   let stepData: object[] = [];
   
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Traces" section');
-    await observabilityPage.clickTraces();
+    await page.goto('/app/apm/traces');
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and filtering data by http.response.status_code : 502`);
     await datePicker.setPeriod();
     await Promise.race([
@@ -116,11 +101,15 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, observabilit
     ]);
   });
 
+  await page.waitForTimeout(10000);
+
   await testStep('step02', stepData, page, async () => {
     logger.info('Opening the "Explorer" tab and filtering data by http.response.status_code : 502');
     await tracesPage.openExplorerTab();
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
   });
+
+  await page.waitForTimeout(30000);
   
   await testStep('step03', stepData, page, async () => {
     logger.info('Clicking on the "View related error" in the timeline and asserting related errors');
@@ -138,14 +127,16 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, observabilit
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, observabilityPage, page }, testInfo) => {  
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page }, testInfo) => {  
   let stepData: object[] = [];
   
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Dependencies" section and asserting visibility of dependencies table');
-    await observabilityPage.clickDependencies();
+    await page.goto('/app/apm/dependencies');
     await dependenciesPage.assertVisibilityTable();
   });
+
+  await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
     logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of dependencies table`);
@@ -174,8 +165,11 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     }
   });
 
+  await page.waitForTimeout(10000);
+
   await testStep('step03', stepData, page, async () => {
     logger.info('Clicking on the most impactful operation and asserting visibility of the timeline');
+    // Selecting the first row in the table since the list of dependencies changes on each refresh
     await dependenciesPage.clickTableRow();
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
@@ -186,11 +180,15 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     ]);
   });
 
+  await page.waitForTimeout(30000);
+
   await testStep('step04', stepData, page, async () => {
     logger.info('Clicking on the transaction in the timeline and asserting visibility of the tab panel');
     await dependenciesPage.clickTimelineTransaction();
     await dependenciesPage.assertVisibilityTabPanel();
   });
+
+  await page.waitForTimeout(30000);
 
   await testStep('step05', stepData, page, async () => {
     logger.info('Clicking on the "Investigate" button and selecting "View transaction in Discover"');
