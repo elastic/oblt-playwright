@@ -1,11 +1,9 @@
-name: "Serverless - APM"
+name: "ECH"
 on:
-  # schedule:
-  #   - cron: "0 * * * *"
-  #   - cron: "15 * * * *"
-  #   - cron: "30 * * * *"
-  #   - cron: "*/15 * * * *"
-  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+    - cron: "20 * * * *"
+    - cron: "40 * * * *"
 permissions:
   contents: read
 
@@ -42,9 +40,9 @@ jobs:
         if: steps.cache-playwright.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps
 
-  test_1_day:
+  apm:
       needs: install
-      name: Run tests (1 day)
+      name: Run tests (APM)
       timeout-minutes: 60
       runs-on: ubuntu-latest
       if: github.event.schedule == '0 * * * *'
@@ -72,14 +70,14 @@ jobs:
             ~/.cache/ms-playwright
           key: playwright-${{ hashFiles('package-lock.json') }}
       
-      - name: Run Playwright tests
-        run: npx playwright test apm.serverless.spec.ts --project serverless
+      - name: Run Playwright tests - APM
+        run: npx playwright test apm.stateful.spec.ts --project stateful
         env:
-          KIBANA_HOST: ${{ secrets.KIBANA_HOST_SERVERLESS }}
-          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_SERVERLESS }}
-          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
-          ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
-          API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
+          KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
+          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_STATEFUL }}
+          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_STATEFUL }}
+          ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
+          API_KEY: ${{ secrets.API_KEY_STATEFUL }}
           TIME_UNIT: ${{ vars.TIME_UNIT }}
           TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
@@ -91,12 +89,12 @@ jobs:
           path: /home/runner/work/oblt-playwright/
           retention-days: 1
 
-  test_7_days:
+  infra:
     needs: install
-    name: Run tests (7 days)
+    name: Run tests (Infra)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.schedule == '*/15 * * * *'
+    if: github.event.schedule == '20 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -121,16 +119,16 @@ jobs:
           ~/.cache/ms-playwright
         key: playwright-${{ hashFiles('package-lock.json') }}
     
-    - name: Run Playwright tests
-      run: npx playwright test apm.serverless.spec.ts --project serverless
+    - name: Run Playwright tests - Infra
+      run: npx playwright test infra.stateful.spec.ts --project stateful
       env:
-        KIBANA_HOST: ${{ secrets.KIBANA_HOST_SERVERLESS }}
-        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_SERVERLESS }}
-        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
-        API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_STATEFUL }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_STATEFUL }}
+        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
+        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -140,12 +138,12 @@ jobs:
         path: /home/runner/work/oblt-playwright/
         retention-days: 1
 
-  test_14_days:
+  logs:
     needs: install
-    name: Run tests (14 days)
+    name: Run tests (Logs)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: github.event.schedule == '30 * * * *'
+    if: github.event.schedule == '40 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -170,16 +168,16 @@ jobs:
           ~/.cache/ms-playwright
         key: playwright-${{ hashFiles('package-lock.json') }}
     
-    - name: Run Playwright tests
-      run: npx playwright test apm.serverless.spec.ts --project serverless
+    - name: Run Playwright tests - Logs
+      run: npx playwright test logs.stateful.spec.ts --project stateful
       env:
-        KIBANA_HOST: ${{ secrets.KIBANA_HOST_SERVERLESS }}
-        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_SERVERLESS }}
-        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
-        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
-        API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
+        KIBANA_HOST: ${{ secrets.KIBANA_HOST_STATEFUL }}
+        KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_STATEFUL }}
+        KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_STATEFUL }}
+        ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
+        API_KEY: ${{ secrets.API_KEY_STATEFUL }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_X }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -191,9 +189,9 @@ jobs:
 
   upload:
     needs:
-      - test_1_day
-      - test_7_days
-      - test_14_days
+      - apm
+      - infra
+      - logs
     if: always()
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
