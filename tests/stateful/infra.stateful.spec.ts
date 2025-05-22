@@ -42,6 +42,7 @@ test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, date
     await page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]').click();
   });
 
+  logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
@@ -104,6 +105,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
     await inventoryPage.clickNodeWaffleContainer();
   });
 
+  logger.info('Waiting for 20s before proceeding to the next step...');
   await page.waitForTimeout(20000);
   
   await testStep('step02', stepData, page, async () => {
@@ -122,6 +124,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
     ]);
   });
 
+  logger.info('Waiting for 20s before proceeding to the next step...');
   await page.waitForTimeout(20000);
 
   await testStep('step03', stepData, page, async () => {
@@ -143,6 +146,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
     await inventoryPage.clickPopoverK8sMetrics();
   });
 
+  logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step04', stepData, page, async () => {

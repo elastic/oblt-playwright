@@ -51,6 +51,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, page}, tes
     await discoverPage.assertVisibilityDataGridRow();
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
@@ -74,6 +75,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, page}, testInfo) =
     await discoverPage.assertVisibilityDataGridRow();
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
