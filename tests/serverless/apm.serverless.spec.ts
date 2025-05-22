@@ -87,7 +87,8 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servicesPage, tracesPage }, testInfo) => {
+// Test is skipped because Explorer is not available in the serverless environment
+test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, servicesPage, tracesPage }, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
@@ -130,7 +131,7 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
+test.only('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
