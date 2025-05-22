@@ -131,7 +131,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   (testInfo as any).stepData = stepData;
 });
 
-test.only('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
