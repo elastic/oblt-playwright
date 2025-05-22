@@ -97,26 +97,32 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
         })
       ]);
     await inventoryPage.clickDismiss();
+    await inventoryPage.clickAutoRefreshButton();
     logger.info('Sorting by metric value and clicking on a host');
     await inventoryPage.sortByMetricValue();
     await inventoryPage.memoryUsage();
     await inventoryPage.clickNodeWaffleContainer();
   });
 
-  await page.waitForTimeout(30000);
+  await page.waitForTimeout(20000);
   
   await testStep('step02', stepData, page, async () => {
-    await page.evaluate("document.body.style.zoom=0.8");
     logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
     await datePicker.setPeriod();
+    await page.mouse.wheel(0, 900);
     logger.info('Asserting visibility of the "CPU Usage" and "Memory Usage" visualizations');
-    await Promise.all([
-      inventoryPage.assertVisibilityVisualization(cpuUsage),
-      inventoryPage.assertVisibilityVisualization(memoryUsage)
+    await Promise.race([
+      Promise.all([
+        inventoryPage.assertVisibilityVisualization(cpuUsage),
+        inventoryPage.assertVisibilityVisualization(memoryUsage)
+        ]),
+      inventoryPage.assertVisualizationNoData(cpuUsage).then(() => {
+          throw new Error('Test is failed due to an error when loading data');
+        })
     ]);
   });
 
-  await page.waitForTimeout(30000);
+  await page.waitForTimeout(20000);
 
   await testStep('step03', stepData, page, async () => {
     await inventoryPage.closeInfraAssetDetailsFlyout();
