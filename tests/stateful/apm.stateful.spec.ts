@@ -45,6 +45,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     ]);
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
   
   await testStep('step02', stepData, page, async () => {
@@ -61,6 +62,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     ]);
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
   
   await testStep('step03', stepData, page, async () => {
@@ -73,6 +75,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await servicesPage.filterByCorrelationValue();
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
   
   await testStep('step04', stepData, page, async () => {
@@ -101,6 +104,7 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
     ]);
   });
 
+  logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
@@ -109,6 +113,7 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
   
   await testStep('step03', stepData, page, async () => {
@@ -136,6 +141,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     await dependenciesPage.assertVisibilityTable();
   });
 
+  logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
@@ -165,6 +171,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     }
   });
 
+  logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step03', stepData, page, async () => {
@@ -180,6 +187,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     ]);
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step04', stepData, page, async () => {
@@ -188,6 +196,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     await dependenciesPage.assertVisibilityTabPanel();
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step05', stepData, page, async () => {

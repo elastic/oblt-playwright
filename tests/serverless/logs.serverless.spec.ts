@@ -65,6 +65,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
     ]);
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
@@ -102,6 +103,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
     ]);
   });
 
+  logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
