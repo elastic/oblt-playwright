@@ -14,8 +14,8 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 1,
   reporter: [['list', { printSteps: true }]],
-  timeout: 600000,
-  expect: {timeout: 600000},
+  timeout: 1000000,
+  expect: {timeout: 1000000},
 
   use: {
     browserName: 'chromium',

@@ -8,6 +8,7 @@ export default class InventoryPage {
     }
     
     private readonly dismiss = () => this.page.locator('xpath=//span[contains(text(),"Dismiss")]');
+    private readonly autoRefreshButton = () => this.page.locator('xpath=//button[@data-test-subj="infraWaffleTimeControlsAutoRefreshButton"]');
     private readonly metricDropdown = () => this.page.getByTestId('infraInventoryMetricDropdown');
     private readonly metricMemoryUsage = () => this.page.locator('xpath=//div[@data-test-subj="infraInventoryMetricsContextMenu"]//span[contains(text(), "Memory usage")]');
     private readonly sortWaffleByDropdown = () => this.page.getByTestId('waffleSortByDropdown');
@@ -37,6 +38,10 @@ export default class InventoryPage {
 
     public async clickDismiss() {
         await this.dismiss().click();
+        }
+
+    public async clickAutoRefreshButton() {
+        await this.autoRefreshButton().click();
         }
 
     public async sortByMetricValue() {
@@ -148,4 +153,9 @@ export default class InventoryPage {
     public async assertNoData() {
         await expect(this.noDataToDisplay(), 'There is no data to display').toBeVisible();
         }
+
+    public async assertVisualizationNoData(title: string) {
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//*[@title="N/A"]`), `"${title}" visualization shows no data`).toBeVisible()
+        }
+
 }
