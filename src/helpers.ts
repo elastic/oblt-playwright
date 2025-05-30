@@ -149,6 +149,7 @@ export async function writeJsonReport(
   testInfo: TestInfo, 
   testStartTime: number,
   stepData?: object[],
+  cacheStats?: object,
   hostsMeasurements?: any
   ) {
   let build_flavor: any = clusterData.version.build_flavor;
@@ -177,6 +178,7 @@ export async function writeJsonReport(
     version: version,
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
+    cacheStats: cacheStats ? cacheStats : null,
     measurements: hostsMeasurements ? hostsObject : null,
   };
     
@@ -210,4 +212,21 @@ export async function testStep(
   } catch (error) {
     throw error;
   }
+}
+
+export async function getCacheStats() {;
+  const url = `${ELASTICSEARCH_HOST}/_searchable_snapshots/cache/stats?human`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      "accept": "*/*",
+      "Authorization": API_KEY,
+      "kbn-xsrf": "reporting"
+    }
+  });
+  if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+  const jsonDataNode = JSON.parse(await response.text());
+  return jsonDataNode;
 }
