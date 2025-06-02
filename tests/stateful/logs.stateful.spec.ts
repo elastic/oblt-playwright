@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getCacheStats, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
@@ -21,8 +21,13 @@ test.beforeEach(async ({ discoverPage, headerBar, page, sideNav, spaceSelector }
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
+  let cacheStats: object | undefined = undefined;
+  const timeValue = process.env.TIME_VALUE ? Number(process.env.TIME_VALUE) : undefined;
+  if (timeValue !== undefined && timeValue > 1 && process.env.TIME_UNIT === "Days") {
+    cacheStats = await getCacheStats();
+  }
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData, cacheStats);
 });
 
 test('Discover - All logs', async ({datePicker, discoverPage, page}, testInfo) => {
