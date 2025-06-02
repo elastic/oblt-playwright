@@ -1,9 +1,9 @@
 name: "ECH"
 on:
-  # schedule:
-  #   - cron: "0 * * * *"
-  #   - cron: "20 * * * *"
-  #   - cron: "40 * * * *"
+  schedule:
+    - cron: "0 * * * *"
+    - cron: "20 * * * *"
+    - cron: "40 * * * *"
 permissions:
   contents: read
 
@@ -79,7 +79,7 @@ jobs:
           ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
           API_KEY: ${{ secrets.API_KEY_STATEFUL }}
           TIME_UNIT: ${{ vars.TIME_UNIT }}
-          TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
+          TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
@@ -128,7 +128,7 @@ jobs:
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
         API_KEY: ${{ secrets.API_KEY_STATEFUL }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -177,7 +177,7 @@ jobs:
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
         API_KEY: ${{ secrets.API_KEY_STATEFUL }}
         TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_Z }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4

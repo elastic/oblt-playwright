@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
 import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
@@ -22,8 +22,13 @@ test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
+  let cacheStats: object | undefined = undefined;
+  const timeValue = process.env.TIME_VALUE ? Number(process.env.TIME_VALUE) : undefined;
+  if (timeValue !== undefined && timeValue > 1 && process.env.TIME_UNIT === "Days") {
+    cacheStats = await getCacheStats();
+  }
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData, cacheStats);
 });
 
 test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, page }, testInfo) => {
