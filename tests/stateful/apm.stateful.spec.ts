@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { checkApmData, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { checkApmData, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
@@ -20,8 +20,13 @@ test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
+  let cacheStats: object | undefined = undefined;
+  const timeValue = process.env.TIME_VALUE ? Number(process.env.TIME_VALUE) : undefined;
+  if (timeValue !== undefined && timeValue > 1 && process.env.TIME_UNIT === "Days") {
+    cacheStats = await getCacheStats();
+  }
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  await writeJsonReport(clusterData, testInfo, testStartTime, stepData, cacheStats);
 });
 
 test('APM - Services', async ({ datePicker, discoverPage, notifications, page, servicesPage }, testInfo) => {
