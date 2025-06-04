@@ -1,3 +1,5 @@
+[ECH](https://github.com/elastic/oblt-playwright/blob/main/tests/stateful/logs.stateful.spec.ts) | [Serverless](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/logs.serverless.spec.ts)
+---
 | **Test**  | **Steps** |
 | :------------ | :------------ |
 | **All logs** | **Step 01** - Selecting `*logs` data view, setting search period and asserting canvas visibility<br><br>  |

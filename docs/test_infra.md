@@ -1,3 +1,5 @@
+[ECH](https://github.com/elastic/oblt-playwright/blob/main/tests/stateful/infra.stateful.spec.ts) | [Serverless](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/infra.serverless.spec.ts)
+---
 | **Test**  | **Steps** |
 | :------------ | :------------ |
 | **Cluster Overview dashboard** | **Step 01** - Navigating to the "Cluster Overview" dashboard<br><br>_⌛Spend 10 seconds reviewing the page_<br><br>**Step 02** - Setting the search period and asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations'<br><br> |
