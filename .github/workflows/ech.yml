@@ -86,7 +86,8 @@ jobs:
         if: always()
         with:
           name: test-results
-          path: /home/runner/work/oblt-playwright/
+          path: |
+            /home/runner/work/oblt-playwright/*.json
           retention-days: 1
 
   infra:
@@ -135,7 +136,7 @@ jobs:
       if: always()
       with:
         name: test-results
-        path: /home/runner/work/oblt-playwright/
+        path: /home/runner/work/oblt-playwright/*.json
         retention-days: 1
 
   logs:
@@ -184,7 +185,7 @@ jobs:
       if: always()
       with:
         name: test-results
-        path: /home/runner/work/oblt-playwright/
+        path: /home/runner/work/oblt-playwright/*.json
         retention-days: 1
 
   upload:
