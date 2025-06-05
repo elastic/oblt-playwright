@@ -78,8 +78,8 @@ jobs:
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_STATEFUL }}
           ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
           API_KEY: ${{ secrets.API_KEY_STATEFUL }}
-          TIME_UNIT: ${{ vars.TIME_UNIT }}
-          TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
+          TIME_UNIT: ${{ vars.TIME_UNIT_HOURS }}
+          TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
@@ -127,8 +127,8 @@ jobs:
         KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_STATEFUL }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
         API_KEY: ${{ secrets.API_KEY_STATEFUL }}
-        TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
+        TIME_UNIT: ${{ vars.TIME_UNIT_HOURS }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -176,8 +176,8 @@ jobs:
         KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_STATEFUL }}
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_STATEFUL }}
         API_KEY: ${{ secrets.API_KEY_STATEFUL }}
-        TIME_UNIT: ${{ vars.TIME_UNIT }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_Y }}
+        TIME_UNIT: ${{ vars.TIME_UNIT_HOURS }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
