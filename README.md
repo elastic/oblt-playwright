@@ -57,8 +57,14 @@ REPORTING_CLUSTER_API_KEY = 'ApiKey ...'
 
 ```typescript
 REPORTING_CLUSTER_INDEX = 
-TIME_UNIT = 'Minutes'
-TIME_VALUE = 15
+// Predefined variables:
+TIME_UNIT_HOURS
+TIME_UNIT_DAYS
+TIME_VALUE_1
+TIME_VALUE_3
+TIME_VALUE_7
+TIME_VALUE_14
+TIME_VALUE_29
 ```
 
 ### 🚀 Workflows
