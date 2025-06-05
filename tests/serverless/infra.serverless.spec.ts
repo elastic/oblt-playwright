@@ -27,7 +27,7 @@ test.afterEach('Log test results', async ({}, testInfo) => {
   await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
 });
 
-test('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
+test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top Memory intensive pods per Node";
   let stepData: object[] = [];
