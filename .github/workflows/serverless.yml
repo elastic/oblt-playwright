@@ -79,7 +79,7 @@ jobs:
           ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
           API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
           TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
-          TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
+          TIME_VALUE: ${{ vars.TIME_VALUE_14 }}
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
@@ -128,7 +128,7 @@ jobs:
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
         API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
         TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_14 }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -177,7 +177,7 @@ jobs:
         ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
         API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
         TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
-        TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
+        TIME_VALUE: ${{ vars.TIME_VALUE_14 }}
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
