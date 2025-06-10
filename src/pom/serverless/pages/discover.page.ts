@@ -14,7 +14,7 @@ export default class DiscoverPage {
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
     private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
-    private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-test-subj="euiDataGridBody"]//div[1]//div[@data-test-subj="dataGridRowCell"][@aria-rowindex="1"][@data-gridcell-column-id="openDetails"][1]');
+    private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-test-subj="dataGridRowCell"][@aria-rowindex="1"][@data-gridcell-column-id="actions"][1]');
     private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
     private readonly flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
     private readonly docViewer = () => this.page.getByTestId('kbnDocViewer');
