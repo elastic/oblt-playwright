@@ -15,6 +15,13 @@ export default class DatePicker {
     private readonly applyButton = () => this.page.locator('xpath=//span[contains(text(), "Apply")]');
     private readonly refreshButton = () => this.page.getByTestId('superDatePickerApplyTimeButton');
     private readonly selectedDate = () => this.page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER });
+    private readonly showDatesButton = () => this.page.getByTestId('superDatePickerShowDatesButton');
+    private readonly absoluteTabStartDate = () => this.page.locator('xpath=//button[@aria-label="Start date: Absolute"]');
+    private readonly absoluteTabEndDate = () => this.page.locator('xpath=//button[@aria-label="End date: Absolute"]');
+    private readonly dateInputStart = () => this.page.locator('form').filter({ hasText: 'Start date' }).getByTestId('superDatePickerAbsoluteDateInput');
+    private readonly dateInputEnd = () => this.page.locator('form').filter({ hasText: 'End date' }).getByTestId('superDatePickerAbsoluteDateInput');
+    private readonly nowButton = () => this.page.locator('xpath=//button[text()="now"]');
+    private readonly refreshQuery = () => this.page.locator('xpath=//button//span[text()="Update"]');
 
     public async assertVisibilityDatePicker() {
         await expect(this.datePicker()).toBeVisible();
@@ -57,12 +64,30 @@ export default class DatePicker {
         return truthiness;
     }
 
-    public async setPeriod() {
-        await this.clickDatePicker();
-        await this.fillTimeValue(TIME_VALUE);
-        await this.selectTimeUnit(TIME_UNIT);
-        await this.clickApplyButton();
+    /*
+    Use this function to set a fixed time window. 
+    */
+    public async setPeriod(
+        from: string = process.env.START_DATE ?? "", // Example: 2025-06-11T00:00:00.000Z
+        to: string = process.env.END_DATE ?? ""
+    ) {
+        await this.showDatesButton().click();
+        await this.absoluteTabStartDate().click();
+        await this.dateInputStart().fill(from);
+        await this.page.keyboard.press('Enter');
+        await this.nowButton().click();
+        await this.absoluteTabEndDate().click();
+        await this.dateInputEnd().fill(to);
+        await this.page.keyboard.press('Enter');
+        await this.refreshQuery().click();
     }
+
+    // public async setPeriod() {
+    //     await this.clickDatePicker();
+    //     await this.fillTimeValue(TIME_VALUE);
+    //     await this.selectTimeUnit(TIME_UNIT);
+    //     await this.clickApplyButton();
+    // }
 
     public async setPeriodProfiling() {
         await this.clickDatePickerHostsProfiling();
