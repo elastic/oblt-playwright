@@ -5,6 +5,8 @@ export const ELASTICSEARCH_HOST = `${process.env.ELASTICSEARCH_HOST}`;
 export const API_KEY = `${process.env.API_KEY}`;
 export const TIME_UNIT = `${process.env.TIME_UNIT}`;
 export const TIME_VALUE = `${process.env.TIME_VALUE}`;
+export const START_DATE = `${process.env.START_DATE}`;
+export const END_DATE = `${process.env.END_DATE}`;
 export const REPORT_FILE = `${process.env.REPORT_FILE}`;
 export const CI = `${process.env.CI}`;
 
