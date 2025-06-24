@@ -162,6 +162,9 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
       dependenciesPage.assertVisibilityTable(),
       dependenciesPage.assertOperationsNotFound().then(() => {
         throw new Error('Test is failed because dependency operations not found');
+      }),
+      dependenciesPage.assertUnableToLoadPage().then(() => {
+        throw new Error('Test is failed: "Unable to load page" message encountered');
       })
     ]);
   });
@@ -176,6 +179,9 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
       dependenciesPage.assertVisibilityTimelineTransaction(),
       notifications.assertErrorFetchingResource().then(() => {
         throw new Error('Test is failed due to an error when loading data');
+      }),
+      dependenciesPage.assertUnableToLoadPage().then(() => {
+        throw new Error('Test is failed: "Unable to load page" message encountered');
       })
     ]);
   });

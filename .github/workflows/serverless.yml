@@ -96,8 +96,7 @@ jobs:
     name: Run tests (Infra)
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: false
-    # if: github.event.schedule == '20 * * * *'
+    if: github.event.schedule == '20 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
