@@ -18,7 +18,6 @@ export default class DatePicker {
     private readonly absoluteTabStartDate = () => this.page.locator('xpath=//button[@aria-label="Start date: Absolute"]');
     private readonly absoluteTabEndDate = () => this.page.locator('xpath=//button[@aria-label="End date: Absolute"]');
     private readonly dateInput = () => this.page.getByTestId('superDatePickerAbsoluteDateInput');
-    private readonly nowButton = () => this.page.locator('xpath=//button[text()="now"]');
     private readonly refreshQuery = () => this.page.locator('xpath=//button//span[text()="Update"]');
     private readonly applyButtonPopover = () => this.page.getByTestId('superDatePickerApplyTimeButton');
 
@@ -46,15 +45,28 @@ export default class DatePicker {
     Use this function to set a fixed time window. 
     */
     public async setPeriod(from: string = START_DATE, to: string = END_DATE) {
-        await this.showDatesButton().click();
-        await this.absoluteTabStartDate().click();
+        await Promise.any([
+            expect(this.showDatesButton()).toBeVisible(),
+            expect(this.datePickerStartDatePopoverButton()).toBeVisible()
+            ]);
+        if (await this.showDatesButton().isVisible()) {
+            await this.showDatesButton().click();
+        } else {
+            await this.datePickerStartDatePopoverButton().click();
+        }
+        await this.absoluteTabStartDate().click(),
         await this.dateInput().fill(from);
         await this.page.keyboard.press('Enter');
-        await this.nowButton().click();
+        await this.page.waitForTimeout(500);
+        await this.datePickerEndDatePopoverButton().click()
         await this.absoluteTabEndDate().click();
         await this.dateInput().fill(to);
         await this.page.keyboard.press('Enter');
-        await this.refreshQuery().click();
+        await expect(this.page.locator('xpath=//button[@data-test-subj="superDatePickerendDatePopoverButton"]')).not.toHaveText('Now');
+        await Promise.race([
+            this.refreshQuery().click(),
+            this.applyButtonPopover().click()
+        ]);
     }
 
     // public async setPeriod() {

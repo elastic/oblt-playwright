@@ -9,6 +9,8 @@ export default class DatePicker {
     }
 
     private readonly datePicker = () => this.page.getByTestId('superDatePickerToggleQuickMenuButton');
+    private readonly datePickerStartDatePopoverButton = () => this.page.getByTestId('superDatePickerstartDatePopoverButton');
+    private readonly datePickerEndDatePopoverButton = () => this.page.getByTestId('superDatePickerendDatePopoverButton');
     private readonly datePickerHostsProfiling = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsProfilingTabContent"]//button[@data-test-subj="superDatePickerToggleQuickMenuButton"]');
     private readonly timeValue  = () => this.page.locator('xpath=//input[@aria-label="Time value"]');
     private readonly timeUnit = () => this.page.locator('xpath=//*[@aria-label="Time unit"]');
@@ -18,10 +20,9 @@ export default class DatePicker {
     private readonly showDatesButton = () => this.page.getByTestId('superDatePickerShowDatesButton');
     private readonly absoluteTabStartDate = () => this.page.locator('xpath=//button[@aria-label="Start date: Absolute"]');
     private readonly absoluteTabEndDate = () => this.page.locator('xpath=//button[@aria-label="End date: Absolute"]');
-    private readonly dateInputStart = () => this.page.locator('form').filter({ hasText: 'Start date' }).getByTestId('superDatePickerAbsoluteDateInput');
-    private readonly dateInputEnd = () => this.page.locator('form').filter({ hasText: 'End date' }).getByTestId('superDatePickerAbsoluteDateInput');
-    private readonly nowButton = () => this.page.locator('xpath=//button[text()="now"]');
+    private readonly dateInput = () => this.page.getByTestId('superDatePickerAbsoluteDateInput');
     private readonly refreshQuery = () => this.page.locator('xpath=//button//span[text()="Update"]');
+    private readonly applyButtonPopover = () => this.page.getByTestId('superDatePickerApplyTimeButton');
 
     public async assertVisibilityDatePicker() {
         await expect(this.datePicker()).toBeVisible();
@@ -70,16 +71,30 @@ export default class DatePicker {
     public async setPeriod(
         from: string = process.env.START_DATE ?? "", // Example: 2025-06-11T00:00:00.000Z
         to: string = process.env.END_DATE ?? ""
-    ) {
-        await this.showDatesButton().click();
-        await this.absoluteTabStartDate().click();
-        await this.dateInputStart().fill(from);
+        ) 
+        {
+        await Promise.any([
+            expect(this.showDatesButton()).toBeVisible(),
+            expect(this.datePickerStartDatePopoverButton()).toBeVisible()
+            ]);
+        if (await this.showDatesButton().isVisible()) {
+            await this.showDatesButton().click();
+        } else {
+            await this.datePickerStartDatePopoverButton().click();
+        }
+        await this.absoluteTabStartDate().click(),
+        await this.dateInput().fill(from);
         await this.page.keyboard.press('Enter');
-        await this.nowButton().click();
+        await this.page.waitForTimeout(500);
+        await this.datePickerEndDatePopoverButton().click();
         await this.absoluteTabEndDate().click();
-        await this.dateInputEnd().fill(to);
+        await this.dateInput().fill(to);
         await this.page.keyboard.press('Enter');
-        await this.refreshQuery().click();
+        await expect(this.page.locator('xpath=//button[@data-test-subj="superDatePickerendDatePopoverButton"]')).not.toHaveText('Now');
+        await Promise.race([
+            this.refreshQuery().click(),
+            this.applyButtonPopover().click()
+        ]);
     }
 
     // public async setPeriod() {

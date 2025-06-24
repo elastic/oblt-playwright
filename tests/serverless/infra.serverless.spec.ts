@@ -108,6 +108,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
     await inventoryPage.sortByMetricValue();
     await inventoryPage.memoryUsage();
     await inventoryPage.clickNodeWaffleContainer();
+    await inventoryPage.clickOpenAsPageButton();
   });
 
   logger.info('Waiting for 20s before proceeding to the next step...');
@@ -136,6 +137,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
   await page.waitForTimeout(20000);
 
   await testStep('step03', stepData, page, async () => {
+    await inventoryPage.clickReturnButton();
     await inventoryPage.closeInfraAssetDetailsFlyout();
     logger.info('Switching to Pods view');
     await inventoryPage.switchInventoryToPodsView();

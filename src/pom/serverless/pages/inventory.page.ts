@@ -25,6 +25,8 @@ export default class InventoryPage {
     private readonly inspectorRequests = () => this.page.getByTestId('inspectorViewChooserRequests');
     private readonly inspectorRequestDetail = () => this.page.getByTestId('inspectorRequestDetailRequest');
     private readonly inspectorRequestCopyClipboardButton = () => this.page.getByTestId('inspectorRequestCopyClipboardButton');
+    private readonly openAsPageButton = () => this.page.getByTestId('infraAssetDetailsOpenAsPageButton');
+    private readonly returnButton = () => this.page.getByTestId('infraAssetDetailsReturnButton');
     private readonly flyoutInfraAssetDetailsCloseButton = () => this.page.locator('xpath=//div[@data-component-name="infraAssetDetailsFlyout"]//button[@data-test-subj="euiFlyoutCloseButton"]');
     private readonly flyoutCloseButton = () => this.page.getByTestId('euiFlyoutCloseButton');
     private readonly noDataToDisplay = () => this.page.locator('xpath=//*[text()="There is no data to display."]');
@@ -68,6 +70,14 @@ export default class InventoryPage {
         
     public async clickTableCell() {
         await this.tableCell().click();
+        }
+
+    public async clickOpenAsPageButton() {
+        await this.openAsPageButton().click();
+        }
+
+    public async clickReturnButton() {
+        await this.returnButton().click();
         }
 
     public async clickPopoverK8sMetrics() {

@@ -12,6 +12,7 @@ export default class DependenciesPage {
     public readonly dependencyTableLoaded = () => this.page.locator('xpath=//div[@data-test-subj="dependenciesTable"]//div[@class="euiBasicTable"]');
     public readonly dependencyTableNotLoaded = () => this.page.locator('xpath=//span[@class="euiTableCellContent__text"][text()="Failed to fetch"]');
     private readonly operationsNotFound = () => this.page.locator('xpath=//*[text()="No operations found"]');
+    private readonly unableToLoadPage = () => this.page.locator('xpath=//h2[@data-test-subj="errorBoundaryFatalHeader"]');
     private readonly timelineTransaction = () => this.page.locator('xpath=(//div[@type="transaction"])[1]//*[@color]');
     private readonly tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
     private readonly investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
@@ -35,6 +36,10 @@ export default class DependenciesPage {
 
     public async assertOperationsNotFound() {
         await expect(this.operationsNotFound()).toBeVisible();
+        }
+
+    public async assertUnableToLoadPage() {
+        await expect(this.unableToLoadPage()).toBeVisible();
         }
 
     public async clickTimelineTransaction() {
