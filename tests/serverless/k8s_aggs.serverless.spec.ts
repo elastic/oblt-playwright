@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getDatePickerLogMessageServerless, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 import DashboardPage from '../../src/pom/serverless/pages/dashboard.page.ts';
 import DatePicker from '../../src/pom/serverless/components/date_picker.component.ts';
@@ -48,8 +48,8 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
     await page.getByRole('link', { name: title }).click();
   });
   await testStep('step02', stepData, page, async () => {
-    logger.info('Setting the search period of last ' + process.env.TIME_VALUE + ' ' + process.env.TIME_UNIT + ' and asserting the visualization: ' + title);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
+    await datePicker.setInterval();
     await Promise.race([
       dashboardPage.assertVisibilityVisualization(title),
       dashboardPage.assertNoData(title).then(() => {

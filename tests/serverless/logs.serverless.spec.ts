@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorServerless, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getDatePickerLogMessageServerless, fetchClusterData, spaceSelectorServerless, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
@@ -29,8 +29,8 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of the chart, canvas, and data grid row`);
+    await datePicker.setInterval();
     await Promise.race([
       Promise.all([
         discoverPage.assertChartIsRendered(),
@@ -50,8 +50,8 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of the chart, canvas, and data grid row`);
+    await datePicker.setInterval();
     await Promise.race([
       Promise.all([
         await discoverPage.assertChartIsRendered(),
@@ -88,8 +88,8 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of the chart, canvas, and data grid row`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of the chart, canvas, and data grid row`);
+    await datePicker.setInterval();
     await Promise.race([
       Promise.all([
         await discoverPage.assertChartIsRendered(),

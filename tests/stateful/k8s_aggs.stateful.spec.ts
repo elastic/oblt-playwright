@@ -1,9 +1,10 @@
 import { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getDatePickerLogMessageStateful, getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 import DashboardPage from '../../src/pom/stateful/pages/dashboard.page.ts';
 import DatePicker from '../../src/pom/stateful/components/date_picker.component.ts';
+import { TIME_UNIT, TIME_VALUE } from '../../src/env.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
@@ -54,8 +55,8 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
     await page.getByRole('link', { name: title }).click();
   });
   await testStep('step02', stepData, page, async () => {
-    logger.info('Setting the search period of last ' + process.env.TIME_VALUE + ' ' + process.env.TIME_UNIT + ' and asserting the visualization: ' + title);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()} and asserting the visualization: ` + title);
+    await datePicker.setInterval();
     await Promise.race([
       dashboardPage.assertVisibilityVisualization(title),
       dashboardPage.assertNoData(title).then(() => {

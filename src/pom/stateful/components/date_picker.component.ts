@@ -1,5 +1,11 @@
 import { expect, Page } from "@playwright/test";
-import { TIME_VALUE, TIME_UNIT } from '../../../../src/env.ts';
+import { 
+    ABSOLUTE_TIME_RANGE_ECH, 
+    START_DATE, 
+    END_DATE, 
+    TIME_VALUE, 
+    TIME_UNIT 
+    } from '../../../../src/env.ts';
 
 export default class DatePicker {
     page: Page;
@@ -16,7 +22,6 @@ export default class DatePicker {
     private readonly timeUnit = () => this.page.locator('xpath=//*[@aria-label="Time unit"]');
     private readonly applyButton = () => this.page.locator('xpath=//span[contains(text(), "Apply")]');
     private readonly refreshButton = () => this.page.getByTestId('superDatePickerApplyTimeButton');
-    private readonly selectedDate = () => this.page.getByLabel('Commonly used').getByRole('button', { name: process.env.DATE_PICKER });
     private readonly showDatesButton = () => this.page.getByTestId('superDatePickerShowDatesButton');
     private readonly absoluteTabStartDate = () => this.page.locator('xpath=//button[@aria-label="Start date: Absolute"]');
     private readonly absoluteTabEndDate = () => this.page.locator('xpath=//button[@aria-label="End date: Absolute"]');
@@ -56,58 +61,40 @@ export default class DatePicker {
         await this.refreshButton().click();
     }
 
-    public async selectDate() {
-        await this.selectedDate().click();
-    }
-
-    public async assertSelectedDate() {
-        const truthiness = await this.selectedDate().isVisible();
-        return truthiness;
-    }
-
-    /*
-    Use this function to set a fixed time window. 
-    */
-    public async setPeriod(
-        from: string = process.env.START_DATE ?? "", // Example: 2025-06-11T00:00:00.000Z
-        to: string = process.env.END_DATE ?? ""
-        ) 
+    public async setInterval(
+        from: string = START_DATE ?? "", // Example: 2025-06-11T00:00:00.000Z
+        to: string = END_DATE ?? ""
+        )
         {
-        await Promise.any([
-            expect(this.showDatesButton()).toBeVisible(),
-            expect(this.datePickerStartDatePopoverButton()).toBeVisible()
+        if (ABSOLUTE_TIME_RANGE_ECH === 'true') {
+            await Promise.any([
+                expect(this.showDatesButton()).toBeVisible(),
+                expect(this.datePickerStartDatePopoverButton()).toBeVisible()
+                ]);
+            if (await this.showDatesButton().isVisible()) {
+                await this.showDatesButton().click();
+            } else {
+                await this.datePickerStartDatePopoverButton().click();
+            }
+            await this.absoluteTabStartDate().click();
+            await this.dateInput().fill(from);
+            await this.page.keyboard.press('Enter');
+            await this.page.waitForTimeout(500);
+            await this.datePickerEndDatePopoverButton().click();
+            await this.absoluteTabEndDate().click();
+            await this.dateInput().fill(to);
+            await this.page.keyboard.press('Enter');
+            await expect(this.datePickerEndDatePopoverButton()).not.toHaveText('Now');
+            await Promise.race([
+                this.refreshQuery().click(),
+                this.applyButtonPopover().click()
             ]);
-        if (await this.showDatesButton().isVisible()) {
-            await this.showDatesButton().click();
         } else {
-            await this.datePickerStartDatePopoverButton().click();
+            await this.clickDatePicker();
+            await this.fillTimeValue(TIME_VALUE);
+            await this.selectTimeUnit(TIME_UNIT);
+            await this.clickApplyButton();
         }
-        await this.absoluteTabStartDate().click(),
-        await this.dateInput().fill(from);
-        await this.page.keyboard.press('Enter');
-        await this.page.waitForTimeout(500);
-        await this.datePickerEndDatePopoverButton().click();
-        await this.absoluteTabEndDate().click();
-        await this.dateInput().fill(to);
-        await this.page.keyboard.press('Enter');
-        await expect(this.page.locator('xpath=//button[@data-test-subj="superDatePickerendDatePopoverButton"]')).not.toHaveText('Now');
-        await Promise.race([
-            this.refreshQuery().click(),
-            this.applyButtonPopover().click()
-        ]);
     }
 
-    // public async setPeriod() {
-    //     await this.clickDatePicker();
-    //     await this.fillTimeValue(TIME_VALUE);
-    //     await this.selectTimeUnit(TIME_UNIT);
-    //     await this.clickApplyButton();
-    // }
-
-    public async setPeriodProfiling() {
-        await this.clickDatePickerHostsProfiling();
-        await this.fillTimeValue(TIME_VALUE);
-        await this.selectTimeUnit(TIME_UNIT);
-        await this.clickApplyButton();
-    }
 }

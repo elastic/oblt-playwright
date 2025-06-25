@@ -1,6 +1,7 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { fetchClusterData, getHostData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { fetchClusterData, getDatePickerLogMessageStateful, getHostData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
+import { TIME_UNIT, TIME_VALUE } from '../../src/env.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
@@ -40,7 +41,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
         logger.info('Navigating to Hosts page');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        await datePicker.setPeriod();
+        await datePicker.setInterval();
         await page.evaluate("document.body.style.zoom=0.9");
         logger.info('Asserting the visibility of elements on the Hosts page');
         const asyncResults = await Promise.race([
@@ -88,8 +89,8 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page }, test
         logger.info('Navigating to the "Hosts" page');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-        await datePicker.setPeriod();
+        logger.info(`${getDatePickerLogMessageStateful()}`);
+        await datePicker.setInterval();
         logger.info('Navigating to the "Logs" tab');
         await hostsPage.clickLogsTab();
         logger.info('Asserting visibility of the "Logs" stream');
@@ -116,8 +117,8 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
         logger.info('Navigating to the "Hosts" page');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-        await datePicker.setPeriod();
+        logger.info(`${getDatePickerLogMessageStateful()}`);
+        await datePicker.setInterval();
         logger.info('Navigating to the "Alerts" tab');
         await hostsPage.clickAlertsTab();
         logger.info('Asserting visibility of the "Alerts" chart and table');
