@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, getHostData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { fetchClusterData, getDatePickerLogMessageServerless, getHostData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
@@ -40,8 +40,8 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-        await datePicker.setPeriod();
+        logger.info(`${getDatePickerLogMessageServerless()}`);
+        await datePicker.setInterval();
         await page.evaluate("document.body.style.zoom=0.9");
         logger.info('Asserting visibility of elements on the Hosts page');
         const asyncResults = await Promise.race([
@@ -84,8 +84,8 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testI
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-        await datePicker.setPeriod();
+        logger.info(`${getDatePickerLogMessageServerless()}`);
+        await datePicker.setInterval();
         logger.info('Navigating to the "Logs" tab');
         await hostsPage.clickLogsTab();
         logger.info('Asserting visibility of the "Logs" stream');
@@ -111,8 +111,8 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-        await datePicker.setPeriod();
+        logger.info(`${getDatePickerLogMessageServerless()}`);
+        await datePicker.setInterval();
         logger.info('Navigating to the "Alerts" tab');
         await hostsPage.clickAlertsTab();
         logger.info('Asserting visibility of the "Alerts" chart and table');

@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
+import { getDatePickerLogMessageStateful, getPodData, fetchClusterData, spaceSelectorStateful, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
 import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
@@ -23,8 +23,8 @@ test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   let cacheStats: object | undefined = undefined;
-  const timeValue = process.env.TIME_VALUE ? Number(process.env.TIME_VALUE) : undefined;
-  if (timeValue !== undefined && timeValue > 1 && process.env.TIME_UNIT === "Days") {
+  const timeValue = TIME_VALUE ? Number(TIME_VALUE) : undefined;
+  if (timeValue !== undefined && timeValue > 1 && TIME_UNIT === "Days") {
     cacheStats = await getCacheStats();
   }
   const stepData = (testInfo as any).stepData;
@@ -51,7 +51,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
+    logger.info(`${getDatePickerLogMessageStateful()}`);
     await datePicker.clickDatePicker();
     await datePicker.fillTimeValue(TIME_VALUE);
     await datePicker.selectTimeUnit(TIME_UNIT);
@@ -115,8 +115,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
   await page.waitForTimeout(20000);
   
   await testStep('step02', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()}`);
+    await datePicker.setInterval();
     await page.mouse.wheel(0, 900);
     logger.info('Asserting visibility of the "CPU Usage" and "Memory Usage" visualizations');
     await Promise.race([
@@ -157,8 +157,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
   await page.waitForTimeout(10000);
 
   await testStep('step04', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()}`);
+    await datePicker.setInterval();
     logger.info('Asserting visibility of the "Pod CPU Usage" and "Pod Memory Usage" visualizations');
     await Promise.all([
       inventoryPage.assertVisibilityPodVisualization(podCpuUsage),

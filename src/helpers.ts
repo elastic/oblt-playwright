@@ -1,5 +1,5 @@
 import { APIRequestContext, expect, Locator, Page, TestInfo } from '@playwright/test';
-import { API_KEY, CI, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT } from '../src/env.ts';
+import { ABSOLUTE_TIME_RANGE_ECH, ABSOLUTE_TIME_RANGE_SERVERLESS, API_KEY, CI, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT, START_DATE, END_DATE } from '../src/env.ts';
 import SpaceSelectorStateful from './pom/stateful/components/space_selector.component';
 import SpaceSelectorServerless from './pom/serverless/components/space_selector.component';
 import HeaderBar from './pom/stateful/components/header_bar.component';
@@ -142,6 +142,18 @@ export async function fetchClusterData() {
     return JSON.parse(json);
   });
   return jsonDataCluster;
+}
+
+export function getDatePickerLogMessageStateful(): string {
+  return ABSOLUTE_TIME_RANGE_ECH === 'true'
+    ? `Setting the fixed search interval from ${START_DATE} to ${END_DATE}`
+    : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
+}
+
+export function getDatePickerLogMessageServerless(): string {
+  return ABSOLUTE_TIME_RANGE_SERVERLESS === 'true'
+    ? `Setting the fixed search interval from ${START_DATE} to ${END_DATE}`
+    : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
 }
 
 export async function writeJsonReport(

@@ -1,6 +1,7 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
+import { getDatePickerLogMessageStateful, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
+import { TIME_UNIT, TIME_VALUE } from '../../src/env.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
@@ -22,8 +23,8 @@ test.beforeEach(async ({ discoverPage, headerBar, page, sideNav, spaceSelector }
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   let cacheStats: object | undefined = undefined;
-  const timeValue = process.env.TIME_VALUE ? Number(process.env.TIME_VALUE) : undefined;
-  if (timeValue !== undefined && timeValue > 1 && process.env.TIME_UNIT === "Days") {
+  const timeValue = TIME_VALUE ? Number(TIME_VALUE) : undefined;
+  if (timeValue !== undefined && timeValue > 1 && TIME_UNIT === "Days") {
     cacheStats = await getCacheStats();
   }
   const stepData = (testInfo as any).stepData;
@@ -34,8 +35,8 @@ test('Discover - All logs', async ({datePicker, discoverPage, page}, testInfo) =
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()}`);
+    await datePicker.setInterval();
     logger.info('Asserting visibility of the chart, canvas, and data grid row');
     await discoverPage.assertChartIsRendered();
     await discoverPage.assertVisibilityCanvas();
@@ -48,8 +49,8 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, page}, tes
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()}`);
+    await datePicker.setInterval();
     logger.info('Asserting visibility of the chart, canvas, and data grid row')
     await discoverPage.assertChartIsRendered();
     await discoverPage.assertVisibilityCanvas();
@@ -72,8 +73,8 @@ test('Discover - Patterns', async ({datePicker, discoverPage, page}, testInfo) =
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()}`);
+    await datePicker.setInterval();
     logger.info('Asserting visibility of the chart, canvas, and data grid row');
     await discoverPage.assertChartIsRendered();
     await discoverPage.assertVisibilityCanvas();

@@ -1,6 +1,7 @@
 import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { checkApmData, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
+import { checkApmData, getDatePickerLogMessageStateful, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
+import { TIME_UNIT, TIME_VALUE } from '../../src/env.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
@@ -21,8 +22,8 @@ test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   let cacheStats: object | undefined = undefined;
-  const timeValue = process.env.TIME_VALUE ? Number(process.env.TIME_VALUE) : undefined;
-  if (timeValue !== undefined && timeValue > 1 && process.env.TIME_UNIT === "Days") {
+  const timeValue = TIME_VALUE ? Number(TIME_VALUE) : undefined;
+  if (timeValue !== undefined && timeValue > 1 && TIME_UNIT === "Days") {
     cacheStats = await getCacheStats();
   }
   const stepData = (testInfo as any).stepData;
@@ -37,8 +38,8 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Services" section');
     await page.goto('/app/apm/services');
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and selecting the "opbeans-go" service`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()} and selecting the "opbeans-go" service`);
+    await datePicker.setInterval();
     await servicesPage.selectServiceOpbeansGo();
     logger.info('Asserting visibility of the "Transactions" tab');
     await Promise.race([
@@ -99,8 +100,8 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Traces" section');
     await page.goto('/app/apm/traces');
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and filtering data by http.response.status_code : 502`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()} and filtering data by http.response.status_code : 502`);
+    await datePicker.setInterval();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
@@ -150,8 +151,8 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of dependencies table`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageStateful()} and asserting visibility of dependencies table`);
+    await datePicker.setInterval();
     const [ index ] = await waitForOneOf([
       dependenciesPage.dependencyTableLoaded(),
       dependenciesPage.dependencyTableNotLoaded()

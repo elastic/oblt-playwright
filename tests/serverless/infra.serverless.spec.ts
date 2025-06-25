@@ -1,6 +1,6 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { expect, Page } from "@playwright/test";
-import { getPodData, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getPodData, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport, getDatePickerLogMessageServerless } from "../../src/helpers.ts";
 import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
@@ -53,11 +53,8 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
-    await datePicker.clickDatePicker();
-    await datePicker.fillTimeValue(TIME_VALUE);
-    await datePicker.selectTimeUnit(TIME_UNIT);
-    await datePicker.clickApplyButton();
+    logger.info(getDatePickerLogMessageServerless());
+    await datePicker.setInterval();
     logger.info('Asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations');
     await Promise.race([
       Promise.all([
@@ -85,7 +82,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   (testInfo as any).stepData = stepData;
 });
 
-test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sideNav }, testInfo) => {
+test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, testInfo) => {
   const cpuUsage = "infraAssetDetailsKPIcpuUsage";
   const memoryUsage = "infraAssetDetailsKPImemoryUsage";
   const podCpuUsage = "podCpuUsage";
@@ -115,8 +112,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
   await page.waitForTimeout(20000);
   
   await testStep('step02', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(getDatePickerLogMessageServerless());
+    await datePicker.setInterval();
     await page.mouse.wheel(0, 900);
     logger.info('Asserting visibility of the "Host CPU Usage" and "Host Memory Usage" visualizations');
     await Promise.race([
@@ -159,8 +156,8 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, sid
   await page.waitForTimeout(10000);
 
   await testStep('step04', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${TIME_VALUE} ${TIME_UNIT}`);
-    await datePicker.setPeriod();
+    logger.info(getDatePickerLogMessageServerless());
+    await datePicker.setInterval();
     logger.info('Asserting visibility of the "Pod CPU Usage" and "Pod Memory Usage" visualizations');
     await Promise.race([
       Promise.all([

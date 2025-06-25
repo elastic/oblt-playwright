@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { checkApmData, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from '../../src/helpers.ts';
+import { checkApmData, fetchClusterData, getDatePickerLogMessageServerless, spaceSelectorServerless, testStep, writeJsonReport } from '../../src/helpers.ts';
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
@@ -32,8 +32,8 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   await testStep('step01', stepData, page, async () => {   
     logger.info('Navigating to the "Services" section');
     await page.goto('/app/apm/services');
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and selecting the "opbeans-go" service`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and selecting the "opbeans-go" service`);
+    await datePicker.setInterval();
     await servicesPage.selectServiceOpbeansGo();
     logger.info('Asserting visibility of the "Transactions" tab');
     await Promise.race([
@@ -94,8 +94,8 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Traces" section');
     await page.goto('/app/apm/traces');
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and waiting for the top traces table to be loaded`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and waiting for the top traces table to be loaded`);
+    await datePicker.setInterval();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
@@ -144,8 +144,8 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`Setting the search period of last ${process.env.TIME_VALUE} ${process.env.TIME_UNIT} and asserting visibility of dependencies table`);
-    await datePicker.setPeriod();
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of dependencies table`);
+    await datePicker.setInterval();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
