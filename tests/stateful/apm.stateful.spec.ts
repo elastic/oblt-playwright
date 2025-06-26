@@ -105,7 +105,7 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
   });
