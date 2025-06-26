@@ -1,5 +1,5 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { getDatePickerLogMessageServerless, fetchClusterData, spaceSelectorServerless, waitForOneOf, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { getDatePickerLogMessageServerless, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
@@ -29,7 +29,7 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of the chart, canvas, and data grid row`);
+    logger.info(`${getDatePickerLogMessageServerless()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await Promise.race([
       Promise.all([
@@ -39,8 +39,11 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
-        })
+        throw new Error('Test is failed: Error while fetching resource');
+      }),
+      notifications.assertErrorIncrementCount().then(() => {
+        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      })
     ]);
   });
   (testInfo as any).stepData = stepData;
@@ -50,7 +53,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of the chart, canvas, and data grid row`);
+    logger.info(`${getDatePickerLogMessageServerless()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await Promise.race([
       Promise.all([
@@ -59,8 +62,11 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         await discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
       ]),
-    notifications.assertErrorFetchingResource().then(() => {
-      throw new Error('Test is failed due to an error when loading data');
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed: Error while fetching resource');
+      }),
+      notifications.assertErrorIncrementCount().then(() => {
+        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       })
     ]);
   });
@@ -77,8 +83,11 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
-        })
+        throw new Error('Test is failed: Error while fetching resource');
+      }),
+      notifications.assertErrorIncrementCount().then(() => {
+        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      })
     ]);
   });
   (testInfo as any).stepData = stepData;
@@ -88,7 +97,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of the chart, canvas, and data grid row`);
+    logger.info(`${getDatePickerLogMessageServerless()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await Promise.race([
       Promise.all([
@@ -97,8 +106,11 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
         await discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
       ]),
-    notifications.assertErrorFetchingResource().then(() => {
-      throw new Error('Test is failed due to an error when loading data');
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed: Error while fetching resource');
+      }),
+      notifications.assertErrorIncrementCount().then(() => {
+        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       })
     ]);
   });
@@ -109,22 +121,27 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
   await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
     await discoverPage.clickPatternsTab();
-    const [ index ] = await waitForOneOf([
-      discoverPage.logPatternsRowToggle(),
-      discoverPage.patternsNotLoaded()
-      ]);
-    const patternsLoaded = index === 0;
-    if (patternsLoaded) {
-      await discoverPage.assertVisibilityPatternsRowToggle();
-      logger.info('Clicking on the filter pattern button');
-      await discoverPage.clickFilterPatternButton();
-      logger.info('Asserting visibility of the chart, canvas, and data grid row');
-      await discoverPage.assertChartIsRendered();
-      await discoverPage.assertVisibilityCanvas();
-      await discoverPage.assertVisibilityDataGridRow();
-      } else {
-        throw new Error('Test is failed due to an error when loading categories');
-      }
+    await Promise.race([
+      Promise.all([
+        discoverPage.assertVisibilityPatternsRowToggle(),
+        headerBar.assertLoadingIndicator()
+      ]),
+      discoverPage.assertPatternsNotLoaded().then(() => {
+        throw new Error('Test is failed: Error loading categories');
+      }),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed: Error while fetching resource');
+      }),
+      notifications.assertErrorIncrementCount().then(() => {
+        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      })
+    ]);
+    logger.info('Clicking on the filter pattern button');
+    await discoverPage.clickFilterPatternButton();
+    logger.info('Asserting visibility of the chart, canvas, and data grid row');
+    await discoverPage.assertChartIsRendered();
+    await discoverPage.assertVisibilityCanvas();
+    await discoverPage.assertVisibilityDataGridRow();
   });
   (testInfo as any).stepData = stepData;
 });

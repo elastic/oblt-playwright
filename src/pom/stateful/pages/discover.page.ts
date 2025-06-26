@@ -30,7 +30,7 @@ export default class DiscoverPage {
     private readonly patternsTab = () => this.page.getByTestId('dscViewModePatternAnalysisButton');
     public readonly logPatternsRowToggle = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//td[@data-test-subj="aiopsLogPatternsExpandRowToggle"]');
     private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
-    public readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
+    private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
 
     public async clickFieldStatsTab() {
         await this.fieldStatsTab().click();
@@ -91,6 +91,10 @@ export default class DiscoverPage {
 
     public async assertVisibilityDocViewer() {
         await expect(this.docViewer()).toBeVisible();
+        }
+
+    public async assertPatternsNotLoaded() {
+        await expect(this.patternsNotLoaded()).toBeVisible();
         }
 
     public async filterByKubernetesContainer() {

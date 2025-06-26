@@ -39,7 +39,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await Promise.race([
       servicesPage.assertVisibilityTransactionsTab(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
   });
@@ -99,7 +99,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
   });
@@ -121,7 +121,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
     await Promise.race([
       tracesPage.assertRelatedError(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
     logger.info('Clicking on the related error and asserting visibility of the error distribution chart');
@@ -149,7 +149,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
     logger.info('Clicking on the dependency and asserting visibility of dependencies table');
@@ -178,7 +178,7 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       }),
       dependenciesPage.assertUnableToLoadPage().then(() => {
         throw new Error('Test is failed: "Unable to load page" message encountered');
