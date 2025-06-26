@@ -117,14 +117,14 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
   await testStep('step02', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageStateful()}`);
     await datePicker.setInterval();
-    await page.mouse.wheel(0, 900);
+    await page.mouse.wheel(0, 2000);
     logger.info('Asserting visibility of the "CPU Usage" and "Memory Usage" visualizations');
     await Promise.race([
       Promise.all([
         inventoryPage.assertVisibilityVisualization(cpuUsage),
         inventoryPage.assertVisibilityVisualization(memoryUsage)
         ]),
-      inventoryPage.assertVisualizationNoData(cpuUsage).then(() => {
+        inventoryPage.assertVisualizationNoData(cpuUsage).then(() => {
           throw new Error('Test is failed due to an error when loading data');
         })
     ]);
