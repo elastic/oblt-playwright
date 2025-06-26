@@ -194,7 +194,8 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
       }),
       dependenciesPage.assertUnableToLoadPage().then(() => {
         throw new Error('Test is failed: "Unable to load page" message encountered');
-      })
+      }),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Test is failed: Trace sample not loaded within 2 minutes')), 120000))
     ]);
   });
 
