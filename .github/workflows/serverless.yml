@@ -1,9 +1,9 @@
 name: "Serverless"
 on:
-  # schedule:
-  #   - cron: "0 * * * *"
-  #   - cron: "20 * * * *"
-  #   - cron: "40 * * * *"
+  schedule:
+    - cron: "0 * * * *"
+    - cron: "20 * * * *"
+    - cron: "40 * * * *"
 permissions:
   contents: read
 
