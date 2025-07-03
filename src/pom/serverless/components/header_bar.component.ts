@@ -12,4 +12,8 @@ export default class HeaderBar {
     public async assertLoadingIndicator() {
         await expect(this.loadingIndicator(), 'Loading indicator').toBeHidden();
         }
+
+    public async assertVisibleLoadingIndicator() {
+        await expect(this.loadingIndicator(), 'Loading indicator').toBeVisible();
+        }
 }
