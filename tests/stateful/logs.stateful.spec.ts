@@ -37,6 +37,7 @@ test('Discover - All logs', async ({datePicker, discoverPage, page, headerBar, n
   await testStep('step01', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageStateful()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
+    await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
         await discoverPage.assertChartIsRendered(),
@@ -61,6 +62,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, page, head
   await testStep('step01', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageStateful()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
+    await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
         await discoverPage.assertChartIsRendered(),
@@ -105,6 +107,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, page, headerBar, n
   await testStep('step01', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageStateful()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
+    await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
         await discoverPage.assertChartIsRendered(),
