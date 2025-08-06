@@ -1,33 +1,23 @@
 import { Page } from '@playwright/test';
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { getDatePickerLogMessageServerless, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { 
+  getDatePickerLogMessageServerless, 
+  fetchClusterData, 
+  importDashboard,
+  spaceSelectorServerless, 
+  testStep, 
+  writeJsonReport
+ } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 import DashboardPage from '../../src/pom/serverless/pages/dashboard.page.ts';
 import DatePicker from '../../src/pom/serverless/components/date_picker.component.ts';
+import HeaderBar from '../../src/pom/serverless/components/header_bar.component.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
 
 test.beforeAll(async ({ browser }) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto('/app/management/kibana/objects');
-  logger.info('Checking if Playwright dashboards are available');
-  await page.locator('xpath=//input[@data-test-subj="savedObjectSearchBar"]').fill('Playwright');
-  await page.keyboard.press('Enter');
-  await page.waitForTimeout(2000);
-  const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
-  if (noItems) {
-    logger.info('Importing dashboards...');
-    await page.getByRole('button', { name: 'Import' }).click();
-    await page.locator('xpath=//input[@type="file"]').setInputFiles('../../src/data/dashboards/dashboards.ndjson');
-    await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
-    await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
-  } else {
-    logger.info('Dashboards already exist.');
-  }
-  await context.close();
-
+  await importDashboard(browser, 'src/data/dashboards/k8s_aggs_dashboard.ndjson');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
 });
@@ -38,7 +28,7 @@ test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
   await page.goto('/app/dashboards');
 });
 
-async function testBody(title: string, page: Page, dashboardPage: DashboardPage, datePicker: DatePicker) {
+async function testBody(title: string, page: Page, dashboardPage: DashboardPage, datePicker: DatePicker, headerBar: HeaderBar) {
   let stepData: object[] = [];
   await testStep('step01', stepData, page, async () => {
     await dashboardPage.assertVisibilityHeading();
@@ -50,8 +40,15 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
   await testStep('step02', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
+    await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
-      dashboardPage.assertVisibilityVisualization(title),
+      Promise.all([
+        dashboardPage.assertVisibilityVisualization(title),
+        headerBar.assertLoadingIndicator()
+      ]),
+      dashboardPage.assertAlreadyClosedError(title).then(() => {
+        throw new Error(`Test is failed due to an embedded error when loading visualization: 'Already closed, can't increment ref count'`);
+        }),
       dashboardPage.assertNoData(title).then(() => {
         throw new Error('Test is failed due to not available data');
       })
@@ -74,8 +71,8 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
       const stepData = (testInfo as any).stepData;
       await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
     });
-    test(`${title}`, async ({ page, dashboardPage, datePicker }, testInfo) => {
-      await testBody(title, page, dashboardPage, datePicker).then((result) => {
+    test(`${title}`, async ({ page, dashboardPage, datePicker, headerBar }, testInfo) => {
+      await testBody(title, page, dashboardPage, datePicker, headerBar).then((result) => {
       (testInfo as any).stepData = result;
       })
     });
