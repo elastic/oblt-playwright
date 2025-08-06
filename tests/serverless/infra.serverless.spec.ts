@@ -1,19 +1,28 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { expect, Page } from "@playwright/test";
-import { getPodData, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport, getDatePickerLogMessageServerless } from "../../src/helpers.ts";
+import { 
+  fetchClusterData, 
+  getDatePickerLogMessageServerless, 
+  getPodData, 
+  importDashboard, 
+  spaceSelectorServerless, 
+  testStep, 
+  writeJsonReport 
+ } from "../../src/helpers.ts";
 import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
 const testStartTime: number = Date.now();
 
-test.beforeAll('Check pod data', async ({ request }) => {
+test.beforeAll('Check pod data', async ({ browser, request }) => {
   logger.info('Checking if pod data is available in the last 24 hours');
   const podsData = await getPodData(request);
   const podsArr = podsData.nodes;
   test.skip(podsArr.length == 0, 'Test is skipped: No pod data is available');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
+  await importDashboard(browser, 'src/data/dashboards/k8s_aggs_dashboard.ndjson');
 });
 
 test.beforeEach(async ({ sideNav, spaceSelector }) => {
@@ -78,6 +87,34 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
         throw new Error('Test is failed due to an error when loading data');
         })
       ]);
+  });
+  (testInfo as any).stepData = stepData;
+});
+
+test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, headerBar}, testInfo) => {
+  let stepData: object[] = [];
+  const title = "K8S Aggregations";
+  await testStep('step01', stepData, page, async () => {
+    await page.goto('/app/dashboards');
+    await dashboardPage.assertVisibilityHeading();
+    await dashboardPage.assertVisibilityTable();
+    logger.info('Searching for the dashboard: ' + title);
+    await dashboardPage.searchDashboard(title);
+    await page.getByRole('link', { name: '[Playwright Test] K8S Aggregations' }).click();
+  });
+  await testStep('step02', stepData, page, async () => {
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
+    await datePicker.setInterval();
+    await headerBar.assertVisibleLoadingIndicator();
+    await Promise.race([
+      headerBar.assertLoadingIndicator(),
+      dashboardPage.assertAlreadyClosedError(title).then(() => {
+        throw new Error(`Test is failed due to an embedded error when loading visualization: 'Already closed, can't increment ref count'`);
+        }),
+      dashboardPage.assertNoData(title).then(() => {
+        throw new Error('Test is failed due to not available data');
+      })
+    ])
   });
   (testInfo as any).stepData = stepData;
 });

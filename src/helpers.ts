@@ -1,4 +1,4 @@
-import { APIRequestContext, expect, Locator, Page, TestInfo } from '@playwright/test';
+import { APIRequestContext, Browser, expect, Locator, Page, TestInfo } from '@playwright/test';
 import { ABSOLUTE_TIME_RANGE_ECH, ABSOLUTE_TIME_RANGE_SERVERLESS, API_KEY, CI, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT, START_DATE, END_DATE } from '../src/env.ts';
 import SpaceSelectorStateful from './pom/stateful/components/space_selector.component';
 import SpaceSelectorServerless from './pom/serverless/components/space_selector.component';
@@ -6,6 +6,7 @@ import HeaderBar from './pom/stateful/components/header_bar.component';
 import SideNav from './pom/serverless/components/side_nav.component';
 import * as fs from 'fs';
 import * as path from 'path';
+import { logger } from './logger.ts';
 
 const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : './playwright-report';
 
@@ -154,6 +155,27 @@ export function getDatePickerLogMessageServerless(): string {
   return ABSOLUTE_TIME_RANGE_SERVERLESS === 'true'
     ? `Setting the fixed search interval from ${START_DATE} to ${END_DATE}`
     : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
+}
+
+export async function importDashboard(browser: Browser, inputFile: string) {
+  logger.info('Checking if Playwright dashboards are available');
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/app/management/kibana/objects');
+    await page.locator('xpath=//input[@data-test-subj="savedObjectSearchBar"]').fill('Playwright');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(2000);
+    const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
+    if (noItems) {
+      logger.info('Importing dashboards...');
+      await page.getByRole('button', { name: 'Import' }).click();
+      await page.locator('xpath=//input[@type="file"]').setInputFiles(inputFile);
+      await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
+      await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
+    } else {
+      logger.info('Dashboard(s) already exist.');
+    }
+    await context.close();
 }
 
 export async function writeJsonReport(

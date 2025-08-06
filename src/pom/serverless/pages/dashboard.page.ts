@@ -87,6 +87,10 @@ export default class DashboardPage {
         await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//*[text()="No results found"]`), 'No results found').toBeVisible();
         }
 
+    public async assertAlreadyClosedError(title: string) {
+        await expect(this.page.locator(`xpath=//div[@data-title="${title}"]//*[text()="already closed"]`), `Already closed, can't increment ref count`).toBeVisible();
+        }
+
     public async assertNoDashboard() {
         await expect(this.page.locator('xpath=//*[text()="No dashboards matched your search."]'), '"No dashboard found" message').toBeVisible();
         }
