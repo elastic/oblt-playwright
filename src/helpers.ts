@@ -326,7 +326,6 @@ export async function testStep(
 }
 
 export async function getCacheStats() {
-  ;
   const url = `${ELASTICSEARCH_HOST}/_searchable_snapshots/cache/stats?human`;
   const response = await fetch(url, {
     method: 'GET',
