@@ -3,7 +3,8 @@ import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
 import { 
   getDatePickerLogMessageServerless, 
   fetchClusterData, 
-  importDashboard,
+  importDashboards,
+  printResults,
   spaceSelectorServerless, 
   testStep, 
   writeJsonReport
@@ -14,10 +15,11 @@ import DatePicker from '../../src/pom/serverless/components/date_picker.componen
 import HeaderBar from '../../src/pom/serverless/components/header_bar.component.ts';
 
 let clusterData: any;
+let reports: string[] = [];
 const testStartTime: number = Date.now();
 
 test.beforeAll(async ({ browser }) => {
-  await importDashboard(browser, 'src/data/dashboards/k8s_aggs_dashboard.ndjson');
+  await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
 });
@@ -28,6 +30,16 @@ test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
   await page.goto('/app/dashboards');
 });
 
+test.afterEach('Log test results', async ({}, testInfo) => {
+  const stepData = (testInfo as any).stepData;
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  reports.push(...reportFiles.filter(item => typeof item === 'string'));
+});
+
+test.afterAll('Print test results', async ({}) => {
+  await printResults(reports);
+});
+
 async function testBody(title: string, page: Page, dashboardPage: DashboardPage, datePicker: DatePicker, headerBar: HeaderBar) {
   let stepData: object[] = [];
   await testStep('step01', stepData, page, async () => {
@@ -36,7 +48,8 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
     logger.info('Searching for the dashboard: ' + title);
     await dashboardPage.searchDashboard(title);
     await page.getByRole('link', { name: title }).click();
-  });
+  }, 'Searching for the dashboard');
+
   await testStep('step02', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
@@ -53,7 +66,7 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
         throw new Error('Test is failed due to not available data');
       })
     ])
-  });
+  }, 'Setting search interval and ensuring visualizations are loaded');
   return stepData;
 }
 

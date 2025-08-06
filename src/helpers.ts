@@ -1,5 +1,15 @@
 import { APIRequestContext, Browser, expect, Locator, Page, TestInfo } from '@playwright/test';
-import { ABSOLUTE_TIME_RANGE_ECH, ABSOLUTE_TIME_RANGE_SERVERLESS, API_KEY, CI, ELASTICSEARCH_HOST, TIME_VALUE, TIME_UNIT, START_DATE, END_DATE } from '../src/env.ts';
+import {
+  ABSOLUTE_TIME_RANGE_ECH,
+  ABSOLUTE_TIME_RANGE_SERVERLESS,
+  API_KEY,
+  CI,
+  ELASTICSEARCH_HOST,
+  END_DATE,
+  START_DATE,
+  TIME_UNIT,
+  TIME_VALUE
+} from '../src/env.ts';
 import SpaceSelectorStateful from './pom/stateful/components/space_selector.component';
 import SpaceSelectorServerless from './pom/serverless/components/space_selector.component';
 import HeaderBar from './pom/stateful/components/header_bar.component';
@@ -7,6 +17,7 @@ import SideNav from './pom/serverless/components/side_nav.component';
 import * as fs from 'fs';
 import * as path from 'path';
 import { logger } from './logger.ts';
+import { Table } from 'console-table-printer';
 
 const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : './playwright-report';
 
@@ -65,7 +76,7 @@ export async function getHostData(request: APIRequestContext) {
     data: {
       "filterQuery": "",
       "metrics": [{ "type": "memory" }],
-      "nodeType": "host", 
+      "nodeType": "host",
       "sourceId": "default",
       "accountId": "",
       "region": "",
@@ -116,7 +127,7 @@ export async function checkApmData(request: APIRequestContext): Promise<boolean>
       "accept": "application/json",
       "Authorization": API_KEY,
       "Content-Type": "application/json;charset=UTF-8",
-      "kbn-xsrf": "true",          
+      "kbn-xsrf": "true",
       "x-elastic-internal-origin": "kibana"
     },
     data: {}
@@ -157,41 +168,43 @@ export function getDatePickerLogMessageServerless(): string {
     : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
 }
 
-export async function importDashboard(browser: Browser, inputFile: string) {
+export async function importDashboards(browser: Browser, inputFile: string) {
   logger.info('Checking if Playwright dashboards are available');
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto('/app/management/kibana/objects');
-    await page.locator('xpath=//input[@data-test-subj="savedObjectSearchBar"]').fill('Playwright');
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(2000);
-    const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
-    if (noItems) {
-      logger.info('Importing dashboards...');
-      await page.getByRole('button', { name: 'Import' }).click();
-      await page.locator('xpath=//input[@type="file"]').setInputFiles(inputFile);
-      await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
-      await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
-    } else {
-      logger.info('Dashboard(s) already exist.');
-    }
-    await context.close();
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/app/management/kibana/objects');
+  await page.locator('xpath=//input[@data-test-subj="savedObjectSearchBar"]').fill('Playwright');
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(2000);
+  const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
+  if (noItems) {
+    logger.info('Importing dashboards...');
+    await page.getByRole('button', { name: 'Import' }).click();
+    await page.locator('xpath=//input[@type="file"]').setInputFiles(inputFile);
+    await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
+    await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
+  } else {
+    logger.info('Dashboard(s) already exist.');
+  }
+  await context.close();
 }
 
 export async function writeJsonReport(
-  clusterData: any, 
-  testInfo: TestInfo, 
+  clusterData: any,
+  testInfo: TestInfo,
   testStartTime: number,
   stepData?: object[],
   cacheStats?: object,
   hostsMeasurements?: any
-  ) {
+) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
   let version: any = clusterData.version.number;
   let hostsObject: {} = {};
+  let files: string[] = [];
 
   const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+  files.push(fileName);
   const outputPath = path.join(outputDirectory, fileName);
 
   if (hostsMeasurements) {
@@ -203,7 +216,10 @@ export async function writeJsonReport(
   const reportData = {
     title: testInfo.title,
     startTime: testStartTime,
-    period: `Last ${TIME_VALUE} ${TIME_UNIT}`,
+    period: ((ABSOLUTE_TIME_RANGE_SERVERLESS === 'true' && build_flavor === 'serverless') ||
+      (ABSOLUTE_TIME_RANGE_ECH === 'true' && build_flavor === 'default'))
+      ? `From ${new Date(START_DATE).toISOString()} to ${new Date(END_DATE).toISOString()}`
+      : `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
     duration: testInfo.duration,
     errors: testInfo.errors,
@@ -215,8 +231,67 @@ export async function writeJsonReport(
     cacheStats: cacheStats ? cacheStats : null,
     measurements: hostsMeasurements ? hostsObject : null,
   };
-    
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
+  return files;
+}
+
+export async function printResults(reportFiles: string[]) {
+  try {
+    reportFiles.forEach(file => {
+      const filePath = path.join(outputDirectory, file);
+
+      try {
+        if (!fs.existsSync(filePath)) {
+          console.error(`Test reports not found at '${filePath}'.`);
+          return;
+        }
+
+        const fileContent = fs.readFileSync(filePath, 'utf-8');
+        const jsonData = JSON.parse(fileContent);
+
+        console.log(`\n\n`);
+
+        const p = new Table({
+          title: `${jsonData.title} @ ${jsonData.period}`,
+          columns: [
+            { name: 'step', title: 'Step', color: "yellow" },
+            { name: 'description', title: 'Description', maxLen: 50 },
+            { name: 'start', title: 'Start' },
+            { name: 'end', title: 'End' },
+            { name: 'duration', title: 'Duration', color: "green" },
+          ],
+        });
+
+        const data: any[] = [];
+
+        if (jsonData.steps && Array.isArray(jsonData.steps) && jsonData.steps.length > 0) {
+          jsonData.steps.forEach((stepObj: { [key: string]: any }) => {
+            const stepName = Object.keys(stepObj)[0];
+            const stepDetails = stepObj[stepName];
+
+            const stepRow = {
+              step: stepName,
+              description: stepDetails.description || 'N/A',
+              start: stepDetails.start ? new Date(stepDetails.start).toISOString() : 'N/A',
+              end: stepDetails.end ? new Date(stepDetails.end).toISOString() : 'N/A',
+              duration: stepDetails.duration ? `${Math.round(stepDetails.duration)} ms` : 'N/A',
+            };
+            data.push(stepRow);
+          });
+        } else {
+          data.push({ step: 'No steps data found' });
+        }
+
+        p.addRows(data, { separator: true });
+        p.printTable();
+
+      } catch (innerError: any) {
+        console.error(`Error processing file '${file}':`, innerError.message);
+      }
+    });
+  } catch (error: any) {
+    console.error('An error occurred while trying to read the report directory:', error.message);
+  }
 }
 
 export async function testStep(
@@ -224,6 +299,7 @@ export async function testStep(
   stepData: object[],
   page: Page,
   stepFunction: any,
+  description?: string,
   ...args: any[]
 ): Promise<any> {
   const start = Date.now();
@@ -235,10 +311,11 @@ export async function testStep(
     const duration = endTimePerf - startTimePerf;
 
     stepData.push({
-        [title]: {
+      [title]: {
         start,
         end,
-        duration
+        duration,
+        description
       }
     });
 
@@ -248,7 +325,8 @@ export async function testStep(
   }
 }
 
-export async function getCacheStats() {;
+export async function getCacheStats() {
+  ;
   const url = `${ELASTICSEARCH_HOST}/_searchable_snapshots/cache/stats?human`;
   const response = await fetch(url, {
     method: 'GET',
@@ -259,8 +337,8 @@ export async function getCacheStats() {;
     }
   });
   if (!response.ok) {
-      throw new Error(response.statusText);
-    }
+    throw new Error(response.statusText);
+  }
   const jsonDataNode = JSON.parse(await response.text());
   return jsonDataNode;
 }

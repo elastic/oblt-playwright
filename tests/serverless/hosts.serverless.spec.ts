@@ -1,8 +1,17 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { fetchClusterData, getDatePickerLogMessageServerless, getHostData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { 
+    fetchClusterData, 
+    getDatePickerLogMessageServerless, 
+    getHostData, 
+    printResults, 
+    spaceSelectorServerless, 
+    testStep, 
+    writeJsonReport 
+} from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
+let reports: string[] = [];
 const testStartTime: number = Date.now();
 
 test.beforeAll('Check data', async ({ request }) => {
@@ -24,7 +33,12 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
 test.afterEach('Log test results', async ({}, testInfo) => {
   const hostsMeasurements = (testInfo as any).hostsMeasurements;
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
+  reports.push(...reportFiles.filter(item => typeof item === 'string'));
+});
+
+test.afterAll('Print test results', async ({}) => {
+  await printResults(reports);
 });
 
 test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, page }, testInfo) => {
@@ -72,11 +86,11 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
             })
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
-    });
+    }, 'Asserting visibility of visualizations on the Hosts landing page');
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testInfo) => {  
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testInfo) => {
     let stepData: object[] = [];
 
     await testStep('step01', stepData, page, async () => {
@@ -99,7 +113,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testI
             })
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
-    });
+    }, 'Asserting visibility of the log stream on the Hosts landing page');
     (testInfo as any).stepData = stepData;
 });
 
@@ -127,6 +141,6 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
             })
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
-    });
+    }, 'Asserting visibility of the alerts chart and table on the Hosts landing page');
     (testInfo as any).stepData = stepData;
 });

@@ -4,15 +4,16 @@ import {
   fetchClusterData, 
   getDatePickerLogMessageServerless, 
   getPodData, 
-  importDashboard, 
+  importDashboards,
+  printResults,
   spaceSelectorServerless, 
   testStep, 
   writeJsonReport 
  } from "../../src/helpers.ts";
-import { TIME_VALUE, TIME_UNIT } from '../../src/env.ts';
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
+let reports: string[] = [];
 const testStartTime: number = Date.now();
 
 test.beforeAll('Check pod data', async ({ browser, request }) => {
@@ -22,7 +23,7 @@ test.beforeAll('Check pod data', async ({ browser, request }) => {
   test.skip(podsArr.length == 0, 'Test is skipped: No pod data is available');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
-  await importDashboard(browser, 'src/data/dashboards/k8s_aggs_dashboard.ndjson');
+  await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
 });
 
 test.beforeEach(async ({ sideNav, spaceSelector }) => {
@@ -33,7 +34,12 @@ test.beforeEach(async ({ sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  reports.push(...reportFiles.filter(item => typeof item === 'string'));
+});
+
+test.afterAll('Print test results', async ({}) => {
+  await printResults(reports);
 });
 
 test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage, datePicker, headerBar, sideNav, notifications, page }, testInfo) => {
@@ -56,7 +62,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
       ]);
     logger.info('Clicking on the "Cluster Overview" dashboard');
     await page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]').click();
-  });
+  }, 'Searching for the "Cluster Overview" dashboard and navigating to it');
 
   logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
@@ -87,7 +93,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
         throw new Error('Test is failed due to an error when loading data');
         })
       ]);
-  });
+  }, 'Setting the search interval and asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations');
   (testInfo as any).stepData = stepData;
 });
 
@@ -101,7 +107,8 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
     logger.info('Searching for the dashboard: ' + title);
     await dashboardPage.searchDashboard(title);
     await page.getByRole('link', { name: '[Playwright Test] K8S Aggregations' }).click();
-  });
+  }, 'Searching for the "K8S Aggregations" dashboard and navigating to it');
+  
   await testStep('step02', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
@@ -115,7 +122,7 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
         throw new Error('Test is failed due to not available data');
       })
     ])
-  });
+  }, 'Setting search interval and ensuring visualizations are loaded');
   (testInfo as any).stepData = stepData;
 });
 
@@ -143,7 +150,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
     await inventoryPage.memoryUsage();
     await inventoryPage.clickNodeWaffleContainer();
     await inventoryPage.clickOpenAsPageButton();
-  });
+  }, 'Navigating to Infrastructure inventory, asserting waffle map, sorting by metric value and selecting a host');
 
   logger.info('Waiting for 20s before proceeding to the next step...');
   await page.waitForTimeout(20000);
@@ -165,7 +172,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
           throw new Error('Test is failed due to an error when loading data');
           })
     ]);
-  });
+  }, 'Setting search interval, asserting "Host CPU Usage" & "Host Memory Usage" visualizations visibility');
 
   logger.info('Waiting for 20s before proceeding to the next step...');
   await page.waitForTimeout(20000);
@@ -187,7 +194,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
     await inventoryPage.switchToTableView();
     await inventoryPage.clickTableCell();
     await inventoryPage.clickPopoverK8sMetrics();
-  });
+  }, 'Selecting "Pods" as "Show" option, asserting waffle map, then navigating to the Kubernetes Pod metrics');
 
   logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
@@ -205,6 +212,6 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
         throw new Error('Test is failed because there is no data to display in the pod visualization');
         })
     ]);
-  });
+  }, 'Setting search interval, asserting "Pod CPU Usage" & "Pod Memory Usage" visualization visibility');
   (testInfo as any).stepData = stepData;
 });
