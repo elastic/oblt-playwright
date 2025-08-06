@@ -1,8 +1,16 @@
 import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
-import { getDatePickerLogMessageServerless, fetchClusterData, spaceSelectorServerless, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { 
+  fetchClusterData, 
+  getDatePickerLogMessageServerless, 
+  printResults, 
+  spaceSelectorServerless, 
+  testStep, 
+  writeJsonReport 
+} from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
+let reports: string[] = [];
 const testStartTime: number = Date.now();
 
 test.beforeAll('Fetch cluster data', async ({}) => {
@@ -22,7 +30,12 @@ test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  reports.push(...reportFiles.filter(item => typeof item === 'string'));
+});
+
+test.afterAll('Print test results', async ({}) => {
+  await printResults(reports);
 });
 
 test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
@@ -46,7 +59,7 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       })
     ]);
-  });
+  }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
   (testInfo as any).stepData = stepData;
 });
 
@@ -71,7 +84,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       })
     ]);
-  });
+  }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -91,7 +104,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       })
     ]);
-  });
+  }, 'Navigating to the "Field Statistics" tab and asserting doc count');
   (testInfo as any).stepData = stepData;
 });
 
@@ -116,7 +129,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       })
     ]);
-  });
+  }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -145,6 +158,6 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
     await discoverPage.assertChartIsRendered();
     await discoverPage.assertVisibilityCanvas();
     await discoverPage.assertVisibilityDataGridRow();
-  });
+  }, 'Navigating to the "Patterns" tab and asserting patterns row visibility');
   (testInfo as any).stepData = stepData;
 });
