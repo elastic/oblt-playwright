@@ -264,7 +264,7 @@ export async function printResults(reportFiles: string[]) {
 
         const data: any[] = [];
 
-        if (jsonData.steps && Array.isArray(jsonData.steps) && jsonData.steps.length > 0) {
+        if (Array.isArray(jsonData.steps) && jsonData.steps.length > 0) {
           jsonData.steps.forEach((stepObj: { [key: string]: any }) => {
             const stepName = Object.keys(stepObj)[0];
             const stepDetails = stepObj[stepName];
