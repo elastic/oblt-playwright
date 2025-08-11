@@ -1,11 +1,11 @@
 import { expect, Page } from "@playwright/test";
 import { 
-    ABSOLUTE_TIME_RANGE_ECH, 
+    ABSOLUTE_TIME_RANGE_SERVERLESS, 
     START_DATE, 
     END_DATE, 
     TIME_VALUE, 
     TIME_UNIT 
-    } from '../../../../src/env.ts';
+    } from '../../env.ts';
 
 export default class DatePicker {
     page: Page;
@@ -17,11 +17,9 @@ export default class DatePicker {
     private readonly datePicker = () => this.page.getByTestId('superDatePickerToggleQuickMenuButton');
     private readonly datePickerStartDatePopoverButton = () => this.page.getByTestId('superDatePickerstartDatePopoverButton');
     private readonly datePickerEndDatePopoverButton = () => this.page.getByTestId('superDatePickerendDatePopoverButton');
-    private readonly datePickerHostsProfiling = () => this.page.locator('xpath=//div[@data-test-subj="infraAssetDetailsProfilingTabContent"]//button[@data-test-subj="superDatePickerToggleQuickMenuButton"]');
     private readonly timeValue  = () => this.page.locator('xpath=//input[@aria-label="Time value"]');
     private readonly timeUnit = () => this.page.locator('xpath=//*[@aria-label="Time unit"]');
     private readonly applyButton = () => this.page.locator('xpath=//span[contains(text(), "Apply")]');
-    private readonly refreshButton = () => this.page.getByTestId('superDatePickerApplyTimeButton');
     private readonly showDatesButton = () => this.page.getByTestId('superDatePickerShowDatesButton');
     private readonly absoluteTabStartDate = () => this.page.locator('xpath=//button[@aria-label="Start date: Absolute"]');
     private readonly absoluteTabEndDate = () => this.page.locator('xpath=//button[@aria-label="End date: Absolute"]');
@@ -32,17 +30,9 @@ export default class DatePicker {
     public async assertVisibilityDatePicker() {
         await expect(this.datePicker()).toBeVisible();
     }
-
-    public async assertVisibilityDatePickerHostsProfiling() {
-        await expect(this.datePickerHostsProfiling()).toBeVisible();
-    }
-
+    
     public async clickDatePicker() {
         await this.datePicker().click();
-    }
-
-    public async clickDatePickerHostsProfiling() {
-        await this.datePickerHostsProfiling().click();
     }
 
     public async fillTimeValue(value: string) {
@@ -57,16 +47,12 @@ export default class DatePicker {
         await this.applyButton().click();
     }
 
-    public async clickRefreshButton() {
-        await this.refreshButton().click();
-    }
-
     public async setInterval(
         from: string = START_DATE ?? "", // Example: 2025-06-11T00:00:00.000Z
         to: string = END_DATE ?? ""
         )
         {
-        if (ABSOLUTE_TIME_RANGE_ECH === 'true') {
+        if (ABSOLUTE_TIME_RANGE_SERVERLESS === 'true') {
             await Promise.any([
                 expect(this.showDatesButton()).toBeVisible(),
                 expect(this.datePickerStartDatePopoverButton()).toBeVisible()
@@ -96,5 +82,4 @@ export default class DatePicker {
             await this.clickApplyButton();
         }
     }
-
 }

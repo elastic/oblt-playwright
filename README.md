@@ -139,22 +139,17 @@ It is recommended to run tests during ongoing data collection.
 
 #### Run a specific suite
 
-Specify script name and project name (`stateful` or `serverless`) in the test command. Example:
-
 ```bash
-npx playwright test apm.serverless.spec.ts --project serverless --headed
+npx playwright test apm.kibana.spec.ts --project kibana --headed
 ```
 
 #### Run a specific test
 
-Specify test name and project name (`stateful` or `serverless`) in the test command. Example:
-
 ```bash
-npx playwright test -g "APM - Services" --project serverless --headed
+npx playwright test -g "APM - Services" --project kibana --headed
 ```
 
 ## 📚 Additional Resources
 
-- [Guide for creating a new test](https://github.com/elastic/oblt-playwright/blob/main/docs/guidelines.md)
 - [Test suites and required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data_mapping.md)
 - Step definitions: [APM](https://github.com/elastic/oblt-playwright/blob/main/docs/test_apm.md) | [Infrastructure](https://github.com/elastic/oblt-playwright/blob/main/docs/test_infra.md) | [Logs](https://github.com/elastic/oblt-playwright/blob/main/docs/test_logs.md)

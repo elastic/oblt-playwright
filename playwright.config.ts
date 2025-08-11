@@ -31,57 +31,21 @@ export default defineConfig({
 
   projects: [
     {
-      name: 'stateful_auth',
-      testMatch: 'stateful.auth.ts',
+      name: 'auth',
+      testMatch: 'auth.ts',
       use: {
         viewport: {width: 1920, height: 1080},
       }
     },
     {
-      name: 'serverless_auth',
-      testMatch: 'serverless.auth.ts',
-      use: {
-        testIdAttribute: 'data-test-id',
-        viewport: {width: 1920, height: 1080},
-      },
-    },
-    {
-      name: 'stateful_teardown',
-      testMatch: 'stateful.teardown.setup.ts',
-      use: {
-        viewport: {width: 1920, height: 1080},
-        storageState: STORAGE_STATE,
-        testIdAttribute: 'data-test-subj',
-      },
-    },
-    {
-      name: 'serverless_teardown',
-      testMatch: 'serverless.teardown.setup.ts',
-      use: {
-        viewport: {width: 1920, height: 1080},
-        storageState: STORAGE_STATE,
-        testIdAttribute: 'data-test-subj',
-      },
-    },
-    {
-      name: 'stateful',
-      testMatch: '**\/*.stateful.spec.ts',
+      name: 'kibana',
+      testMatch: '**\/*.kibana.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
       },
-      dependencies: ['stateful_auth'],
-    },
-    {
-      name: 'serverless',
-      testMatch: '**\/*.serverless.spec.ts',
-      use: {
-        ...devices['Desktop Chrome'],
-        viewport: {width: 1920, height: 1200},
-        storageState: STORAGE_STATE,
-      },
-      dependencies: ['serverless_auth'],
+      dependencies: ['auth'],
     },
     {
       name: 'api',

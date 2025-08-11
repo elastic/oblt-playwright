@@ -86,15 +86,15 @@ jobs:
       
       - name: Run Playwright tests - APM
         if: github.event.schedule == '0 * * * *'
-        run: npx playwright test apm.serverless.spec.ts --project serverless
+        run: npx playwright test apm.kibana.spec.ts --project kibana
 
       - name: Run Playwright tests - Infra
         if: github.event.schedule == '20 * * * *'
-        run: npx playwright test infra.serverless.spec.ts --project serverless
+        run: npx playwright test infra.kibana.spec.ts --project kibana
 
       - name: Run Playwright tests - Logs
         if: github.event.schedule == '40 * * * *'
-        run: npx playwright test logs.serverless.spec.ts --project serverless
+        run: npx playwright test logs.kibana.spec.ts --project kibana
 
       - name: Wait before proceeding to next job
         run: sleep 120
@@ -132,7 +132,7 @@ jobs:
           key: playwright-${{ hashFiles('package-lock.json') }}
       
       - name: Run Playwright tests - APM
-        run: npx playwright test apm.serverless.spec.ts --project serverless
+        run: npx playwright test apm.kibana.spec.ts --project kibana
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
@@ -142,11 +142,11 @@ jobs:
           path: /home/runner/work/oblt-playwright/*.json
           retention-days: 1
 
-  k8s_aggs:
+  infra:
     needs: 
       - install
       - warmup
-    name: Run tests (K8S Aggregations)
+    name: Run tests (Infrastructure)
     timeout-minutes: 20
     runs-on: ubuntu-latest
     if: github.event.schedule == '20 * * * *'
@@ -174,8 +174,8 @@ jobs:
           ~/.cache/ms-playwright
         key: playwright-${{ hashFiles('package-lock.json') }}
     
-    - name: Run Playwright tests - K8S Aggregations
-      run: npx playwright test k8s_aggs.serverless.spec.serverless.spec.ts --project serverless
+    - name: Run Playwright tests - Infrastructure
+      run: npx playwright test infra.kibana.spec.ts --project kibana
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -218,7 +218,7 @@ jobs:
         key: playwright-${{ hashFiles('package-lock.json') }}
     
     - name: Run Playwright tests - Logs
-      run: npx playwright test logs.serverless.spec.ts --project serverless
+      run: npx playwright test logs.kibana.spec.ts --project kibana
 
     - name: Upload test reports
       uses: actions/upload-artifact@v4
@@ -231,7 +231,7 @@ jobs:
   upload:
     needs:
       - apm
-      - k8s_aggs
+      - infra
       - logs
     if: always()
     name: Upload test reports to Elasticsearch
@@ -247,7 +247,7 @@ jobs:
         node-version: 20
   
     - name: Download raw test report from artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         path: /home/runner/work/oblt-playwright/
         

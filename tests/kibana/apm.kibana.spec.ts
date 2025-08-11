@@ -1,9 +1,17 @@
-import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { checkApmData, getDatePickerLogMessageStateful, fetchClusterData, spaceSelectorStateful, waitForOneOf, testStep, writeJsonReport, getCacheStats } from "../../src/helpers.ts";
+import { test } from '../../src/pom/page.fixtures.ts';
+import { 
+  checkApmData, 
+  fetchClusterData, 
+  getDatePickerLogMessageServerless, 
+  printResults, 
+  selectDefaultSpace, 
+  testStep, 
+  writeJsonReport 
+} from '../../src/helpers.ts';
 import { logger } from '../../src/logger.ts';
-import { TIME_UNIT, TIME_VALUE } from '../../src/env.ts';
 
 let clusterData: any;
+let reports: string[] = [];
 const testStartTime: number = Date.now();
 
 test.beforeAll('Check APM data', async ({ request }) => {
@@ -14,42 +22,41 @@ test.beforeAll('Check APM data', async ({ request }) => {
   clusterData = await fetchClusterData();
 });
 
-test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ page, sideNav }) => {
   await sideNav.goto();
   logger.info('Selecting the default Kibana space');
-  await spaceSelectorStateful(headerBar, spaceSelector);
+  await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-  let cacheStats: object | undefined = undefined;
-  const timeValue = TIME_VALUE ? Number(TIME_VALUE) : undefined;
-  if (timeValue !== undefined && timeValue > 1 && TIME_UNIT === "Days") {
-    cacheStats = await getCacheStats();
-  }
   const stepData = (testInfo as any).stepData;
-  await writeJsonReport(clusterData, testInfo, testStartTime, stepData, cacheStats);
+    const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+    reports.push(...reportFiles.filter(item => typeof item === 'string'));
+});
+
+test.afterAll('Print test results', async ({}) => {
+  await printResults(reports);
 });
 
 test('APM - Services', async ({ datePicker, discoverPage, notifications, page, servicesPage }, testInfo) => {
-  const throughput = "throughput";
-  const errorRate = "errorRate";
+  const throughput: string = "throughput";
+  const errorRate: string = "errorRate";
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Services" section');
     await page.goto('/app/apm/services');
-    logger.info(`${getDatePickerLogMessageStateful()} and selecting the "opbeans-go" service`);
+    logger.info(`${getDatePickerLogMessageServerless()} and selecting the "opbeans-go" service`);
     await datePicker.setInterval();
     await servicesPage.selectServiceOpbeansGo();
     logger.info('Asserting visibility of the "Transactions" tab');
     await Promise.race([
       servicesPage.assertVisibilityTransactionsTab(),
       notifications.assertErrorFetchingResource().then(() => {
-        logger.error('Test is failed due to an error when loading data');
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
-  });
+  }, 'Setting search interval, then selecting "opbeans-go" and asserting transaction tab visibility');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -66,7 +73,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
         throw new Error('Test is failed because transaction errors not found');
       })
     ]);
-  });
+  }, 'Navigating to the "Transactions" tab, clicking on the most impactful transaction and asserting visualization visibility');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -76,10 +83,10 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await servicesPage.openFailedTransactionCorrelationsTab();
     logger.info('Asserting visibility of the "Correlation" button');
     await servicesPage.assertVisibilityCorrelationButton();
-    logger.info('Filtering data by field value and correlation value');
+    logger.info('Filtering data by correlation value and field value');
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
-  });
+  }, 'Clicking on the "Failed transaction correlations" tab, asserting visualization visibility, then filtering the result by a certain field value');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -90,17 +97,18 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await servicesPage.clickViewInDiscoverButton();
     logger.info('Asserting visibility of the canvas');
     await discoverPage.assertVisibilityCanvas();
-  });
+  }, 'Clicking on the "Investigate" button, navigating to Discover, and asserting canvas visibility');
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servicesPage, tracesPage }, testInfo) => {
+// Test is skipped because Explorer section is not currently available
+test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, servicesPage, tracesPage }, testInfo) => {
   let stepData: object[] = [];
-  
+
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Traces" section');
     await page.goto('/app/apm/traces');
-    logger.info(`${getDatePickerLogMessageStateful()} and filtering data by http.response.status_code : 502`);
+    logger.info(`${getDatePickerLogMessageServerless()} and waiting for the top traces table to be loaded`);
     await datePicker.setInterval();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
@@ -108,16 +116,16 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
         throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
-  });
+  }, 'Setting search interval and waiting for top traces table to load');
 
   logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
-
+  
   await testStep('step02', stepData, page, async () => {
     logger.info('Opening the "Explorer" tab and filtering data by http.response.status_code : 502');
     await tracesPage.openExplorerTab();
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
-  });
+  }, 'Navigating to the "Explorer" tab, filtering data by http.response.status_code : 502');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -127,77 +135,71 @@ test('APM - Traces', async ({ datePicker, headerBar, notifications, page, servic
     await Promise.race([
       tracesPage.assertRelatedError(),
       notifications.assertErrorFetchingResource().then(() => {
-        logger.error('Test is failed due to an error when loading data');
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       })
     ]);
     logger.info('Clicking on the related error and asserting visibility of the error distribution chart');
     await tracesPage.clickRelatedError();
     await servicesPage.assertVisibilityErrorDistributionChart();
-  });
+  }, 'Clicking on the "View related error" in the timeline. Asserting related errors');
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page }, testInfo) => {  
+test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
   let stepData: object[] = [];
-  
+
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Dependencies" section and asserting visibility of dependencies table');
     await page.goto('/app/apm/dependencies');
     await dependenciesPage.assertVisibilityTable();
-  });
+  }, 'Navigating to the Dependencies section, asserting dependencies table');
 
   logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageStateful()} and asserting visibility of dependencies table`);
+    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of dependencies table`);
     await datePicker.setInterval();
-    const [ index ] = await waitForOneOf([
-      dependenciesPage.dependencyTableLoaded(),
-      dependenciesPage.dependencyTableNotLoaded()
-      ]);
-    const tableLoaded = index === 0;
-    if (tableLoaded) {
-      logger.info('Clicking on the dependency and asserting visibility of dependencies table');
-      await dependenciesPage.clickTableRow();
-      await dependenciesPage.assertVisibilityTable();
-      logger.info('Navigating to the Operations tab and asserting visibility of the table');
-      await dependenciesPage.openOperationsTab();
-      await Promise.race([
-        dependenciesPage.assertVisibilityTable(),
-        dependenciesPage.assertOperationsNotFound().then(() => {
-          throw new Error('Test is failed because dependency operations not found');
-        }),
-        dependenciesPage.assertUnableToLoadPage().then(() => {
-          throw new Error('Test is failed: "Unable to load page" message encountered');
-        })
-      ]);
-    } else {
-      logger.error('Dependencies table not loaded.');
-      throw new Error('Test is failed due to an error when loading dependencies table.');
-    }
-  });
+    await Promise.race([
+      headerBar.assertLoadingIndicator(),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed: Error while fetching resource');
+      })
+    ]);
+    logger.info('Clicking on the dependency and asserting visibility of dependencies table');
+    // Selecting the first row in the table since the list of dependencies changes on each refresh
+    await dependenciesPage.clickTableRow();
+    await dependenciesPage.assertVisibilityTable();
+    logger.info('Navigating to the Operations tab and asserting visibility of the table');
+    await dependenciesPage.openOperationsTab();
+    await Promise.race([
+      dependenciesPage.assertVisibilityTable(),
+      dependenciesPage.assertOperationsNotFound().then(() => {
+        throw new Error('Test is failed because dependency operations not found');
+      }),
+      dependenciesPage.assertUnableToLoadPage().then(() => {
+        throw new Error('Test is failed: "Unable to load page" message encountered');
+      })
+    ]);
+  }, 'Setting search interval, selecting the dependency, navigating to the "Operations" tab and asserting table visibility');
 
   logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
   await testStep('step03', stepData, page, async () => {
     logger.info('Clicking on the most impactful operation and asserting visibility of the timeline');
-    // Selecting the first row in the table since the list of dependencies changes on each refresh
     await dependenciesPage.clickTableRow();
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
       notifications.assertErrorFetchingResource().then(() => {
-        logger.error('Test is failed due to an error when loading data');
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Test is failed: Error while fetching resource');
       }),
       dependenciesPage.assertUnableToLoadPage().then(() => {
         throw new Error('Test is failed: "Unable to load page" message encountered');
       }),
       new Promise((_, reject) => setTimeout(() => reject(new Error('Test is failed: Trace sample not loaded within 2 minutes')), 120000))
     ]);
-  });
+  }, 'Clicking on the most impactful operation and asserting timeline visibility');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
@@ -206,17 +208,17 @@ test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, 
     logger.info('Clicking on the transaction in the timeline and asserting visibility of the tab panel');
     await dependenciesPage.clickTimelineTransaction();
     await dependenciesPage.assertVisibilityTabPanel();
-  });
+  }, 'Clicking on the transaction in the timeline and asserting tab panel visibility');
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step05', stepData, page, async () => {
-    logger.info('Clicking on the "Investigate" button and selecting "View transaction in Discover"');
+    logger.info('Clicking on the "Investigate" button and navigating to Trace logs');
     await dependenciesPage.clickInvestigateButton();
-    await dependenciesPage.clickViewInDiscover();
+    await dependenciesPage.clickTraceLogsButton();
     logger.info('Asserting visibility of the data grid row');
     await discoverPage.assertVisibilityDataGridRow();
-  });
+  }, 'Selecting "Trace logs", asserting data grid row');
   (testInfo as any).stepData = stepData;
 });

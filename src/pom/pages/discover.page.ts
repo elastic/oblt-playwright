@@ -9,6 +9,7 @@ export default class DiscoverPage {
 
     public readonly discoverTab = () => this.page.getByTestId('discoverTab');
     private readonly dataView = () => this.page.getByTestId('discover-dataView-switch-link');
+    private readonly dataViewInput = () => this.page.locator('xpath=//*[@data-test-subj="changeDataViewPopover"]//input');
     private readonly dataViewLogs = () => this.page.locator('xpath=//li[@value="logs-*"]');
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
@@ -34,6 +35,7 @@ export default class DiscoverPage {
 
     public async selectLogsDataView() {
         await this.dataView().click();
+        await this.dataViewInput().fill('logs-*');
         await this.dataViewLogs().click();
         }
 
