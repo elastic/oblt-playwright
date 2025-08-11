@@ -1,18 +1,18 @@
 import { Page } from '@playwright/test';
-import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
+import { test } from '../../src/pom/page.fixtures.ts';
 import { 
   getDatePickerLogMessageServerless, 
   fetchClusterData, 
   importDashboards,
   printResults,
-  spaceSelectorServerless, 
+  selectDefaultSpace, 
   testStep, 
   writeJsonReport
  } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
-import DashboardPage from '../../src/pom/serverless/pages/dashboard.page.ts';
-import DatePicker from '../../src/pom/serverless/components/date_picker.component.ts';
-import HeaderBar from '../../src/pom/serverless/components/header_bar.component.ts';
+import DashboardPage from '../../src/pom/pages/dashboard.page.ts';
+import DatePicker from '../../src/pom/components/date_picker.component.ts';
+import HeaderBar from '../../src/pom/components/header_bar.component.ts';
 
 let clusterData: any;
 let reports: string[] = [];
@@ -26,7 +26,7 @@ test.beforeAll(async ({ browser }) => {
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
   await page.goto('/');
-  await spaceSelectorServerless(sideNav, spaceSelector);
+  await selectDefaultSpace(clusterData.version.build_flavor, page);
   await page.goto('/app/dashboards');
 });
 
