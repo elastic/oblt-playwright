@@ -1,9 +1,9 @@
-import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
+import { test } from '../../src/pom/page.fixtures.ts';
 import { 
   fetchClusterData, 
   getDatePickerLogMessageServerless, 
   printResults, 
-  spaceSelectorServerless, 
+  selectDefaultSpace, 
   testStep, 
   writeJsonReport 
 } from "../../src/helpers.ts";
@@ -21,7 +21,7 @@ test.beforeAll('Fetch cluster data', async ({}) => {
 test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
   logger.info('Selecting the default Kibana space');
   await sideNav.goto();
-  await spaceSelectorServerless(sideNav, spaceSelector);
+  await selectDefaultSpace(clusterData.version.build_flavor, page);
   logger.info('Navigating to the "Discover" section');
   await page.goto('/app/discover');
   logger.info('Selecting the "Logs" data view');

@@ -1,21 +1,23 @@
 import { test as base } from "@playwright/test";
-import DashboardPage from "../../pom/serverless/pages/dashboard.page";
-import DatePicker from "../../pom/serverless/components/date_picker.component";
-import DependenciesPage from "../../pom/serverless/pages/dependencies.page";
-import HeaderBar from "../../pom/serverless/components/header_bar.component";
-import HostsPage from "../../pom/serverless/pages/hosts.page";
-import InventoryPage from "../../pom/serverless/pages/inventory.page";
-import DiscoverPage from "../../pom/serverless/pages/discover.page";
-import ManagementPage from "../../pom/serverless/pages/management.page";
-import Notifications from "../../pom/serverless/components/notifications.component";
-import OnboardingPage from "../../pom/serverless/pages/onboarding.page";
-import ServicesPage from "../../pom/serverless/pages/services.page";
-import SideNav from "../../pom/serverless/components/side_nav.component";
-import SpaceSelector from "../../pom/serverless/components/space_selector.component";
-import TracesPage from "../../pom/serverless/pages/traces.page";
+import DashboardPage from "./pages/dashboard.page";
+import DatasetsPage from "./pages//datasets.page";
+import DatePicker from "./components/date_picker.component";
+import DependenciesPage from "./pages/dependencies.page";
+import HeaderBar from "./components/header_bar.component";
+import HostsPage from "./pages/hosts.page";
+import InventoryPage from "./pages/inventory.page";
+import DiscoverPage from "./pages/discover.page";
+import ManagementPage from "./pages/management.page";
+import Notifications from "./components/notifications.component";
+import OnboardingPage from "./pages/onboarding.page";
+import ServicesPage from "./pages/services.page";
+import SideNav from "./components/side_nav.component";
+import SpaceSelector from "./components/space_selector.component";
+import TracesPage from "./pages/traces.page";
 
 export const test = base.extend<{
-    dashboardPage: DashboardPage, 
+    dashboardPage: DashboardPage,
+    datasetsPage: DatasetsPage,
     datePicker: DatePicker, 
     dependenciesPage: DependenciesPage,
     headerBar: HeaderBar,
@@ -33,6 +35,10 @@ export const test = base.extend<{
     ({
         dashboardPage: async({page}, use) => {
             await use(new DashboardPage(page));
+        },
+
+        datasetsPage: async({page}, use) => {
+            await use(new DatasetsPage(page));
         },
 
         datePicker: async({page}, use) => {

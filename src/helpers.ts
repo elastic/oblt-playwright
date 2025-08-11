@@ -1,4 +1,11 @@
-import { APIRequestContext, Browser, expect, Locator, Page, TestInfo } from '@playwright/test';
+import { 
+  APIRequestContext, 
+  Browser, 
+  Locator, 
+  Page, 
+  TestInfo, 
+  expect 
+} from '@playwright/test';
 import {
   ABSOLUTE_TIME_RANGE_ECH,
   ABSOLUTE_TIME_RANGE_SERVERLESS,
@@ -10,10 +17,6 @@ import {
   TIME_UNIT,
   TIME_VALUE
 } from '../src/env.ts';
-import SpaceSelectorStateful from './pom/stateful/components/space_selector.component';
-import SpaceSelectorServerless from './pom/serverless/components/space_selector.component';
-import HeaderBar from './pom/stateful/components/header_bar.component';
-import SideNav from './pom/serverless/components/side_nav.component';
 import * as fs from 'fs';
 import * as path from 'path';
 import { logger } from './logger.ts';
@@ -37,28 +40,26 @@ export async function waitForOneOf(locators: Locator[]): Promise<WaitForRes> {
   return res;
 }
 
-export async function spaceSelectorStateful(headerBar: HeaderBar, spaceSelector: SpaceSelectorStateful) {
+export async function selectDefaultSpace(
+  buildFlavor: string,
+  page: Page
+) {
   const [index] = await waitForOneOf([
-    headerBar.helpMenuButton(),
-    spaceSelector.spaceSelector()
+    page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
+    page.locator('xpath=//div[@data-test-subj="helpMenuButton"]'),
+    page.locator('xpath=//h1[contains(text(),"Select your space")]')
   ]);
-  const selector = index === 1;
+  const selector = index === 2;
   if (selector) {
-    await spaceSelector.selectDefault();
-    await headerBar.assertHelpMenuButton();
-  };
-}
-
-export async function spaceSelectorServerless(sideNav: SideNav, spaceSelector: SpaceSelectorServerless) {
-  const [index] = await waitForOneOf([
-    sideNav.sideNav(),
-    spaceSelector.spaceSelector(),
-  ]);
-  const selector = index === 1;
-  if (selector) {
-    await spaceSelector.selectDefault();
-    await sideNav.assertSideNav();
-  };
+  await page.locator('xpath=//a[contains(text(),"Default")]').click();
+  if (buildFlavor === 'default') {
+    await expect(page.locator('xpath=//div[@data-test-subj="helpMenuButton"]'), 'Help menu button').toBeVisible();
+  } else if (buildFlavor === 'serverless') {
+    await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'), 'Side navigation panel').toBeVisible();
+  } else {
+    throw new Error(`Unsupported build flavor: ${buildFlavor}`);
+  }
+  }
 }
 
 export async function getHostData(request: APIRequestContext) {
@@ -252,7 +253,7 @@ export async function printResults(reportFiles: string[]) {
         console.log(`\n\n`);
 
         const p = new Table({
-          title: `${jsonData.title} @ ${jsonData.period}`,
+          title: `[${jsonData.build_flavor}] ${jsonData.title} @ ${jsonData.period}`,
           columns: [
             { name: 'step', title: 'Step', color: "yellow" },
             { name: 'description', title: 'Description', maxLen: 50 },
@@ -318,7 +319,7 @@ export async function testStep(
         description
       }
     });
-
+    
     return result;
   } catch (error) {
     throw error;

@@ -1,4 +1,4 @@
-import { test } from '../../src/fixtures/serverless/page.fixtures.ts';
+import { test } from '../../src/pom/page.fixtures.ts';
 import { expect, Page } from "@playwright/test";
 import { 
   fetchClusterData, 
@@ -6,7 +6,7 @@ import {
   getPodData, 
   importDashboards,
   printResults,
-  spaceSelectorServerless, 
+  selectDefaultSpace, 
   testStep, 
   writeJsonReport 
  } from "../../src/helpers.ts";
@@ -26,10 +26,10 @@ test.beforeAll('Check pod data', async ({ browser, request }) => {
   await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
 });
 
-test.beforeEach(async ({ sideNav, spaceSelector }) => {
+test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
   await sideNav.goto();
-  logger.info('Selecting the default Kibana space')
-  await spaceSelectorServerless(sideNav, spaceSelector);
+  logger.info('Selecting the default Kibana space');
+  await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {

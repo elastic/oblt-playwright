@@ -1,9 +1,17 @@
-import { test } from '../../src/fixtures/stateful/page.fixtures.ts';
-import { fetchClusterData, getDatePickerLogMessageStateful, getHostData, spaceSelectorStateful, testStep, writeJsonReport } from "../../src/helpers.ts";
+import { test } from '../../src/pom/page.fixtures.ts';
+import { 
+    fetchClusterData, 
+    getDatePickerLogMessageServerless, 
+    getHostData, 
+    printResults, 
+    selectDefaultSpace, 
+    testStep, 
+    writeJsonReport 
+} from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
-import { TIME_UNIT, TIME_VALUE } from '../../src/env.ts';
 
 let clusterData: any;
+let reports: string[] = [];
 const testStartTime: number = Date.now();
 
 test.beforeAll('Check data', async ({ request }) => {
@@ -16,16 +24,21 @@ test.beforeAll('Check data', async ({ request }) => {
     clusterData = await fetchClusterData();
 });
 
-test.beforeEach(async ({ headerBar, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ page, sideNav }) => {
     await sideNav.goto();
     logger.info('Selecting the default Kibana space');
-    await spaceSelectorStateful(headerBar, spaceSelector);
+    await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
 test.afterEach('Log test results', async ({}, testInfo) => {
-    const hostsMeasurements = (testInfo as any).hostsMeasurements;
-    const stepData = (testInfo as any).stepData;
-    await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
+  const hostsMeasurements = (testInfo as any).hostsMeasurements;
+  const stepData = (testInfo as any).stepData;
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
+  reports.push(...reportFiles.filter(item => typeof item === 'string'));
+});
+
+test.afterAll('Print test results', async ({}) => {
+  await printResults(reports);
 });
 
 test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, page }, testInfo) => {
@@ -38,12 +51,13 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
     let stepData: object[] = [];
   
     await testStep('step01', stepData, page, async () => {
-        logger.info('Navigating to Hosts page');
+        logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
+        logger.info(`${getDatePickerLogMessageServerless()}`);
         await datePicker.setInterval();
         await page.evaluate("document.body.style.zoom=0.9");
-        logger.info('Asserting the visibility of elements on the Hosts page');
+        logger.info('Asserting visibility of elements on the Hosts page');
         const asyncResults = await Promise.race([
             Promise.all([
                 hostsPage.assertHostsNumber(),
@@ -56,40 +70,35 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
                 ]),
             hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
-                logger.error(`Test is failed because "${cpuUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
-                logger.error(`Test is failed because "${normalizedLoadKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
-                logger.error(`Test is failed because "${memoryUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
-                logger.error(`Test is failed because "${diskUsageKPI}" visualization data is not available`);
                 throw new Error('Test is failed because no visualization data available');
             }),
             notifications.assertErrorFetchingResource().then(() => {
-                logger.error('Test is failed because Hosts data failed to load');
                 throw new Error('Test is failed because Hosts data failed to load');
             })
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
-    });
+    }, 'Asserting visibility of visualizations on the Hosts landing page');
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page }, testInfo) => {    
+test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testInfo) => {
     let stepData: object[] = [];
-    
+
     await testStep('step01', stepData, page, async () => {
         let noLogsData = false;
-        logger.info('Navigating to the "Hosts" page');
+        logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`${getDatePickerLogMessageStateful()}`);
+        logger.info(`${getDatePickerLogMessageServerless()}`);
         await datePicker.setInterval();
         logger.info('Navigating to the "Logs" tab');
         await hostsPage.clickLogsTab();
@@ -100,24 +109,23 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page }, test
                 ]),
             hostsPage.assertVisibilityNoLogs().then(() => {
                 noLogsData = true;
-                logger.warn('Test is skipped due to lack of logs data');
-                test.skip(noLogsData, "Test is skipped due to lack of alerts data.")
+                test.skip(noLogsData, "Test is skipped due to lack of logs data")
             })
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
-    });
+    }, 'Asserting visibility of the log stream on the Hosts landing page');
     (testInfo as any).stepData = stepData;
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, testInfo) => {    
+test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, testInfo) => {
     let stepData: object[] = [];
-    
+
     await testStep('step01', stepData, page, async () => {
         let noAlertsData = false;
-        logger.info('Navigating to the "Hosts" page');
+        logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`${getDatePickerLogMessageStateful()}`);
+        logger.info(`${getDatePickerLogMessageServerless()}`);
         await datePicker.setInterval();
         logger.info('Navigating to the "Alerts" tab');
         await hostsPage.clickAlertsTab();
@@ -129,11 +137,10 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
                 ]),
             hostsPage.assertNoResultsMatchMessage().then(() => {
                 noAlertsData = true;
-                logger.warn('Test is skipped due to lack of alerts data');
-                test.skip(noAlertsData, "Test is skipped due to lack of alerts data.")
+                test.skip(noAlertsData, "Test is skipped due to lack of alerts data")
             })
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
-    });
+    }, 'Asserting visibility of the alerts chart and table on the Hosts landing page');
     (testInfo as any).stepData = stepData;
 });

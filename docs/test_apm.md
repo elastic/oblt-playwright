@@ -1,4 +1,4 @@
-[ECH](https://github.com/elastic/oblt-playwright/blob/main/tests/stateful/apm.stateful.spec.ts) | [Serverless](https://github.com/elastic/oblt-playwright/blob/main/tests/serverless/apm.serverless.spec.ts)
+[🔗 Test code](https://github.com/elastic/oblt-playwright/blob/main/tests/kibana/apm.kibana.spec.ts)
 ---
 | **Test**  | **Steps** |
 | :------------ | :------------ |
