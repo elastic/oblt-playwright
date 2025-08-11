@@ -24,7 +24,7 @@ test.beforeAll('Check APM data', async ({ request }) => {
 
 test.beforeEach(async ({ page, sideNav }) => {
   await sideNav.goto();
-  logger.info('Selecting the default Kibana space')
+  logger.info('Selecting the default Kibana space');
   await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
@@ -97,7 +97,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await servicesPage.clickViewInDiscoverButton();
     logger.info('Asserting visibility of the canvas');
     await discoverPage.assertVisibilityCanvas();
-  }, 'Clicking on the "Failed transaction correlations" tab, asserting visualization visibility, then filtering the result by a certain field value');
+  }, 'Clicking on the "Investigate" button, navigating to Discover, and asserting canvas visibility');
   (testInfo as any).stepData = stepData;
 });
 

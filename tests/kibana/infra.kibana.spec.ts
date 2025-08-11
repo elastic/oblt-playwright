@@ -28,7 +28,7 @@ test.beforeAll('Check pod data', async ({ browser, request }) => {
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
   await sideNav.goto();
-  logger.info('Selecting the default Kibana space')
+  logger.info('Selecting the default Kibana space');
   await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
