@@ -1,9 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import { API_KEY } from './src/env.ts';
 import path from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
 

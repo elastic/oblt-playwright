@@ -111,8 +111,6 @@ npx playwright install chromium
 
 #### 🔒 Environmental variables
 
-Create .env file in the root directory with the following environmental variables:
-
 ```typescript
 KIBANA_HOST = 
 ELASTICSEARCH_HOST = // No trailing slash
