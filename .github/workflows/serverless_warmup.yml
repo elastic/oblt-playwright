@@ -14,8 +14,8 @@ env:
   KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
   ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
   API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
-  TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
-  TIME_VALUE: ${{ vars.TIME_VALUE_7 }}
+  TIME_UNIT: ${{ vars.TIME_UNIT_HOURS }}
+  TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
   START_DATE: ${{ vars.START_DATE }}
   END_DATE: ${{ vars.END_DATE }}
   ABSOLUTE_TIME_RANGE_SERVERLESS: false
@@ -91,7 +91,7 @@ jobs:
 
       - name: Run Playwright tests - Data Set Quality
         if: github.event.schedule == '15 * * * *'
-        run: npx playwright test dataset.kibana.spec.ts --project kibana
+        run: npx playwright test datasets.kibana.spec.ts --project kibana
 
       - name: Run Playwright tests - Infra
         if: github.event.schedule == '30 * * * *'
