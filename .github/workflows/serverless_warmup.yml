@@ -1,10 +1,10 @@
 name: "Serverless (with warm-up)"
 on:
-  # schedule:
-  #   - cron: "0 * * * *"
-  #   - cron: "15 * * * *"
-  #   - cron: "30 * * * *"
-  #   - cron: "45 * * * *"
+  schedule:
+    - cron: "0 * * * *"
+    - cron: "15 * * * *"
+    - cron: "30 * * * *"
+    - cron: "45 * * * *"
 permissions:
   contents: read
 
@@ -14,7 +14,7 @@ env:
   KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
   ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
   API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
-  TIME_UNIT: ${{ vars.TIME_UNIT_HOURS }}
+  TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
   TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
   START_DATE: ${{ vars.START_DATE }}
   END_DATE: ${{ vars.END_DATE }}
