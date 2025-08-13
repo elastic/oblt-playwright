@@ -65,7 +65,7 @@ jobs:
       ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
       API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
       TIME_UNIT: Minutes
-      TIME_VALUE: 15
+      TIME_VALUE: 30
     outputs:
       is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
