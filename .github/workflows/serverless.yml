@@ -1,10 +1,7 @@
 name: "Serverless"
 on:
   schedule:
-    - cron: "0 * * * *"
-    - cron: "15 * * * *"
-    - cron: "30 * * * *"
-    - cron: "45 * * * *"
+    - cron: "*/20 * * * *"
 permissions:
   contents: read
 
@@ -21,6 +18,20 @@ env:
   ABSOLUTE_TIME_RANGE_SERVERLESS: false
 
 jobs:
+  dispatcher:
+    name: Dispatcher
+    runs-on: ubuntu-latest
+    outputs:
+      job: ${{ steps.random-job.outputs.job }}
+    steps:
+      - name: Select random job
+        id: random-job
+        run: |
+          jobs=("apm" "datasets" "infra" "logs")
+          selected_job=${jobs[$RANDOM % ${#jobs[@]}]}
+          echo "Selected job is $selected_job"
+          echo "job=$selected_job" >> $GITHUB_OUTPUT
+
   install:
     timeout-minutes: 10
     name: Install
@@ -56,10 +67,11 @@ jobs:
   apm:
       needs: 
         - install
+        - dispatcher
       name: Run tests (APM)
-      timeout-minutes: 20
+      timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: github.event.schedule == '0 * * * *'
+      if: needs.dispatcher.outputs.job == 'apm'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -98,10 +110,11 @@ jobs:
   datasets:
       needs: 
         - install
+        - dispatcher
       name: Run tests (Data Set Quality)
-      timeout-minutes: 20
+      timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: github.event.schedule == '15 * * * *'
+      if: needs.dispatcher.outputs.job == 'datasets'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -140,10 +153,11 @@ jobs:
   infra:
     needs: 
       - install
+      - dispatcher
     name: Run tests (Infrastructure)
-    timeout-minutes: 20
+    timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.event.schedule == '30 * * * *'
+    if: needs.dispatcher.outputs.job == 'infra'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -182,10 +196,11 @@ jobs:
   logs:
     needs: 
       - install
+      - dispatcher
     name: Run tests (Logs)
-    timeout-minutes: 20
+    timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.event.schedule == '45 * * * *'
+    if: needs.dispatcher.outputs.job == 'logs'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
