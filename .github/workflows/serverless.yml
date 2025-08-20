@@ -1,7 +1,11 @@
 name: "Serverless"
 on:
   schedule:
-    - cron: "*/20 * * * *"
+  #   - cron: "*/20 * * * *"
+    - cron: "0 * * * *"
+    - cron: "15 * * * *"
+    - cron: "30 * * * *"
+    - cron: "45 * * * *"
 permissions:
   contents: read
 
@@ -18,19 +22,19 @@ env:
   ABSOLUTE_TIME_RANGE_SERVERLESS: false
 
 jobs:
-  dispatcher:
-    name: Dispatcher
-    runs-on: ubuntu-latest
-    outputs:
-      job: ${{ steps.random-job.outputs.job }}
-    steps:
-      - name: Select random job
-        id: random-job
-        run: |
-          jobs=("apm" "datasets" "infra" "logs")
-          selected_job=${jobs[$RANDOM % ${#jobs[@]}]}
-          echo "Selected job is $selected_job"
-          echo "job=$selected_job" >> $GITHUB_OUTPUT
+  # dispatcher:
+  #   name: Dispatcher
+  #   runs-on: ubuntu-latest
+  #   outputs:
+  #     job: ${{ steps.random-job.outputs.job }}
+  #   steps:
+  #     - name: Select random job
+  #       id: random-job
+  #       run: |
+  #         jobs=("apm" "datasets" "infra" "logs")
+  #         selected_job=${jobs[$RANDOM % ${#jobs[@]}]}
+  #         echo "Selected job is $selected_job"
+  #         echo "job=$selected_job" >> $GITHUB_OUTPUT
 
   install:
     timeout-minutes: 10
@@ -67,11 +71,12 @@ jobs:
   apm:
       needs: 
         - install
-        - dispatcher
+        # - dispatcher
       name: Run tests (APM)
       timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: needs.dispatcher.outputs.job == 'apm'
+      # if: needs.dispatcher.outputs.job == 'apm'
+      if: github.event.schedule == '0 * * * *'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -110,11 +115,12 @@ jobs:
   datasets:
       needs: 
         - install
-        - dispatcher
+        # - dispatcher
       name: Run tests (Data Set Quality)
       timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: needs.dispatcher.outputs.job == 'datasets'
+      # if: needs.dispatcher.outputs.job == 'datasets'
+      if: github.event.schedule == '15 * * * *'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -153,11 +159,12 @@ jobs:
   infra:
     needs: 
       - install
-      - dispatcher
+      # - dispatcher
     name: Run tests (Infrastructure)
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: needs.dispatcher.outputs.job == 'infra'
+    # if: needs.dispatcher.outputs.job == 'infra'
+    if: github.event.schedule == '30 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -196,11 +203,12 @@ jobs:
   logs:
     needs: 
       - install
-      - dispatcher
+      # - dispatcher
     name: Run tests (Logs)
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: needs.dispatcher.outputs.job == 'logs'
+    # if: needs.dispatcher.outputs.job == 'logs'
+    if: github.event.schedule == '45 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
