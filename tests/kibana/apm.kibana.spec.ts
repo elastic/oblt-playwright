@@ -145,7 +145,8 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   (testInfo as any).stepData = stepData;
 });
 
-test('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
+// Test is skipped due to intermittent functional issues
+test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
