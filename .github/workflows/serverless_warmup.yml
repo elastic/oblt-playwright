@@ -26,7 +26,7 @@ jobs:
     name: Install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
  
       - name: Cache node_modules
@@ -69,7 +69,7 @@ jobs:
     outputs:
       is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/setup-node@v4
       with:
         node-version: 20
@@ -120,7 +120,7 @@ jobs:
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -163,7 +163,7 @@ jobs:
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -206,7 +206,7 @@ jobs:
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/setup-node@v4
       with:
         node-version: 20
@@ -249,7 +249,7 @@ jobs:
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/setup-node@v4
       with:
         node-version: 20
@@ -295,7 +295,7 @@ jobs:
         REPORTING_CLUSTER_ES: ${{ secrets.REPORTING_CLUSTER_ES }}
         REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/setup-node@v4
       with:
         node-version: 20
