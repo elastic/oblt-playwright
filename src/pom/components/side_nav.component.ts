@@ -11,7 +11,7 @@ export default class SideNav {
         await this.page.goto('/');
     }
 
-    public readonly sideNav = () => this.page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]');
+    public readonly sideNav = () => this.page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]');
     private readonly discover = () => this.page.locator('xpath=//a[@id="discover"]');
     private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
