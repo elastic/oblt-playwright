@@ -45,7 +45,7 @@ export async function selectDefaultSpace(
   page: Page
 ) {
   const [index] = await waitForOneOf([
-    page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
+    page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]'),
     page.locator('xpath=//div[@data-test-subj="helpMenuButton"]'),
     page.locator('xpath=//h1[contains(text(),"Select your space")]')
   ]);
@@ -55,7 +55,7 @@ export async function selectDefaultSpace(
   if (buildFlavor === 'default') {
     await expect(page.locator('xpath=//div[@data-test-subj="helpMenuButton"]'), 'Help menu button').toBeVisible();
   } else if (buildFlavor === 'serverless') {
-    await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'), 'Side navigation panel').toBeVisible();
+    await expect(page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]'), 'Side navigation panel').toBeVisible();
   } else {
     throw new Error(`Unsupported build flavor: ${buildFlavor}`);
   }

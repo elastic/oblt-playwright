@@ -27,7 +27,7 @@ test("Authentication", async ({ page }) => {
 
     logger.info("Logging in to Kibana (Serverless)");
     const [index] = await waitForOneOf([
-      page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]'),
+      page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]'),
       page.locator('xpath=//h1[contains(text(),"Select your space")]'),
       page.locator('xpath=//div[@data-test-id="login-error"]'),
     ]);
@@ -41,7 +41,7 @@ test("Authentication", async ({ page }) => {
     } else if (spaceSelector) {
       logger.info("Selecting the default Kibana space");
       await page.locator('xpath=//a[contains(text(),"Default")]').click();
-      await expect(page.locator('xpath=//div[@data-test-subj="svlObservabilitySideNav"]')).toBeVisible();
+      await expect(page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]')).toBeVisible();
       logger.info("Saving authenticated state");
       await page.context().storageState({ path: STORAGE_STATE });
     } else {
