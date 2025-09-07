@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
  
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -50,7 +50,7 @@ jobs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
       - name: Indicate running status
@@ -102,7 +102,7 @@ jobs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v5
       with:
         node-version: 20
     - name: Indicate running status
@@ -154,7 +154,7 @@ jobs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v5
       with:
         node-version: 20
     - name: Indicate running status
@@ -210,7 +210,7 @@ jobs:
         REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-node@v4
+    - uses: actions/setup-node@v5
       with:
         node-version: 20
   
