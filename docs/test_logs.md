@@ -2,6 +2,6 @@
 ---
 | **Test**  | **Steps** |
 | :------------ | :------------ |
-| **All logs** | **Step 01** - Selecting `*logs` data view, setting search period and asserting canvas visibility<br><br>  |
-| **Field Statistics** | **Step 01** - Selecting `*logs` data view, setting search period and asserting canvas visibility<br><br>_⌛Spend 30 seconds reviewing the page_<br><br>**Step 02** - Navigating to the "Field Statistics" tab and asserting doc count<br><br>  |
-| **Patterns** | **Step 01** - Selecting `*logs` data view, setting search period and asserting canvas visibility<br><br>_⌛Spend 30 seconds reviewing the page_<br><br>**Step 02** - Navigating to the "Patterns" tab and asserting patterns row visibility  |
+| **Discover - All logs** | **Step 01** - Select the `*logs` data view, set the search interval via the date picker, and assert the canvas is loaded<br><br>  |
+| **Discover - Field Statistics** | **Step 01** - Select the `*logs` data view, set the search interval via the date picker and assert the canvas is loaded<br><br>_⌛Spend 30 seconds reviewing the page_<br><br>**Step 02** - Navigate to the "Field Statistics" tab, wait for the data to load and assert the doc count is visible<br><br>  |
+| **Discover - Patterns** | **Step 01** - Select the `*logs` data view, set the search interval via the date picker and assert the canvas is visible<br><br>_⌛Spend 30 seconds reviewing the page_<br><br>**Step 02** - Navigate to the "Patterns" tab, wait for the data to load and assert the patterns row is visible  |
