@@ -71,10 +71,11 @@ TIME_VALUE_29
 
 ### 🚀 Workflows
 
-Currently configured workflows (see [ECH](https://github.com/elastic/oblt-playwright/blob/main/.github/workflows/ech.yml) | [Serverless ](https://github.com/elastic/oblt-playwright/blob/main/.github/workflows/serverless.yml)) execute each of the test suites ([APM](https://github.com/elastic/oblt-playwright/blob/main/docs/test_apm.md), [Infrastructure](https://github.com/elastic/oblt-playwright/blob/main/docs/test_infra.md), [Logs](https://github.com/elastic/oblt-playwright/blob/main/docs/test_logs.md)) on an hourly basis with 20-minute intervals between them.
+Currently configured workflows (see [ECH](https://github.com/elastic/oblt-playwright/blob/main/.github/workflows/ech.yml) | [Serverless ](https://github.com/elastic/oblt-playwright/blob/main/.github/workflows/serverless.yml)) execute each of the test suites ([APM](https://github.com/elastic/oblt-playwright/blob/main/docs/test_apm.md), [Dataset Quality](https://github.com/elastic/oblt-playwright/blob/main/docs/test_datasets.md), [Infrastructure](https://github.com/elastic/oblt-playwright/blob/main/docs/test_infra.md), [Logs](https://github.com/elastic/oblt-playwright/blob/main/docs/test_logs.md)) on an hourly basis with 15 minute intervals between them.
 - APM test suite executes at the top of each hour.
-- Infrastructure test suite executes 20 minutes past the hour.
-- Logs test suite executes 40 minutes past the hour.
+- Dataset Quality executes 15 minutes past the hour.
+- Infrastructure test suite executes 30 minutes past the hour.
+- Logs test suite executes 45 minutes past the hour.
 
 Tests are executed sequentially, with only one Kibana user at a given time.
 
