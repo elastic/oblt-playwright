@@ -7,6 +7,8 @@ updates:
       day: "sunday"
       time: "22:00"
     open-pull-requests-limit: 5
+    cooldown:
+      days: 14
 
   # GitHub actions
   - package-ecosystem: "github-actions"
