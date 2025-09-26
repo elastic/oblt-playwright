@@ -94,7 +94,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   await testStep('step04', stepData, page, async () => {
     logger.info('Clicking on the "Investigate" button and navigating to Discover');
     await servicesPage.clickInvestigate();
-    await servicesPage.clickViewInDiscoverButton();
+    await servicesPage.clickTraceLogsButton();
     logger.info('Asserting visibility of the canvas');
     await discoverPage.assertVisibilityCanvas();
   }, 'Clicking on the "Investigate" button, navigating to Discover, and asserting canvas visibility');

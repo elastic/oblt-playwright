@@ -15,8 +15,8 @@ export default class DependenciesPage {
     private readonly unableToLoadPage = () => this.page.locator('xpath=//h2[@data-test-subj="errorBoundaryFatalHeader"]');
     private readonly timelineTransaction = () => this.page.locator('xpath=(//div[@type="transaction"])[1]//*[@color]');
     private readonly tabPanel = () => this.page.locator('xpath=//*[@role="tabpanel"]');
-    private readonly investigateButton = () => this.page.locator('xpath=//*[@role="dialog"]//*[@data-test-subj="apmActionMenuButtonInvestigateButton"]');
-    private readonly investigateViewInDiscoverButton = () => this.page.getByRole('link', { name: 'View transaction in Discover' });
+    private readonly investigateButton = () => this.page.getByRole('button', { name: 'Investigate' });
+    private readonly investigateTraceLogs = () => this.page.locator('xpath=//div[@data-test-subj="apmActionMenuInvestigateButtonPopup"]//*[@title="Trace logs"]');
 
     public async clickTableRow() {
         await this.dependencyTableRow().click();
@@ -55,6 +55,6 @@ export default class DependenciesPage {
         }
 
     public async clickTraceLogsButton() {
-        await this.investigateViewInDiscoverButton().click();
+        await this.investigateTraceLogs().click();
         }
 }

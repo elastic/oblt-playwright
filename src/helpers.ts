@@ -174,7 +174,7 @@ export async function importDashboards(browser: Browser, inputFile: string) {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto('/app/management/kibana/objects');
-  await page.locator('xpath=//input[@data-test-subj="savedObjectSearchBar"]').fill('Playwright');
+  await page.locator('xpath=//input[@data-test-subj="savedObjectSearchBar"]').fill('Playwright type:(dashboard)');
   await page.keyboard.press('Enter');
   await page.waitForTimeout(2000);
   const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
