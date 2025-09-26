@@ -18,7 +18,7 @@ export default class ServicesPage {
     private readonly filterByCorrelationValueButton = () => this.page.locator('xpath=//div[@data-test-subj="apmCorrelationsTable"]//tbody[@class="css-0"]//tr[1]//td[4]//span[1]//button[1]');
     private readonly filterByFieldValueButton = () => this.page.getByRole('button', { name: 'Field value', exact: true });
     private readonly investigateButton = () => this.page.getByRole('button', { name: 'Investigate' });
-    private readonly investigateViewInDiscover = () => this.page.getByRole('link', { name: 'View transaction in Discover' });
+    private readonly investigateTraceLogs = () => this.page.locator('xpath=//div[@data-test-subj="apmActionMenuInvestigateButtonPopup"]//*[@title="Trace logs"]');
     private readonly errorDistributionChart = () => this.page.getByTestId('errorDistribution');
 
     public async selectServiceOpbeansGo() {
@@ -71,8 +71,8 @@ export default class ServicesPage {
         await this.investigateButton().click();
         }
 
-    public async clickViewInDiscoverButton() {
-        await this.investigateViewInDiscover().click();
+    public async clickTraceLogsButton() {
+        await this.investigateTraceLogs().click();
         }
 
     public async assertVisibilityErrorDistributionChart() {
