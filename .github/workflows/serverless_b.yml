@@ -14,8 +14,8 @@ env:
   KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
   ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_B }}
   API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_B }}
-  TIME_UNIT: ${{ vars.TIME_UNIT_HOURS }}
-  TIME_VALUE: ${{ vars.TIME_VALUE_3 }}
+  TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
+  TIME_VALUE: ${{ vars.TIME_VALUE_1 }}
   START_DATE: ${{ vars.START_DATE }}
   END_DATE: ${{ vars.END_DATE }}
   ABSOLUTE_TIME_RANGE_SERVERLESS: false
@@ -231,9 +231,9 @@ jobs:
     name: Upload test reports to Elasticsearch
     runs-on: ubuntu-latest
     env:
-        REPORTING_CLUSTER_API_KEY: ${{ secrets.REPORTING_CLUSTER_API_KEY }}
-        REPORTING_CLUSTER_ES: ${{ secrets.REPORTING_CLUSTER_ES }}
-        REPORTING_CLUSTER_INDEX: ${{ vars.REPORTING_CLUSTER_INDEX }}
+        REPORT_CLUSTER_API_KEY: ${{ secrets.REPORT_CLUSTER_API_KEY }}
+        REPORT_CLUSTER_ES: ${{ secrets.REPORT_CLUSTER_ES }}
+        REPORT_CLUSTER_INDEX: ${{ vars.REPORT_CLUSTER_INDEX }}
     steps:
     - uses: actions/checkout@v5
     - uses: actions/setup-node@v5
