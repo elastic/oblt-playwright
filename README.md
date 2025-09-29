@@ -46,14 +46,14 @@ KIBANA_PASSWORD_SERVERLESS =
 KIBANA_PASSWORD_STATEFUL = 
 KIBANA_USERNAME_SERVERLESS = 
 KIBANA_USERNAME_STATEFUL = 
-REPORTING_CLUSTER_ES = // No trailing slash
-REPORTING_CLUSTER_API_KEY = 'ApiKey ...'
+REPORT_CLUSTER_ES = // No trailing slash
+REPORT_CLUSTER_API_KEY = 'ApiKey ...'
 ```
 
 #### GitHub Actions Variables:
 
 ```typescript
-REPORTING_CLUSTER_INDEX = 
+REPORT_CLUSTER_INDEX = 
 START_DATE = '2025-06-24T00:00:00.000Z' // Set when the absolute time range is used
 END_DATE = '2025-06-25T00:00:00.000Z' // Set when the absolute time range is used
 // Predefined variables:
@@ -84,7 +84,7 @@ Tests are executed sequentially, with only one Kibana user at a given time.
 
 ### 📊 Test reports
 
-A custom reporter generates JSON files and transmits them to a remote Elasticsearch reporting cluster (specify Elasticsearch endpoint as `REPORTING_CLUSTER_ES` and set `REPORTING_CLUSTER_API_KEY`). Make sure to create an index first and pass its name into `REPORTING_CLUSTER_INDEX` variable. In a newly created index, match `startTime` field to `Date` type.
+A custom reporter generates JSON files and transmits them to a remote Elasticsearch reporting cluster (specify Elasticsearch endpoint as `REPORT_CLUSTER_ES` and set `REPORT_CLUSTER_API_KEY`). Make sure to create an index first and pass its name into `REPORT_CLUSTER_INDEX` variable. In a newly created index, match `startTime` field to `Date` type.
 
 ## 💻 Local usage
 
