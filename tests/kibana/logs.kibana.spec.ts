@@ -1,7 +1,7 @@
 import { test } from '../../src/pom/page.fixtures.ts';
 import { 
   fetchClusterData, 
-  getDatePickerLogMessageServerless, 
+  getDatePickerLogMessage, 
   printResults, 
   selectDefaultSpace, 
   testStep, 
@@ -42,7 +42,7 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()}, asserting visibility of the chart, canvas, and data grid row`);
+    logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -57,6 +57,9 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertAbortedExpression().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
@@ -67,7 +70,7 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()}, asserting visibility of the chart, canvas, and data grid row`);
+    logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -82,6 +85,9 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertAbortedExpression().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
@@ -102,6 +108,9 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertAbortedExpression().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       })
     ]);
   }, 'Navigating to the "Field Statistics" tab and asserting doc count');
@@ -112,7 +121,7 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()}, asserting visibility of the chart, canvas, and data grid row`);
+    logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -127,6 +136,9 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertAbortedExpression().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
@@ -150,6 +162,9 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertAbortedExpression().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       })
     ]);
     logger.info('Clicking on the filter pattern button');

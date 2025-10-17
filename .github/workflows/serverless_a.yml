@@ -18,7 +18,7 @@ env:
   TIME_VALUE: ${{ vars.TIME_VALUE_7 }}
   START_DATE: ${{ vars.START_DATE }}
   END_DATE: ${{ vars.END_DATE }}
-  ABSOLUTE_TIME_RANGE_SERVERLESS: false
+  ABSOLUTE_TIME_RANGE: false
 
 jobs:
   install:

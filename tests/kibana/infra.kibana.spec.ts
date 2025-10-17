@@ -2,7 +2,7 @@ import { test } from '../../src/pom/page.fixtures.ts';
 import { expect, Page } from "@playwright/test";
 import { 
   fetchClusterData, 
-  getDatePickerLogMessageServerless, 
+  getDatePickerLogMessage, 
   getPodData, 
   importDashboards,
   printResults,
@@ -68,7 +68,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(getDatePickerLogMessageServerless());
+    logger.info(getDatePickerLogMessage());
     await datePicker.setInterval();
     logger.info('Asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations');
     await Promise.race([
@@ -110,7 +110,7 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
   }, 'Searching for the "K8S Aggregations" dashboard and navigating to it');
   
   await testStep('step02', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
+    logger.info(`${getDatePickerLogMessage()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -156,7 +156,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
   await page.waitForTimeout(20000);
   
   await testStep('step02', stepData, page, async () => {
-    logger.info(getDatePickerLogMessageServerless());
+    logger.info(getDatePickerLogMessage());
     await datePicker.setInterval();
     await page.mouse.wheel(0, 900);
     logger.info('Asserting visibility of the "Host CPU Usage" and "Host Memory Usage" visualizations');
@@ -200,7 +200,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
   await page.waitForTimeout(10000);
 
   await testStep('step04', stepData, page, async () => {
-    logger.info(getDatePickerLogMessageServerless());
+    logger.info(getDatePickerLogMessage());
     await datePicker.setInterval();
     logger.info('Asserting visibility of the "Pod CPU Usage" and "Pod Memory Usage" visualizations');
     await Promise.race([

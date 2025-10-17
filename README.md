@@ -79,7 +79,7 @@ Tests are executed sequentially, with only one Kibana user at a given time.
 #### To use the absolute time range:
 
 1. Set `START_DATE` and `END_DATE` GitHub Actions variables.
-2. Set `ABSOLUTE_TIME_RANGE_ECH` | `ABSOLUTE_TIME_RANGE_SERVERLESS` workflow job environmental variables  to `true` respectively.
+2. Set `ABSOLUTE_TIME_RANGE` | `ABSOLUTE_TIME_RANGE` workflow job environmental variables  to `true` respectively.
 
 
 ### 📊 Test reports
@@ -116,8 +116,7 @@ KIBANA_USERNAME =
 KIBANA_PASSWORD = 
 TIME_UNIT = 'Minutes'
 TIME_VALUE = 15
-ABSOLUTE_TIME_RANGE_ECH = false // Set 'true' to use the absolute time range in ECH
-ABSOLUTE_TIME_RANGE_SERVERLESS = false // Set 'true' to use the absolute time range in Serverless
+ABSOLUTE_TIME_RANGE = false // Set 'true' to use the absolute time range
 START_DATE = '2025-06-24T00:00:00.000Z' // Set when the absolute time range is used
 END_DATE = '2025-06-25T00:00:00.000Z' // Set when the absolute time range is used
 API_KEY = 'ApiKey ...'
@@ -132,6 +131,11 @@ Create `playwright-report` directory in the root.
 By default, tests run in headless mode. To launch browsers in headed mode, use the `--headed` flag.
 It is recommended to run tests during ongoing data collection.
 
+#### Run all suites
+
+```bash
+npx playwright test --project kibana --headed
+```
 
 #### Run a specific suite
 

@@ -14,6 +14,7 @@ export default class DiscoverPage {
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
+    private readonly abortedExpression = () => this.page.locator('xpath=//div[@data-test-subj="embeddable-lens-failure"]//*[text()="The expression was aborted."]');
     private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
     private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-test-subj="dataGridRowCell"][@aria-rowindex="1"][@data-gridcell-column-id="actions"][1]');
     private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
@@ -28,78 +29,82 @@ export default class DiscoverPage {
     public readonly logPatternsRowToggle = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//td[@data-test-subj="aiopsLogPatternsExpandRowToggle"]');
     private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
     private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
-    
+
     public async clickDataView() {
         await this.dataView().click();
-        }
+    }
 
     public async selectLogsDataView() {
         await this.dataView().click();
         await this.dataViewInput().fill('logs-*');
         await this.dataViewLogs().click();
-        }
+    }
 
     public async clickFieldStatsTab() {
         await this.fieldStatsTab().click();
-        }
+    }
 
     public async clickPatternsTab() {
         await this.patternsTab().click();
-        }
+    }
 
     public async clickFilterPatternButton() {
         await this.logPatternsFilterIn().click();
-        }
+    }
 
     public async assertChartIsRendered() {
         await expect(this.histogramChartIsRendered()).toBeVisible();
-        }
+    }
 
     public async assertVisibilityPatternsRowToggle() {
         await expect(this.logPatternsRowToggle()).toBeVisible();
-        }
+    }
 
     public async assertVisibilityFieldStatsDocCount() {
         await expect(this.fieldStatsDocCount()).toBeVisible();
-        }
+    }
 
     public async assertVisibilityCanvas() {
         await expect(this.logsCanvas()).toBeVisible();
-        }
-    
+    }
+
+    public async assertAbortedExpression() {
+        await expect(this.abortedExpression()).toBeVisible();
+    }
+
     public async filterLogsByError() {
         await this.logsSearchField().click();
         await this.logsSearchField().fill('error');
         await this.fieldToggleError().click();
-        }
+    }
 
     public async expandLogsDataGridRow() {
         await this.logsDataGridRow().click();
-        }
+    }
 
     public async assertVisibilityDataGridRow() {
         await expect(this.logsDataGridRow()).toBeVisible();
-        }
+    }
 
     public async assertVisibilityFlyoutLogMessage() {
         await expect(this.flyoutLogMessage()).toBeVisible();
-        }
+    }
 
     public async assertVisibilityFlyoutService() {
         await expect(this.flyoutService()).toBeVisible();
-        }
+    }
 
     public async assertVisibilityDocViewer() {
         await expect(this.docViewer()).toBeVisible();
-        }
+    }
 
     public async assertPatternsNotLoaded() {
         await expect(this.patternsNotLoaded()).toBeVisible();
-        }
+    }
 
     public async filterByKubernetesContainer() {
         await this.datasetSelectorButton().click();
         await this.datasetKubernetes().click();
         await this.datasetKubernetesContainer().click();
-        }
+    }
 }

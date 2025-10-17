@@ -1,6 +1,6 @@
 import { expect, Page } from "@playwright/test";
 import { 
-    ABSOLUTE_TIME_RANGE_SERVERLESS, 
+    ABSOLUTE_TIME_RANGE, 
     START_DATE, 
     END_DATE, 
     TIME_VALUE, 
@@ -52,7 +52,7 @@ export default class DatePicker {
         to: string = END_DATE ?? ""
         )
         {
-        if (ABSOLUTE_TIME_RANGE_SERVERLESS === 'true') {
+        if (ABSOLUTE_TIME_RANGE === 'true') {
             await Promise.any([
                 expect(this.showDatesButton()).toBeVisible(),
                 expect(this.datePickerStartDatePopoverButton()).toBeVisible()
