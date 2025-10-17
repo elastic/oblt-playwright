@@ -7,8 +7,7 @@ import {
   expect 
 } from '@playwright/test';
 import {
-  ABSOLUTE_TIME_RANGE_ECH,
-  ABSOLUTE_TIME_RANGE_SERVERLESS,
+  ABSOLUTE_TIME_RANGE,
   API_KEY,
   CI,
   ELASTICSEARCH_HOST,
@@ -157,14 +156,8 @@ export async function fetchClusterData() {
   return jsonDataCluster;
 }
 
-export function getDatePickerLogMessageStateful(): string {
-  return ABSOLUTE_TIME_RANGE_ECH === 'true'
-    ? `Setting the fixed search interval from ${START_DATE} to ${END_DATE}`
-    : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
-}
-
-export function getDatePickerLogMessageServerless(): string {
-  return ABSOLUTE_TIME_RANGE_SERVERLESS === 'true'
+export function getDatePickerLogMessage(): string {
+  return ABSOLUTE_TIME_RANGE === 'true'
     ? `Setting the fixed search interval from ${START_DATE} to ${END_DATE}`
     : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
 }
@@ -217,8 +210,8 @@ export async function writeJsonReport(
   const reportData = {
     title: testInfo.title,
     startTime: testStartTime,
-    period: ((ABSOLUTE_TIME_RANGE_SERVERLESS === 'true' && build_flavor === 'serverless') ||
-      (ABSOLUTE_TIME_RANGE_ECH === 'true' && build_flavor === 'default'))
+    period: ((ABSOLUTE_TIME_RANGE === 'true' && build_flavor === 'serverless') ||
+      (ABSOLUTE_TIME_RANGE === 'true' && build_flavor === 'default'))
       ? `From ${new Date(START_DATE).toISOString()} to ${new Date(END_DATE).toISOString()}`
       : `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,

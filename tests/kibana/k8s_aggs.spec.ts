@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 import { test } from '../../src/pom/page.fixtures.ts';
 import { 
-  getDatePickerLogMessageServerless, 
+  getDatePickerLogMessage, 
   fetchClusterData, 
   importDashboards,
   printResults,
@@ -51,7 +51,7 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
   }, 'Searching for the dashboard');
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()} and asserting the visualization: ` + title);
+    logger.info(`${getDatePickerLogMessage()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([

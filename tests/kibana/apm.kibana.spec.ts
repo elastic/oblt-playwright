@@ -1,12 +1,12 @@
 import { test } from '../../src/pom/page.fixtures.ts';
-import { 
-  checkApmData, 
-  fetchClusterData, 
-  getDatePickerLogMessageServerless, 
-  printResults, 
-  selectDefaultSpace, 
-  testStep, 
-  writeJsonReport 
+import {
+  checkApmData,
+  fetchClusterData,
+  getDatePickerLogMessage,
+  printResults,
+  selectDefaultSpace,
+  testStep,
+  writeJsonReport
 } from '../../src/helpers.ts';
 import { logger } from '../../src/logger.ts';
 
@@ -28,13 +28,13 @@ test.beforeEach(async ({ page, sideNav }) => {
   await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
-test.afterEach('Log test results', async ({}, testInfo) => {
+test.afterEach('Log test results', async ({ }, testInfo) => {
   const stepData = (testInfo as any).stepData;
-    const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
-    reports.push(...reportFiles.filter(item => typeof item === 'string'));
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 
-test.afterAll('Print test results', async ({}) => {
+test.afterAll('Print test results', async ({ }) => {
   await printResults(reports);
 });
 
@@ -46,9 +46,17 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Services" section');
     await page.goto('/app/apm/services');
-    logger.info(`${getDatePickerLogMessageServerless()} and selecting the "opbeans-go" service`);
+    logger.info(`${getDatePickerLogMessage()} and selecting the "opbeans-go" service`);
     await datePicker.setInterval();
-    await servicesPage.selectServiceOpbeansGo();
+    await Promise.race([
+      servicesPage.selectServiceOpbeansGo(),
+      servicesPage.assertServicesNotFound().then(() => {
+        throw new Error('Test is failed because services not found');
+      }),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Test is failed: Error while fetching resource');
+      })
+    ]);
     logger.info('Asserting visibility of the "Transactions" tab');
     await Promise.race([
       servicesPage.assertVisibilityTransactionsTab(),
@@ -60,7 +68,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
-  
+
   await testStep('step02', stepData, page, async () => {
     logger.info('Navigating to the "Transactions" tab and asserting visibility of the "Throughput" visualization');
     await servicesPage.openTransactionsTab();
@@ -77,7 +85,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
-  
+
   await testStep('step03', stepData, page, async () => {
     logger.info('Clicking on the "Failed transaction correlations" tab');
     await servicesPage.openFailedTransactionCorrelationsTab();
@@ -90,7 +98,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
-  
+
   await testStep('step04', stepData, page, async () => {
     logger.info('Clicking on the "Investigate" button and navigating to Discover');
     await servicesPage.clickInvestigate();
@@ -108,7 +116,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Traces" section');
     await page.goto('/app/apm/traces');
-    logger.info(`${getDatePickerLogMessageServerless()} and waiting for the top traces table to be loaded`);
+    logger.info(`${getDatePickerLogMessage()} and waiting for the top traces table to be loaded`);
     await datePicker.setInterval();
     await Promise.race([
       headerBar.assertLoadingIndicator(),
@@ -120,7 +128,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
 
   logger.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
-  
+
   await testStep('step02', stepData, page, async () => {
     logger.info('Opening the "Explorer" tab and filtering data by http.response.status_code : 502');
     await tracesPage.openExplorerTab();
@@ -129,7 +137,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
 
   logger.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
-  
+
   await testStep('step03', stepData, page, async () => {
     logger.info('Clicking on the "View related error" in the timeline and asserting related errors');
     await Promise.race([
@@ -159,7 +167,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
   await page.waitForTimeout(10000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessageServerless()} and asserting visibility of dependencies table`);
+    logger.info(`${getDatePickerLogMessage()} and asserting visibility of dependencies table`);
     await datePicker.setInterval();
     await Promise.race([
       headerBar.assertLoadingIndicator(),

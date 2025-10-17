@@ -1,7 +1,7 @@
 import { test } from '../../src/pom/page.fixtures.ts';
 import { 
     fetchClusterData, 
-    getDatePickerLogMessageServerless, 
+    getDatePickerLogMessage, 
     getHostData, 
     printResults, 
     selectDefaultSpace, 
@@ -54,7 +54,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`${getDatePickerLogMessageServerless()}`);
+        logger.info(`${getDatePickerLogMessage()}`);
         await datePicker.setInterval();
         await page.evaluate("document.body.style.zoom=0.9");
         logger.info('Asserting visibility of elements on the Hosts page');
@@ -98,7 +98,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testI
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`${getDatePickerLogMessageServerless()}`);
+        logger.info(`${getDatePickerLogMessage()}`);
         await datePicker.setInterval();
         logger.info('Navigating to the "Logs" tab');
         await hostsPage.clickLogsTab();
@@ -125,7 +125,7 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
-        logger.info(`${getDatePickerLogMessageServerless()}`);
+        logger.info(`${getDatePickerLogMessage()}`);
         await datePicker.setInterval();
         logger.info('Navigating to the "Alerts" tab');
         await hostsPage.clickAlertsTab();
