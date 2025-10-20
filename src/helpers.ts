@@ -69,7 +69,7 @@ export async function getHostData(request: APIRequestContext) {
   let b = await request.post('api/metrics/snapshot', {
     headers: {
       "accept": "application/json",
-      "Authorization": API_KEY,
+      "Authorization": `ApiKey ${API_KEY}`,
       "Content-Type": "application/json;charset=UTF-8",
       "kbn-xsrf": "true",
       "x-elastic-internal-origin": "kibana"
@@ -99,7 +99,7 @@ export async function getPodData(request: APIRequestContext) {
   let response = await request.post('api/metrics/snapshot', {
     headers: {
       "accept": "application/json",
-      "Authorization": API_KEY,
+      "Authorization": `ApiKey ${API_KEY}`,
       "Content-Type": "application/json;charset=UTF-8",
       "kbn-xsrf": "true",
       "x-elastic-internal-origin": "kibana"
@@ -126,7 +126,7 @@ export async function checkApmData(request: APIRequestContext): Promise<boolean>
   let response = await request.get('internal/apm/has_data', {
     headers: {
       "accept": "application/json",
-      "Authorization": API_KEY,
+      "Authorization": `ApiKey ${API_KEY}`,
       "Content-Type": "application/json;charset=UTF-8",
       "kbn-xsrf": "true",
       "x-elastic-internal-origin": "kibana"
@@ -143,7 +143,7 @@ export async function fetchClusterData() {
     method: 'GET',
     headers: {
       "accept": "*/*",
-      "Authorization": API_KEY,
+      "Authorization": `ApiKey ${API_KEY}`,
       "kbn-xsrf": "reporting"
     }
   }).then(response => {
@@ -255,7 +255,7 @@ const fetchPromises = indices.map(async (item) => {
     method: 'POST',
     headers: {
       "accept": "*/*",
-      "Authorization": API_KEY,
+      "Authorization": `ApiKey ${API_KEY}`,
       "Content-Type": "application/json",
       "kbn-xsrf": "reporting"
     },
@@ -424,7 +424,7 @@ export async function getCacheStats() {
     method: 'GET',
     headers: {
       "accept": "*/*",
-      "Authorization": API_KEY,
+      "Authorization": `ApiKey ${API_KEY}`,
       "kbn-xsrf": "reporting"
     }
   });

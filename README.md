@@ -36,8 +36,8 @@ This will create alerting rules for the following rule types:
 #### GitHub Actions Secrets:
 
 ```typescript
-API_KEY_SERVERLESS = 'ApiKey ...'
-API_KEY_STATEFUL = 'ApiKey ...'
+API_KEY_SERVERLESS =
+API_KEY_STATEFUL =
 ELASTICSEARCH_HOST_SERVERLESS = 
 ELASTICSEARCH_HOST_STATEFUL = 
 KIBANA_HOST_SERVERLESS = 
@@ -119,7 +119,7 @@ TIME_VALUE = 15
 ABSOLUTE_TIME_RANGE = false // Set 'true' to use the absolute time range
 START_DATE = '2025-06-24T00:00:00.000Z' // Set when the absolute time range is used
 END_DATE = '2025-06-25T00:00:00.000Z' // Set when the absolute time range is used
-API_KEY = 'ApiKey ...'
+API_KEY =
 ```
 
 #### 📂 Test report location
