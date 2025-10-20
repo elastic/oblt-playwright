@@ -2,7 +2,8 @@ import { test } from '../../src/pom/page.fixtures.ts';
 import { expect, Page } from "@playwright/test";
 import { 
   fetchClusterData, 
-  getDatePickerLogMessage, 
+  getDatePickerLogMessage,
+  getDocCount,
   getPodData, 
   importDashboards,
   printResults,
@@ -13,8 +14,9 @@ import {
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
+let doc_count: object;
 let reports: string[] = [];
-const testStartTime: number = Date.now();
+const testStartTime: string = new Date().toISOString();
 
 test.beforeAll('Check pod data', async ({ browser, request }) => {
   logger.info('Checking if pod data is available in the last 24 hours');
@@ -23,6 +25,7 @@ test.beforeAll('Check pod data', async ({ browser, request }) => {
   test.skip(podsArr.length == 0, 'Test is skipped: No pod data is available');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
+  doc_count = await getDocCount();
   await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
 });
 
@@ -34,7 +37,7 @@ test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 

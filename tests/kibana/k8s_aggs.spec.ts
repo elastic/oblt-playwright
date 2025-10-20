@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 import { test } from '../../src/pom/page.fixtures.ts';
 import { 
   getDatePickerLogMessage, 
+  getDocCount,
   fetchClusterData, 
   importDashboards,
   printResults,
@@ -15,13 +16,15 @@ import DatePicker from '../../src/pom/components/date_picker.component.ts';
 import HeaderBar from '../../src/pom/components/header_bar.component.ts';
 
 let clusterData: any;
+let doc_count: object;
 let reports: string[] = [];
-const testStartTime: number = Date.now();
+const testStartTime: string = new Date().toISOString();
 
 test.beforeAll(async ({ browser }) => {
   await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
+  doc_count = await getDocCount();
 });
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
@@ -32,7 +35,7 @@ test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 

@@ -2,6 +2,7 @@ import { test } from '../../src/pom/page.fixtures.ts';
 import { 
     fetchClusterData, 
     getDatePickerLogMessage, 
+    getDocCount,
     getHostData, 
     printResults, 
     selectDefaultSpace, 
@@ -11,8 +12,9 @@ import {
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
+let doc_count: object;
 let reports: string[] = [];
-const testStartTime: number = Date.now();
+const testStartTime: string = new Date().toISOString();
 
 test.beforeAll('Check data', async ({ request }) => {
     logger.info('Checking if host data is available in the last 24 hours');
@@ -22,6 +24,7 @@ test.beforeAll('Check data', async ({ request }) => {
     test.skip(nodesArr.length == 0 || metricValue == null, 'Test is skipped: No node data is available');
     logger.info('Fetching cluster data');
     clusterData = await fetchClusterData();
+    doc_count = await getDocCount();
 });
 
 test.beforeEach(async ({ page, sideNav }) => {
@@ -33,7 +36,7 @@ test.beforeEach(async ({ page, sideNav }) => {
 test.afterEach('Log test results', async ({}, testInfo) => {
   const hostsMeasurements = (testInfo as any).hostsMeasurements;
   const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData, hostsMeasurements);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData, hostsMeasurements);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 
