@@ -56,7 +56,7 @@ export default defineConfig({
       use: {
         extraHTTPHeaders: {
           "accept": "application/json",
-          "Authorization": API_KEY,
+          "Authorization": `ApiKey ${API_KEY}`,
           "Content-Type": "application/json;charset=UTF-8",
           "kbn-xsrf": "true",          
           "x-elastic-internal-origin": "kibana"
