@@ -1,7 +1,7 @@
 export const KIBANA_HOST = `${process.env.KIBANA_HOST}`;
 export const KIBANA_USERNAME = `${process.env.KIBANA_USERNAME}`;
 export const KIBANA_PASSWORD = `${process.env.KIBANA_PASSWORD}`;
-export const ELASTICSEARCH_HOST = `${process.env.ELASTICSEARCH_HOST}`;
+export const ELASTICSEARCH_HOST = `${process.env.ELASTICSEARCH_HOST}`.replace(/\/$/, "");
 export const API_KEY = (process.env.API_KEY || process.env.ELASTICSEARCH_API_KEY)?.replace(/^ApiKey\s+/i, '') ?? '';
 export const TIME_UNIT = `${process.env.TIME_UNIT}`;
 export const TIME_VALUE = `${process.env.TIME_VALUE}`;
