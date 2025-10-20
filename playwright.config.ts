@@ -28,11 +28,17 @@ export default defineConfig({
 
   projects: [
     {
+      name: 'preflight_check',
+      testMatch: 'preflight_check.ts',
+      dependencies: [],
+    },
+    {
       name: 'auth',
       testMatch: 'auth.ts',
       use: {
-        viewport: {width: 1920, height: 1080},
-      }
+        viewport: {width: 1920, height: 1200},
+      },
+      dependencies: ['preflight_check'],
     },
     {
       name: 'kibana',
