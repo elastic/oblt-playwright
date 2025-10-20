@@ -1,10 +1,10 @@
-import { 
-  APIRequestContext, 
-  Browser, 
-  Locator, 
-  Page, 
-  TestInfo, 
-  expect 
+import {
+  APIRequestContext,
+  Browser,
+  Locator,
+  Page,
+  TestInfo,
+  expect
 } from '@playwright/test';
 import {
   ABSOLUTE_TIME_RANGE,
@@ -50,14 +50,14 @@ export async function selectDefaultSpace(
   ]);
   const selector = index === 2;
   if (selector) {
-  await page.locator('xpath=//a[contains(text(),"Default")]').click();
-  if (buildFlavor === 'default') {
-    await expect(page.locator('xpath=//div[@data-test-subj="helpMenuButton"]'), 'Help menu button').toBeVisible();
-  } else if (buildFlavor === 'serverless') {
-    await expect(page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]'), 'Side navigation panel').toBeVisible();
-  } else {
-    throw new Error(`Unsupported build flavor: ${buildFlavor}`);
-  }
+    await page.locator('xpath=//a[contains(text(),"Default")]').click();
+    if (buildFlavor === 'default') {
+      await expect(page.locator('xpath=//div[@data-test-subj="helpMenuButton"]'), 'Help menu button').toBeVisible();
+    } else if (buildFlavor === 'serverless') {
+      await expect(page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]'), 'Side navigation panel').toBeVisible();
+    } else {
+      throw new Error(`Unsupported build flavor: ${buildFlavor}`);
+    }
   }
 }
 
@@ -157,7 +157,7 @@ export async function fetchClusterData() {
 }
 
 export function getDatePickerLogMessage(): string {
-  return ABSOLUTE_TIME_RANGE === 'true'
+  return ABSOLUTE_TIME_RANGE
     ? `Setting the fixed search interval from ${START_DATE} to ${END_DATE}`
     : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
 }
@@ -183,17 +183,97 @@ export async function importDashboards(browser: Browser, inputFile: string) {
   await context.close();
 }
 
+export async function getDocCount() {
+  const indices: string[] = [
+    `apm-*,logs-*.otel-*,logs-apm*,metrics-*.otel-*,metrics-apm*,traces-*.otel-*,traces-apm*`,
+    `logs-*`,
+    `metrics-*`
+  ];
+
+  const count: {
+    apm: number;
+    logs: number;
+    metrics: number;
+  } = {
+    apm: 0,
+    logs: 0,
+    metrics: 0
+  };
+
+  let request_body: object;
+
+  if (ABSOLUTE_TIME_RANGE) {
+    request_body = {
+      "query": {
+        "range": {
+          "@timestamp": {
+            "gte": `${START_DATE}`,
+            "lt": `${END_DATE}`,
+            "format": "strict_date_optional_time||epoch_millis"
+          }
+        }
+      }
+    }
+  } else {
+    request_body = {
+      "query": {
+        "range": {
+          "@timestamp": {
+            "gte": `now-${TIME_VALUE}${TIME_UNIT.charAt(0).toLowerCase()}/${TIME_UNIT.charAt(0).toLowerCase()}`,
+            "lt": "now"
+          }
+        }
+      }
+    }
+  }
+
+const fetchPromises = indices.map(async (item) => {
+  const url = `${ELASTICSEARCH_HOST}/${item}/_count`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      "accept": "*/*",
+      "Authorization": API_KEY,
+      "Content-Type": "application/json",
+      "kbn-xsrf": "reporting"
+    },
+    body: JSON.stringify(request_body)
+  });
+
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
+
+  const jsonDataNode = JSON.parse(await response.text());
+
+  switch (item) {
+    case `apm-*,logs-*.otel-*,logs-apm*,metrics-*.otel-*,metrics-apm*,traces-*.otel-*,traces-apm*`:
+      count.apm = jsonDataNode.count;
+      break;
+    case `logs-*`:
+      count.logs = jsonDataNode.count;
+      break;
+    case `metrics-*`:
+      count.metrics = jsonDataNode.count;
+      break;
+  }
+});
+
+await Promise.all(fetchPromises);
+return count;
+}
+
 export async function writeJsonReport(
   clusterData: any,
   testInfo: TestInfo,
-  testStartTime: number,
+  testStartTime: string,
+  docsCount: object,
   stepData?: object[],
   cacheStats?: object,
   hostsMeasurements?: any
 ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
-  let version: any = clusterData.version.number;
   let hostsObject: {} = {};
   let files: string[] = [];
 
@@ -210,20 +290,18 @@ export async function writeJsonReport(
   const reportData = {
     title: testInfo.title,
     startTime: testStartTime,
-    period: ((ABSOLUTE_TIME_RANGE === 'true' && build_flavor === 'serverless') ||
-      (ABSOLUTE_TIME_RANGE === 'true' && build_flavor === 'default'))
-      ? `From ${new Date(START_DATE).toISOString()} to ${new Date(END_DATE).toISOString()}`
+    doc_count: docsCount,
+    period: ABSOLUTE_TIME_RANGE
+      ? `From ${START_DATE} to ${END_DATE}`
       : `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
     duration: testInfo.duration,
-    errors: testInfo.errors,
-    timeout: testInfo.timeout,
+    ...(testInfo.errors.length > 0 && { errors: testInfo.errors }),
     cluster_name: cluster_name,
-    version: version,
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
-    cacheStats: cacheStats ? cacheStats : null,
-    measurements: hostsMeasurements ? hostsObject : null,
+    ...(cacheStats && { cacheStats }),
+    ...(hostsMeasurements && { measurements: hostsObject }),
   };
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
   return files;
@@ -264,11 +342,11 @@ export async function printResults(reportFiles: string[]) {
             const stepDetails = stepObj[stepName];
 
             const stepRow = {
-              step: stepName,
-              description: stepDetails.description || 'N/A',
-              start: stepDetails.start ? new Date(stepDetails.start).toISOString() : 'N/A',
-              end: stepDetails.end ? new Date(stepDetails.end).toISOString() : 'N/A',
-              duration: stepDetails.duration ? `${Math.round(stepDetails.duration)} ms` : 'N/A',
+              step: stepObj.title,
+              description: stepObj.description || 'N/A',
+              start: stepObj.start ? new Date(stepObj.start).toISOString() : 'N/A',
+              end: stepObj.end ? new Date(stepObj.end).toISOString() : 'N/A',
+              duration: stepObj.duration ? `${Math.round(stepObj.duration)} ms` : 'N/A',
             };
             data.push(stepRow);
           });
@@ -296,23 +374,22 @@ export async function testStep(
   description?: string,
   ...args: any[]
 ): Promise<any> {
-  const start = Date.now();
-  const startTimePerf = performance.now();
+  const start: string = new Date().toISOString();
+  const startTimePerf: number = performance.now();
   try {
-    const result = await stepFunction.apply(null, [page, ...args]);
-    const endTimePerf = performance.now();
-    const end = Date.now();
-    const duration = endTimePerf - startTimePerf;
+    const result: any = await stepFunction.apply(null, [page, ...args]);
+    const endTimePerf: number = performance.now();
+    const end: string = new Date().toISOString();
+    const duration: number = Math.round(endTimePerf - startTimePerf);
 
     stepData.push({
-      [title]: {
+        title,
+        description,
         start,
         end,
         duration,
-        description
-      }
     });
-    
+
     return result;
   } catch (error) {
     throw error;

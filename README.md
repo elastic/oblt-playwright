@@ -79,7 +79,7 @@ Tests are executed sequentially, with only one Kibana user at a given time.
 #### To use the absolute time range:
 
 1. Set `START_DATE` and `END_DATE` GitHub Actions variables.
-2. Set `ABSOLUTE_TIME_RANGE` | `ABSOLUTE_TIME_RANGE` workflow job environmental variables  to `true` respectively.
+2. Set `ABSOLUTE_TIME_RANGE` workflow job environmental variables  to `true`.
 
 
 ### 📊 Test reports
