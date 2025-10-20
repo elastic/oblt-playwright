@@ -12,6 +12,7 @@ import {
   CI,
   ELASTICSEARCH_HOST,
   END_DATE,
+  KIBANA_HOST,
   START_DATE,
   TIME_UNIT,
   TIME_VALUE
@@ -154,6 +155,27 @@ export async function fetchClusterData() {
     return JSON.parse(json);
   });
   return jsonDataCluster;
+}
+
+export async function checkKibanaAvailability(page: Page) {
+  try {
+    const response = await page.goto(KIBANA_HOST, { 
+      timeout: 30000,
+      waitUntil: 'domcontentloaded' 
+    });
+    
+    if (!response || !response.ok()) {
+      throw new Error(`Kibana is not available. Status: ${response?.status()}`);
+    }
+    
+    return {
+      available: true,
+      status: response.status(),
+      url: KIBANA_HOST
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to reach Kibana at ${KIBANA_HOST}: ${error.message}`);
+  }
 }
 
 export function getDatePickerLogMessage(): string {
