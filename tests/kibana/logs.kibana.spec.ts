@@ -1,7 +1,8 @@
 import { test } from '../../src/pom/page.fixtures.ts';
 import { 
   fetchClusterData, 
-  getDatePickerLogMessage, 
+  getDatePickerLogMessage,
+  getDocCount,
   printResults, 
   selectDefaultSpace, 
   testStep, 
@@ -10,12 +11,14 @@ import {
 import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
+let doc_count: object;
 let reports: string[] = [];
-const testStartTime: number = Date.now();
+const testStartTime: string = new Date().toISOString();
 
 test.beforeAll('Fetch cluster data', async ({}) => {
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
+  doc_count = await getDocCount();
 });
 
 test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
@@ -30,7 +33,7 @@ test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
 
 test.afterEach('Log test results', async ({}, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 

@@ -24,6 +24,7 @@ export default class DatePicker {
     private readonly absoluteTabStartDate = () => this.page.locator('xpath=//button[@aria-label="Start date: Absolute"]');
     private readonly absoluteTabEndDate = () => this.page.locator('xpath=//button[@aria-label="End date: Absolute"]');
     private readonly dateInput = () => this.page.getByTestId('superDatePickerAbsoluteDateInput');
+    private readonly querySubmit = () => this.page.getByTestId('querySubmitButton');
     private readonly refreshQuery = () => this.page.locator('xpath=//button//span[text()="Update"]');
     private readonly applyButtonPopover = () => this.page.getByTestId('superDatePickerApplyTimeButton');
 
@@ -52,7 +53,7 @@ export default class DatePicker {
         to: string = END_DATE ?? ""
         )
         {
-        if (ABSOLUTE_TIME_RANGE === 'true') {
+        if (ABSOLUTE_TIME_RANGE) {
             await Promise.any([
                 expect(this.showDatesButton()).toBeVisible(),
                 expect(this.datePickerStartDatePopoverButton()).toBeVisible()
@@ -70,8 +71,10 @@ export default class DatePicker {
             await this.absoluteTabEndDate().click();
             await this.dateInput().fill(to);
             await this.page.keyboard.press('Enter');
+            await this.datePickerEndDatePopoverButton().click();
             await expect(this.datePickerEndDatePopoverButton()).not.toHaveText('Now');
             await Promise.race([
+                this.querySubmit().click(),
                 this.refreshQuery().click(),
                 this.applyButtonPopover().click()
             ]);
