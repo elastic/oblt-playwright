@@ -18,7 +18,7 @@ test.beforeAll('Check APM data', async ({ request }) => {
   let response = await request.get('internal/apm/has_data', {
       headers: {
         "accept": "application/json",
-        "Authorization": API_KEY,
+        "Authorization": `ApiKey ${API_KEY}`,
         "Content-Type": "application/json;charset=UTF-8",
         "kbn-xsrf": "true",          
         "x-elastic-internal-origin": "kibana"
