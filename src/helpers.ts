@@ -17,14 +17,15 @@ import {
   REPORT_CLUSTER_ES,
   START_DATE,
   TIME_UNIT,
-  TIME_VALUE
+  TIME_VALUE,
+  REPORT_DIR,
 } from '../src/env.ts';
 import * as fs from 'fs';
 import * as path from 'path';
 import { logger } from './logger.ts';
 import { Table } from 'console-table-printer';
 
-const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : './playwright-report';
+const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
 
