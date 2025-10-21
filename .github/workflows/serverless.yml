@@ -1,4 +1,4 @@
-name: "Serverless (A)"
+name: "Serverless"
 on:
   # schedule:
   #   - cron: "0 * * * *"
@@ -9,11 +9,11 @@ permissions:
   contents: read
 
 env:
-  KIBANA_HOST: ${{ secrets.KIBANA_HOST_DEPLOYMENT_A }}
+  KIBANA_HOST: ${{ secrets.KIBANA_HOST_SERVERLESS  }}
   KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME_SERVERLESS }}
   KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD_SERVERLESS }}
-  ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_DEPLOYMENT_A }}
-  API_KEY: ${{ secrets.API_KEY_DEPLOYMENT_A }}
+  ELASTICSEARCH_HOST: ${{ secrets.ELASTICSEARCH_HOST_SERVERLESS }}
+  API_KEY: ${{ secrets.API_KEY_SERVERLESS }}
   TIME_UNIT: ${{ vars.TIME_UNIT_DAYS }}
   TIME_VALUE: ${{ vars.TIME_VALUE_7 }}
   START_DATE: ${{ vars.START_DATE }}
