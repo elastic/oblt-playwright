@@ -82,5 +82,5 @@ jobs:
             provenance: mode=max
             labels: ${{ steps.meta.outputs.labels }}
             tags: ${{ steps.meta.outputs.tags }}
-            cache-from: type=registry,ref=${{ secrets.ELASTIC_DOCKER_REGISTRY }}/observability-ci/oblt-playwright:latest
-            cache-to: ${{ github.ref == 'refs/heads/main' && format('type=registry,ref={0}/observability-ci/oblt-playwright:latest,mode=max', secrets.ELASTIC_DOCKER_REGISTRY) || '' }}
+            cache-from: type=registry,ref=${{ secrets.ELASTIC_DOCKER_REGISTRY }}/observability-ci/oblt-playwright:buildcache
+            cache-to: ${{ github.ref == 'refs/heads/main' && format('type=registry,ref={0}/observability-ci/oblt-playwright:buildcache,mode=max', secrets.ELASTIC_DOCKER_REGISTRY) || '' }}
