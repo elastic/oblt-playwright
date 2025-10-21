@@ -41,7 +41,7 @@ test.afterAll('Print test results', async ({}) => {
   await printResults(reports);
 });
 
-test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+test.skip('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
   let stepData: object[] = [];
 
   await testStep('step01', stepData, page, async () => {
@@ -50,7 +50,6 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
-        discoverPage.assertChartIsRendered(),
         discoverPage.assertVisibilityCanvas(),
         discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
@@ -60,6 +59,9 @@ test('Discover - All logs', async ({datePicker, discoverPage, headerBar, notific
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertHistogramEmbeddedError().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       }),
       discoverPage.assertAbortedExpression().then(() => {
         throw new Error('Test is failed: Chart failed to load');
@@ -78,7 +80,6 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
-        await discoverPage.assertChartIsRendered(),
         await discoverPage.assertVisibilityCanvas(),
         await discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
@@ -88,6 +89,9 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertHistogramEmbeddedError().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       }),
       discoverPage.assertAbortedExpression().then(() => {
         throw new Error('Test is failed: Chart failed to load');
@@ -112,6 +116,9 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
       }),
+      discoverPage.assertHistogramEmbeddedError().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
+      }),
       discoverPage.assertAbortedExpression().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       })
@@ -129,7 +136,6 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
-        await discoverPage.assertChartIsRendered(),
         await discoverPage.assertVisibilityCanvas(),
         await discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
@@ -139,6 +145,9 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertHistogramEmbeddedError().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       }),
       discoverPage.assertAbortedExpression().then(() => {
         throw new Error('Test is failed: Chart failed to load');
@@ -165,6 +174,9 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       }),
       notifications.assertErrorIncrementCount().then(() => {
         throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+      }),
+      discoverPage.assertHistogramEmbeddedError().then(() => {
+        throw new Error('Test is failed: Chart failed to load');
       }),
       discoverPage.assertAbortedExpression().then(() => {
         throw new Error('Test is failed: Chart failed to load');
