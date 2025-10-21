@@ -52,6 +52,7 @@ export default defineConfig({
     },
     {
       name: 'api',
+      testDir: './',
       testMatch: '**\/*.api.spec.ts',
       use: {
         extraHTTPHeaders: {
