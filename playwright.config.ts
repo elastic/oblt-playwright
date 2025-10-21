@@ -8,11 +8,11 @@ export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : 1,
   reporter: [['list', { printSteps: true }]],
-  timeout: 1000000,
-  expect: {timeout: 1000000},
+  timeout: 300000,
+  expect: {timeout: 180000},
 
   use: {
     browserName: 'chromium',
