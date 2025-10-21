@@ -291,7 +291,7 @@ export async function writeJsonReport(
   clusterData: any,
   testInfo: TestInfo,
   testStartTime: string,
-  docsCount: object,
+  docsCount?: object,
   stepData?: object[],
   cacheStats?: object,
   hostsMeasurements?: any
