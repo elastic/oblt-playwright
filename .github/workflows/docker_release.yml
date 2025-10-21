@@ -1,0 +1,86 @@
+---
+name: Docker release
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "Dockerfile"
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/docker_release.yml"
+      - "package*.json"
+      - "playwright.config*.ts"
+  push:
+    branches:
+      - "main"
+    paths:
+      - "Dockerfile"
+      - "src/**"
+      - "tests/**"
+      - ".github/workflows/docker_release.yml"
+      - "package*.json"
+      - "playwright.config*.ts"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "release-oblt-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  fork-notification:
+    if: github.event.repository.fork == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fork notification
+        run: |
+          echo "::notice title=Docker build skipped::This workflow does not run on repository forks for security reasons. Docker images are only built and published from the main repository."
+          echo "ℹ️  Please create a feature branch in the main repository to trigger Docker builds and releases."
+          exit 1
+
+  docker:
+    if: github.event.repository.fork == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # ratchet:docker/setup-buildx-action@v3
+
+      - name: Login to Docker registry
+        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # ratchet:docker/login-action@v3
+        with:
+          registry: ${{ secrets.ELASTIC_DOCKER_REGISTRY }}
+          username: ${{ secrets.ELASTIC_DOCKER_USERNAME }}
+          password: ${{ secrets.ELASTIC_DOCKER_PASSWORD }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f # ratchet:docker/metadata-action@v5
+        with:
+          images: ${{ secrets.ELASTIC_DOCKER_REGISTRY }}/observability-ci/oblt-playwright
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
+
+      - name: Build and push
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # ratchet:docker/build-push-action@v6
+        id: build
+        with:
+            context: .
+            platforms: linux/amd64
+            push: true
+            sbom: true
+            provenance: mode=max
+            labels: ${{ steps.meta.outputs.labels }}
+            tags: ${{ steps.meta.outputs.tags }}
+            cache-from: type=registry,ref=${{ secrets.ELASTIC_DOCKER_REGISTRY }}/observability-ci/oblt-playwright:latest
+            cache-to: ${{ github.ref == 'refs/heads/main' && format('type=registry,ref={0}/observability-ci/oblt-playwright:latest,mode=max', secrets.ELASTIC_DOCKER_REGISTRY) || '' }}
