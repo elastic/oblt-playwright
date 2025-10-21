@@ -53,7 +53,6 @@ REPORT_CLUSTER_API_KEY =
 #### GitHub Actions Variables:
 
 ```typescript
-REPORT_CLUSTER_INDEX = 
 START_DATE = '2025-06-24T00:00:00.000Z' // Set when the absolute time range is used
 END_DATE = '2025-06-25T00:00:00.000Z' // Set when the absolute time range is used
 // Predefined variables:
@@ -84,7 +83,7 @@ Tests are executed sequentially, with only one Kibana user at a given time.
 
 ### 📊 Test reports
 
-A custom reporter generates JSON files and transmits them to a remote Elasticsearch reporting cluster (specify Elasticsearch endpoint as `REPORT_CLUSTER_ES` and set `REPORT_CLUSTER_API_KEY`). Make sure to create an index first and pass its name into `REPORT_CLUSTER_INDEX` variable. In a newly created index, match `startTime` field to `Date` type.
+A custom reporter generates JSON files and sends them to a remote Elasticsearch reporting cluster. This is configured via the `REPORT_CLUSTER_ES` and `REPORT_CLUSTER_API_KEY` environmental variables.
 
 ## 💻 Local usage
 

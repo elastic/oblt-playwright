@@ -13,6 +13,8 @@ import {
   ELASTICSEARCH_HOST,
   END_DATE,
   KIBANA_HOST,
+  REPORT_CLUSTER_API_KEY,
+  REPORT_CLUSTER_ES,
   START_DATE,
   TIME_UNIT,
   TIME_VALUE
@@ -364,11 +366,11 @@ export async function printResults(reportFiles: string[]) {
             const stepDetails = stepObj[stepName];
 
             const stepRow = {
-              step: stepObj.title,
-              description: stepObj.description || 'N/A',
-              start: stepObj.start ? new Date(stepObj.start).toISOString() : 'N/A',
-              end: stepObj.end ? new Date(stepObj.end).toISOString() : 'N/A',
-              duration: stepObj.duration ? `${Math.round(stepObj.duration)} ms` : 'N/A',
+              step: stepName,
+              description: stepDetails.description || 'N/A',
+              start: stepDetails.start ? new Date(stepDetails.start).toISOString() : 'N/A',
+              end: stepDetails.end ? new Date(stepDetails.end).toISOString() : 'N/A',
+              duration: stepDetails.duration ? `${Math.round(stepDetails.duration)} ms` : 'N/A',
             };
             data.push(stepRow);
           });
@@ -405,11 +407,12 @@ export async function testStep(
     const duration: number = Math.round(endTimePerf - startTimePerf);
 
     stepData.push({
-        title,
-        description,
+      [title]: {
         start,
         end,
         duration,
+        description
+      }
     });
 
     return result;
@@ -433,4 +436,86 @@ export async function getCacheStats() {
   }
   const jsonDataNode = JSON.parse(await response.text());
   return jsonDataNode;
+}
+
+export async function checkIndexExists(indexName: string): Promise<boolean> {
+  const url = `${REPORT_CLUSTER_ES}/${indexName}`;
+  const response = await fetch(url, {
+    method: 'HEAD',
+    headers: {
+      'Authorization': `ApiKey ${REPORT_CLUSTER_API_KEY}`,
+    },
+  });
+  return response.ok;
+}
+
+export async function checkIndexTemplateExists(templateName: string): Promise<boolean> {
+  const url = `${REPORT_CLUSTER_ES}/_index_template/${templateName}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Authorization': `ApiKey ${REPORT_CLUSTER_API_KEY}`,
+    },
+  });
+  return response.ok;
+}
+
+export async function createIndexTemplate(templateName: string) {
+  const url = `${REPORT_CLUSTER_ES}/_index_template/${templateName}`;
+  const body = {
+    index_patterns: [`${templateName}`],
+    template: {
+      mappings: {
+        properties: {
+          title: { type: 'text' },
+          startTime: { type: 'date' },
+          doc_count: {
+            properties: {
+              apm: { type: 'long' },
+              logs: { type: 'long' },
+              metrics: { type: 'long' },
+            },
+          },
+          period: { type: 'text' },
+          status: { type: 'keyword' },
+          duration: { type: 'float' },
+          errors: { type: 'object' },
+          cluster_name: { type: 'keyword' },
+          build_flavor: { type: 'keyword' },
+          steps: { type: 'object' },
+          cacheStats: { type: 'object' },
+          measurements: { type: 'object' },
+        },
+      },
+    },
+  };
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `ApiKey ${REPORT_CLUSTER_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(`Failed to create index template. Response: ${JSON.stringify(responseBody)}`);
+  }
+  return response.ok;
+}
+
+export async function createIndex(indexName: string) {
+  const url = `${REPORT_CLUSTER_ES}/${indexName}`;
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `ApiKey ${REPORT_CLUSTER_API_KEY}`,
+    },
+  });
+  if (!response.ok) {
+    const responseBody = await response.json();
+    throw new Error(`Failed to create index. Response: ${JSON.stringify(responseBody)}`);
+  }
+  return response.ok;
 }

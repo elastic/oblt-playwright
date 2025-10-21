@@ -233,7 +233,6 @@ jobs:
     env:
         REPORT_CLUSTER_API_KEY: ${{ secrets.REPORT_CLUSTER_API_KEY }}
         REPORT_CLUSTER_ES: ${{ secrets.REPORT_CLUSTER_ES }}
-        REPORT_CLUSTER_INDEX: ${{ vars.REPORT_CLUSTER_INDEX }}
     steps:
     - uses: actions/checkout@v5
     - uses: actions/setup-node@v6
