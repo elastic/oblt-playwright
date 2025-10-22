@@ -49,6 +49,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   const coresUsedVsTotal = "Cores used vs total cores";
   const topMemoryIntensivePods = "Top Memory intensive pods per Node";
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to Dashboards');
@@ -97,12 +98,13 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
         })
       ]);
   }, 'Setting the search interval and asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations');
-  (testInfo as any).stepData = stepData;
 });
 
 test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, headerBar}, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
   const title = "K8S Aggregations";
+  
   await testStep('step01', stepData, page, async () => {
     await page.goto('/app/dashboards');
     await dashboardPage.assertVisibilityHeading();
@@ -126,7 +128,6 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
       })
     ])
   }, 'Setting search interval and ensuring visualizations are loaded');
-  (testInfo as any).stepData = stepData;
 });
 
 test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, testInfo) => {
@@ -135,6 +136,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
   const podCpuUsage = "podCpuUsage";
   const podMemoryUsage = "podMemoryUsage";
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to Infrastructure inventory');
@@ -216,5 +218,4 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page }, t
         })
     ]);
   }, 'Setting search interval, asserting "Pod CPU Usage" & "Pod Memory Usage" visualization visibility');
-  (testInfo as any).stepData = stepData;
 });

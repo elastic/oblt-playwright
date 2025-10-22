@@ -45,6 +45,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   const throughput: string = "throughput";
   const errorRate: string = "errorRate";
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Services" section');
@@ -109,12 +110,12 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     logger.info('Asserting visibility of the canvas');
     await discoverPage.assertVisibilityCanvas();
   }, 'Clicking on the "Investigate" button, navigating to Discover, and asserting canvas visibility');
-  (testInfo as any).stepData = stepData;
 });
 
 // Test is skipped because Explorer section is not currently available
 test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, servicesPage, tracesPage }, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Traces" section');
@@ -153,12 +154,12 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
     await tracesPage.clickRelatedError();
     await servicesPage.assertVisibilityErrorDistributionChart();
   }, 'Clicking on the "View related error" in the timeline. Asserting related errors');
-  (testInfo as any).stepData = stepData;
 });
 
 // Test is skipped due to intermittent functional issues
 test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverPage, notifications, page, headerBar }, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info('Navigating to the "Dependencies" section and asserting visibility of dependencies table');
@@ -232,5 +233,4 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
     logger.info('Asserting visibility of the data grid row');
     await discoverPage.assertVisibilityDataGridRow();
   }, 'Selecting "Trace logs", asserting data grid row');
-  (testInfo as any).stepData = stepData;
 });

@@ -38,6 +38,7 @@ test.afterAll('Print test results', async ({}) => {
 
 test('Data Set Quality', async ({ datePicker, headerBar, datasetsPage, notifications, page }, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info ('Navigating to the "Data Set Quality" page');
@@ -77,5 +78,4 @@ test('Data Set Quality', async ({ datePicker, headerBar, datasetsPage, notificat
       })
     ]);
     }, 'Setting custom search interval and asserting visibility of visual elements');
-  (testInfo as any).stepData = stepData;
 });
