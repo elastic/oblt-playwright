@@ -84,13 +84,12 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
 ].forEach(({ title }) => {
   test.describe(() => {
     test.afterEach('Write file report', async ({}, testInfo) => {
-      const stepData = (testInfo as any).stepData;
+      const stepData = (testInfo as any).stepData || [];
       await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
     });
     test(`${title}`, async ({ page, dashboardPage, datePicker, headerBar }, testInfo) => {
-      await testBody(title, page, dashboardPage, datePicker, headerBar).then((result) => {
-      (testInfo as any).stepData = result;
-      })
+      const stepData = await testBody(title, page, dashboardPage, datePicker, headerBar);
+      (testInfo as any).stepData = stepData;
     });
   });
 });

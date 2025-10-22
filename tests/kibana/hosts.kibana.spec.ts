@@ -52,6 +52,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
     const cpuUsage = "hostsView-metricChart-cpuUsage";
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
     let stepData: object[] = [];
+    (testInfo as any).stepData = stepData;
   
     await testStep('step01', stepData, page, async () => {
         logger.info('Navigating to the "Hosts" section');
@@ -90,11 +91,11 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
     }, 'Asserting visibility of visualizations on the Hosts landing page');
-    (testInfo as any).stepData = stepData;
 });
 
 test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testInfo) => {
     let stepData: object[] = [];
+    (testInfo as any).stepData = stepData;
 
     await testStep('step01', stepData, page, async () => {
         let noLogsData = false;
@@ -117,11 +118,11 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testI
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
     }, 'Asserting visibility of the log stream on the Hosts landing page');
-    (testInfo as any).stepData = stepData;
 });
 
 test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, testInfo) => {
     let stepData: object[] = [];
+    (testInfo as any).stepData = stepData;
 
     await testStep('step01', stepData, page, async () => {
         let noAlertsData = false;
@@ -145,5 +146,4 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
         ]);
         (testInfo as any).hostsMeasurements = asyncResults;
     }, 'Asserting visibility of the alerts chart and table on the Hosts landing page');
-    (testInfo as any).stepData = stepData;
 });

@@ -371,17 +371,21 @@ export async function printResults(reportFiles: string[]) {
             const stepName = Object.keys(stepObj)[0];
             const stepDetails = stepObj[stepName];
 
-            const stepRow = {
-              step: stepName,
-              description: stepDetails.description || 'N/A',
-              start: stepDetails.start ? new Date(stepDetails.start).toISOString() : 'N/A',
-              end: stepDetails.end ? new Date(stepDetails.end).toISOString() : 'N/A',
-              duration: stepDetails.duration ? `${Math.round(stepDetails.duration)} ms` : 'N/A',
-            };
-            data.push(stepRow);
+            if (stepDetails.status === 'passed') {
+              const stepRow = {
+                step: stepName,
+                description: stepDetails.description || 'N/A',
+                start: stepDetails.start ? new Date(stepDetails.start).toISOString() : 'N/A',
+                end: stepDetails.end ? new Date(stepDetails.end).toISOString() : 'N/A',
+                duration: stepDetails.duration ? `${Math.round(stepDetails.duration)} ms` : 'N/A',
+              };
+              data.push(stepRow);
+            }
           });
-        } else {
-          data.push({ step: 'No steps data found' });
+        }
+        
+        if (data.length === 0) {
+          data.push({ step: 'No passed steps found' });
         }
 
         p.addRows(data, { separator: true });
@@ -417,12 +421,27 @@ export async function testStep(
         start,
         end,
         duration,
-        description
+        description,
+        status: 'passed'
       }
     });
 
     return result;
   } catch (error) {
+    const endTimePerf: number = performance.now();
+    const end: string = new Date().toISOString();
+    const duration: number = Math.round(endTimePerf - startTimePerf);
+    
+    stepData.push({
+      [title]: {
+        start,
+        end,
+        description,
+        status: 'failed',
+        error: error instanceof Error ? error.message : String(error)
+      }
+    });
+    
     throw error;
   }
 }
@@ -482,7 +501,7 @@ export async function createIndexTemplate(templateName: string) {
               metrics: { type: 'long' },
             },
           },
-          period: { type: 'text' },
+          period: { type: 'keyword' },
           status: { type: 'keyword' },
           duration: { type: 'float' },
           errors: { type: 'object' },

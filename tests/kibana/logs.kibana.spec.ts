@@ -43,6 +43,7 @@ test.afterAll('Print test results', async ({}) => {
 
 test.skip('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
@@ -68,11 +69,11 @@ test.skip('Discover - All logs', async ({datePicker, discoverPage, headerBar, no
       })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
-  (testInfo as any).stepData = stepData;
 });
 
 test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
@@ -124,11 +125,11 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       })
     ]);
   }, 'Navigating to the "Field Statistics" tab and asserting doc count');
-  (testInfo as any).stepData = stepData;
 });
 
 test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
   let stepData: object[] = [];
+  (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
     logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
@@ -189,5 +190,4 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
     await discoverPage.assertVisibilityCanvas();
     await discoverPage.assertVisibilityDataGridRow();
   }, 'Navigating to the "Patterns" tab and asserting patterns row visibility');
-  (testInfo as any).stepData = stepData;
 });
