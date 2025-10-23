@@ -507,7 +507,60 @@ export async function createIndexTemplate(templateName: string) {
           errors: { type: 'object' },
           cluster_name: { type: 'keyword' },
           build_flavor: { type: 'keyword' },
-          steps: { type: 'object' },
+          steps: {
+            properties: {
+              step01: {
+                properties: {
+                  error: { type: 'keyword' },
+                  duration: { type: 'long' },
+                  description: { type: 'text' },
+                  start: { type: 'date' },
+                  end: { type: 'date' },
+                  status: { type: 'keyword' },
+                },
+              },
+              step02: {
+                properties: {
+                  error: { type: 'keyword' },
+                  duration: { type: 'long' },
+                  description: { type: 'text' },
+                  start: { type: 'date' },
+                  end: { type: 'date' },
+                  status: { type: 'keyword' },
+                },
+              },
+              step03: {
+                properties: {
+                  error: { type: 'keyword' },
+                  duration: { type: 'long' },
+                  description: { type: 'text' },
+                  start: { type: 'date' },
+                  end: { type: 'date' },
+                  status: { type: 'keyword' },
+                },
+              },
+              step04: {
+                properties: {
+                  error: { type: 'keyword' },
+                  duration: { type: 'long' },
+                  description: { type: 'text' },
+                  start: { type: 'date' },
+                  end: { type: 'date' },
+                  status: { type: 'keyword' },
+                },
+              },
+              step05: {
+                properties: {
+                  error: { type: 'keyword' },
+                  duration: { type: 'long' },
+                  description: { type: 'text' },
+                  start: { type: 'date' },
+                  end: { type: 'date' },
+                  status: { type: 'keyword' },
+                },
+              },
+            },
+          },
           cacheStats: { type: 'object' },
           measurements: { type: 'object' },
         },
