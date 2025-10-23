@@ -295,7 +295,6 @@ export async function writeJsonReport(
   docsCount?: object,
   stepData?: object[],
   cacheStats?: object,
-  hostsMeasurements?: any
 ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
@@ -311,12 +310,6 @@ export async function writeJsonReport(
   logger.info(`Saving report file to ${outputDirectory}`);
   const outputPath = path.join(outputDirectory, fileName);
 
-  if (hostsMeasurements) {
-    hostsObject = hostsMeasurements.reduce((acc, obj) => {
-      return { ...acc, ...obj };
-    }, {});
-  }
-
   const reportData = {
     title: testInfo.title,
     startTime: testStartTime,
@@ -331,7 +324,6 @@ export async function writeJsonReport(
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
     ...(cacheStats && { cacheStats }),
-    ...(hostsMeasurements && { measurements: hostsObject }),
   };
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
   return files;

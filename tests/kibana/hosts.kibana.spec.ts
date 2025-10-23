@@ -1,13 +1,13 @@
 import { test } from '../../src/pom/page.fixtures.ts';
-import { 
-    fetchClusterData, 
-    getDatePickerLogMessage, 
+import {
+    fetchClusterData,
+    getDatePickerLogMessage,
     getDocCount,
-    getHostData, 
-    printResults, 
-    selectDefaultSpace, 
-    testStep, 
-    writeJsonReport 
+    getHostData,
+    printResults,
+    selectDefaultSpace,
+    testStep,
+    writeJsonReport
 } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
@@ -33,18 +33,17 @@ test.beforeEach(async ({ page, sideNav }) => {
     await selectDefaultSpace(clusterData.version.build_flavor, page);
 });
 
-test.afterEach('Log test results', async ({}, testInfo) => {
-  const hostsMeasurements = (testInfo as any).hostsMeasurements;
-  const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData, hostsMeasurements);
-  reports.push(...reportFiles.filter(item => typeof item === 'string'));
+test.afterEach('Log test results', async ({ }, testInfo) => {
+    const stepData = (testInfo as any).stepData;
+    const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
+    reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 
-test.afterAll('Print test results', async ({}) => {
-  await printResults(reports);
+test.afterAll('Print test results', async ({ }) => {
+    await printResults(reports);
 });
 
-test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, notifications, page }, testInfo) => {
+test('Hosts - Landing page - All elements', async ({ datePicker, headerBar, hostsPage, notifications, page }, testInfo) => {
     const cpuUsageKPI = "infraAssetDetailsKPIcpuUsage";
     const normalizedLoadKPI = "infraAssetDetailsKPInormalizedLoad1m";
     const memoryUsageKPI = "infraAssetDetailsKPImemoryUsage";
@@ -53,7 +52,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
     const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
     let stepData: object[] = [];
     (testInfo as any).stepData = stepData;
-  
+
     await testStep('step01', stepData, page, async () => {
         logger.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
@@ -62,7 +61,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
         await datePicker.setInterval();
         await page.evaluate("document.body.style.zoom=0.9");
         logger.info('Asserting visibility of elements on the Hosts page');
-        const asyncResults = await Promise.race([
+        await Promise.race([
             Promise.all([
                 hostsPage.assertHostsNumber(),
                 hostsPage.assertVisibilityHostsTable(),
@@ -70,9 +69,10 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
                 hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
                 hostsPage.assertVisibilityVisualization(memoryUsageKPI),
                 hostsPage.assertVisibilityVisualization(diskUsageKPI),
-                hostsPage.assertVisibilityVisualization(cpuUsage), 
+                hostsPage.assertVisibilityVisualization(cpuUsage),
                 hostsPage.assertVisibilityVisualization(normalizedLoad),
-                ]),
+                headerBar.assertLoadingIndicator(),
+            ]),
             hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
                 throw new Error('Test is failed because no visualization data available');
             }),
@@ -89,11 +89,10 @@ test('Hosts - Landing page - All elements', async ({ datePicker, hostsPage, noti
                 throw new Error('Test is failed because Hosts data failed to load');
             })
         ]);
-        (testInfo as any).hostsMeasurements = asyncResults;
     }, 'Asserting visibility of visualizations on the Hosts landing page');
 });
 
-test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testInfo) => {
+test('Hosts - Landing page - Logs', async ({ datePicker, headerBar, hostsPage, page }, testInfo) => {
     let stepData: object[] = [];
     (testInfo as any).stepData = stepData;
 
@@ -106,21 +105,23 @@ test('Hosts - Landing page - Logs', async ({ datePicker, hostsPage, page}, testI
         await datePicker.setInterval();
         logger.info('Navigating to the "Logs" tab');
         await hostsPage.clickLogsTab();
-        logger.info('Asserting visibility of the "Logs" stream');
-        const asyncResults = await Promise.race([
+        logger.info('Asserting number of host logs...');
+        await Promise.race([
             Promise.all([
-                hostsPage.assertVisibilityLogStream()
-                ]),
+                hostsPage.assertLogsDocNumber(),
+                hostsPage.assertDocTable(),
+                headerBar.assertLoadingIndicator(),
+            ]),
             hostsPage.assertVisibilityNoLogs().then(() => {
                 noLogsData = true;
-                test.skip(noLogsData, "Test is skipped due to lack of logs data")
+                logger.warn('Test is skipped due to lacking host logs data');
+                test.skip(noLogsData, "Test is skipped due to lacking host logs data")
             })
         ]);
-        (testInfo as any).hostsMeasurements = asyncResults;
-    }, 'Asserting visibility of the log stream on the Hosts landing page');
+    }, 'Asserting the number of logs documents on the Hosts landing page');
 });
 
-test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, testInfo) => {
+test('Hosts - Landing page - Alerts', async ({ datePicker, headerBar, hostsPage, page }, testInfo) => {
     let stepData: object[] = [];
     (testInfo as any).stepData = stepData;
 
@@ -134,16 +135,17 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, hostsPage, page }, te
         logger.info('Navigating to the "Alerts" tab');
         await hostsPage.clickAlertsTab();
         logger.info('Asserting visibility of the "Alerts" chart and table');
-        const asyncResults = await Promise.race([
+        await Promise.race([
             Promise.all([
                 hostsPage.assertVisibilityAlertsChart(),
-                hostsPage.assertVisibilityAlertsTable()
-                ]),
+                hostsPage.assertVisibilityAlertsTable(),
+                headerBar.assertLoadingIndicator(),
+            ]),
             hostsPage.assertNoResultsMatchMessage().then(() => {
                 noAlertsData = true;
-                test.skip(noAlertsData, "Test is skipped due to lack of alerts data")
+                logger.warn('Test is skipped due to lacking host alerts data')
+                test.skip(noAlertsData, "Test is skipped due to lacking host alerts data")
             })
         ]);
-        (testInfo as any).hostsMeasurements = asyncResults;
     }, 'Asserting visibility of the alerts chart and table on the Hosts landing page');
 });
