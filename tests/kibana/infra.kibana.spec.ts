@@ -26,7 +26,7 @@ test.beforeAll('Check pod data', async ({ browser, request }) => {
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();
-  await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
+  await importDashboards(browser, 'src/data/saved-objects/k8s_dashboards.ndjson');
 });
 
 test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
