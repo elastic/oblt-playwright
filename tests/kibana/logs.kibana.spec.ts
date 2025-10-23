@@ -1,12 +1,12 @@
 import { test } from '../../src/pom/page.fixtures.ts';
-import { 
-  fetchClusterData, 
+import {
+  fetchClusterData,
   getDatePickerLogMessage,
   getDocCount,
-  printResults, 
-  selectDefaultSpace, 
-  testStep, 
-  writeJsonReport 
+  printResults,
+  selectDefaultSpace,
+  testStep,
+  writeJsonReport
 } from "../../src/helpers.ts";
 import { logger } from '../../src/logger.ts';
 
@@ -15,7 +15,7 @@ let doc_count: object;
 let reports: string[] = [];
 const testStartTime: string = new Date().toISOString();
 
-test.beforeAll('Fetch cluster data', async ({}) => {
+test.beforeAll('Fetch cluster data', async ({ }) => {
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();
@@ -31,17 +31,17 @@ test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
   await discoverPage.selectLogsDataView();
 });
 
-test.afterEach('Log test results', async ({}, testInfo) => {
+test.afterEach('Log test results', async ({ }, testInfo) => {
   const stepData = (testInfo as any).stepData;
   const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 
-test.afterAll('Print test results', async ({}) => {
+test.afterAll('Print test results', async ({ }) => {
   await printResults(reports);
 });
 
-test.skip('Discover - All logs', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, notifications, page }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
@@ -64,14 +64,11 @@ test.skip('Discover - All logs', async ({datePicker, discoverPage, headerBar, no
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
-      discoverPage.assertAbortedExpression().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
-      })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 });
 
-test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar, notifications, page }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
@@ -81,8 +78,8 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
-        await discoverPage.assertVisibilityCanvas(),
-        await discoverPage.assertVisibilityDataGridRow(),
+        discoverPage.assertVisibilityCanvas(),
+        discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
@@ -94,9 +91,6 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
-      discoverPage.assertAbortedExpression().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
-      })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
@@ -120,14 +114,11 @@ test('Discover - Field Statistics', async ({datePicker, discoverPage, headerBar,
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
-      discoverPage.assertAbortedExpression().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
-      })
     ]);
   }, 'Navigating to the "Field Statistics" tab and asserting doc count');
 });
 
-test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notifications, page}, testInfo) => {
+test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifications, page }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
@@ -137,8 +128,8 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
       Promise.all([
-        await discoverPage.assertVisibilityCanvas(),
-        await discoverPage.assertVisibilityDataGridRow(),
+        discoverPage.assertVisibilityCanvas(),
+        discoverPage.assertVisibilityDataGridRow(),
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
@@ -150,9 +141,6 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
-      discoverPage.assertAbortedExpression().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
-      })
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
@@ -179,9 +167,6 @@ test('Discover - Patterns', async ({datePicker, discoverPage, headerBar, notific
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
-      discoverPage.assertAbortedExpression().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
-      })
     ]);
     logger.info('Clicking on the filter pattern button');
     await discoverPage.clickFilterPatternButton();

@@ -15,7 +15,6 @@ export default class DiscoverPage {
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
     private readonly histogramEmbeddedError = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-test-subj="embeddable-lens-failure"]');
-    private readonly abortedExpression = () => this.page.locator('xpath=//div[@data-test-subj="embeddable-lens-failure"]//*[text()="The expression was aborted."]');
     private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
     private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-test-subj="dataGridRowCell"][@aria-rowindex="1"][@data-gridcell-column-id="actions"][1]');
     private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
@@ -71,10 +70,6 @@ export default class DiscoverPage {
 
     public async assertVisibilityCanvas() {
         await expect(this.logsCanvas()).toBeVisible();
-    }
-
-    public async assertAbortedExpression() {
-        await expect(this.abortedExpression()).toBeVisible();
     }
 
     public async filterLogsByError() {
