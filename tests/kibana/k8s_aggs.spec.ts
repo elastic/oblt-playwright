@@ -21,7 +21,7 @@ let reports: string[] = [];
 const testStartTime: string = new Date().toISOString();
 
 test.beforeAll(async ({ browser }) => {
-  await importDashboards(browser, 'src/data/dashboards/dashboards.ndjson');
+  await importDashboards(browser, 'src/data/saved-objects/k8s_dashboards.ndjson');
   logger.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();
