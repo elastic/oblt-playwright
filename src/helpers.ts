@@ -304,6 +304,11 @@ export async function writeJsonReport(
 
   const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
   files.push(fileName);
+
+  if (!fs.existsSync(outputDirectory)) {
+    fs.mkdirSync(outputDirectory, { recursive: true });
+  }
+  logger.info(`Saving report file to ${outputDirectory}`);
   const outputPath = path.join(outputDirectory, fileName);
 
   if (hostsMeasurements) {

@@ -1,13 +1,12 @@
-FROM node:22-alpine AS builder
-
+FROM node:24.6-trixie-slim
+RUN apt update && apt install -y curl
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --include=dev
-RUN npx playwright install chromium
+RUN npm ci
+COPY playwright.config.ts ./
+RUN npx -y playwright@1.55.1 install --with-deps
 COPY src/ ./src/
 COPY tests/ ./tests/
-COPY playwright.config.ts ./
 
-
-ENTRYPOINT ["npx", "playwright"]
+ENTRYPOINT ["npx","playwright"]
 CMD ["--help"]
