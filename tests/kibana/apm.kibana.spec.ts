@@ -94,7 +94,13 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     logger.info('Clicking on the "Failed transaction correlations" tab');
     await servicesPage.openFailedTransactionCorrelationsTab();
     logger.info('Asserting visibility of the "Correlation" button');
-    await servicesPage.assertVisibilityCorrelationButton();
+    await Promise.race([
+      servicesPage.assertVisibilityCorrelationButton(),
+      servicesPage.assertNoSignificantCorrelations().then(() => {
+        logger.warn('Time range is too narrow: No significant APM transaction correlations found');
+        test.skip(true, 'Time range is too narrow: No significant APM transaction correlations found');
+      })
+    ]);
     logger.info('Filtering data by correlation value and field value');
     await servicesPage.filterByFieldValue();
     await servicesPage.filterByCorrelationValue();
