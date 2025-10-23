@@ -12,7 +12,8 @@ export default class HostsPage {
     private readonly hostsTable = () => this.page.getByTestId('hostsView-table-loaded');
     private readonly hostsTableNoData = () => this.page.getByTestId('hostsViewTableNoData');
     private readonly logsTab = () => this.page.getByTestId('hostsView-tabs-logs');
-    private readonly logStream = () => this.page.getByTestId('logStream');
+    private readonly logsNoDocs = () => this.page.locator('xpath=//div[@data-test-subj="docTable"]//div[@data-test-subj="savedSearchTotalDocuments"]/*[text()="0"]');
+    private readonly logsDocTable = () => this.page.locator('xpath=//div[@data-test-subj="docTable"]');
     private readonly logStreamNoMessages = () => this.page.locator('xpath=//h2[contains(text(),"There are no log messages to display.")]');
     private readonly alertsTab = () => this.page.getByTestId('hostsView-tabs-alerts');
     private readonly alertsChart = () => this.page.locator('xpath=//div[@data-test-subj="alertSummaryWidgetFullSizeChartContainer"]//div[contains(@class, "echChartContent")]');
@@ -32,166 +33,120 @@ export default class HostsPage {
 
     public async clickTableCellHosts() {
         await this.tableCellHosts().click();
-        }
-    
+    }
+
     public async setHostsLimit500() {
         await this.hostsLimit500().click();
-        }
+    }
 
     public async clickLogsTab() {
         await this.logsTab().click();
-        }
+    }
 
     public async clickAlertsTab() {
         await this.alertsTab().click();
-        }
+    }
 
     public async openHostsMetadataTab() {
         await this.hostsMetadataTab().click();
-        }
+    }
 
     public async openHostsMetricsTab() {
         await this.hostsMetricsTab().click();
-        }
+    }
 
     public async openHostsProcessesTab() {
         await this.hostsProcessesTab().click();
-        }
+    }
 
     public async openHostsLogsTab() {
         await this.hostsLogsTab().click();
-        }
+    }
 
     public async openHostsLogs() {
         await this.hostsLogs().click();
-        }
+    }
 
     public async assertHostsNumber() {
-        const startTime = performance.now();
         await expect(this.hostsNumber(), 'Hosts number should not be 0').not.toHaveText('0');
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Hosts Count": elapsedTime};
-        return result;
-        }
+    }
 
     public async assertVisibilityHostsTable() {
-        const startTime = performance.now();
         await Promise.all([
             expect(this.hostsTable(), 'Hosts table should be visible').toBeVisible(),
             expect(this.hostsTableNoData(), '"No data to display" message should be hidden').not.toBeVisible()
-            ]);
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Host Names and Metrics": elapsedTime};
-        return result;
-        }
+        ]);
+    }
 
-    public async assertVisibilityLogStream() {
-        const startTime = performance.now();
-        await expect(this.logStream(), 'Log stream should be visible').toBeVisible();
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Log stream": elapsedTime};
-        return result;
-        }
+    public async assertDocTable() {
+        await expect(this.logsDocTable(), 'Doc table should be visible').toBeVisible();
+    }
+
+    public async assertLogsDocNumber() {
+        await expect(this.logsNoDocs(), 'The number of documents should not be 0').not.toBeVisible();
+    }
 
     public async assertVisibilityNoLogs() {
         await expect(this.logStreamNoMessages(), '"There are no log messages to display." visibility').toBeVisible();
-        }
+    }
 
     public async assertVisibilityAlertsChart() {
-        const startTime = performance.now();
         await expect(this.alertsChart(), 'Alerts chart should be visible').toBeVisible();
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Alerts chart": elapsedTime};
-        return result;
-        }
+    }
 
     public async assertVisibilityAlertsTable() {
-        const startTime = performance.now();
         await expect(this.alertsTable(), 'Alerts table should be visible').toBeVisible();
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Alerts table": elapsedTime};
-        return result;
-        }
+    }
 
     public async assertNoResultsMatchMessage() {
         Promise.all([
             await expect(this.noResultsMatchMessage(), 'Alerts table should be visible').toBeVisible(),
             await expect(this.loadingIndicator(), 'Loading indicator should not be visible').not.toBeVisible()
-            ]);
-        }
+        ]);
+    }
 
     public async assertVisibilityHostsMetadataTable() {
-        const startTime = performance.now();
         await expect(this.hostsMetadataTable(), 'Metadata table should be visible').toBeVisible();
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Metadata table": elapsedTime};
-        return result;
-        }
+    }
 
     public async assertVisibilityHostsProcessesTable() {
-        const startTime = performance.now();
         await Promise.all([
             expect(this.hostsProcessesTabTable(), 'Processes table should be visible').toBeVisible(),
             expect(this.hostsProcessesNotFound(), '"There are no log messages to display." message should be hidden').not.toBeVisible()
-            ]);
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Processes table": elapsedTime};
-        return result;
-        }
+        ]);
+    }
 
     public async assertProcessesNotFound() {
         await expect(this.hostsProcessesNotFound(), 'Processes not found').toBeVisible();
-        }
+    }
 
     public async assertVisibilityVisualization(title: string) {
-        const startTime = performance.now();
         await Promise.all([
             await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible(),
             await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"][@data-loading="true"]`), 'Data loading should be completed').not.toBeVisible(),
             await expect(this.page.locator(`xpath=//div[@data-test-subj="${title}"]//div[contains(@class, "euiProgress")]`), 'Progress bar should not be visible').not.toBeVisible()
-            ]);
+        ]);
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]//p[@class="echMetricText__value"][@title="N/A"]`), `"${title}" visualization shows no data`).not.toBeVisible();
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {[title]: elapsedTime};
-        return result;
-        }
+    }
 
     public async assertVisualizationNoData(title: string) {
         await expect(this.page.locator(`xpath=//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]//p[@class="echMetricText__value"][@title="N/A"]`), `"${title}" visualization shows no data`).toBeVisible()
-        }
+    }
 
     public async assertVisibilityVisualizationMetricsTab(title: string) {
-        const startTime = performance.now();
         Promise.all([
             await expect(this.page.locator(`xpath=//div[@data-test-subj="infraAssetDetailsMetricsTabContent"]//div[@data-test-embeddable-id="${title}"]//div[contains(@class, "echChartContent")]`), `"${title}" visualization should be visible`).toBeVisible(),
             await expect(this.page.locator(`xpath=//div[@data-test-subj="infraAssetDetailsMetricsTabContent"]//div[@data-test-embeddable-id="${title}"][@data-loading="true"]`), 'Progress bar should not be visible').not.toBeVisible()
-            ]);
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {[title]: elapsedTime};
-        return result;
-        }
+        ]);
+    }
 
     public async assertVisibilityHostsLogsTabStream() {
-        const startTime = performance.now();
         await Promise.all([
             expect(this.hostsLogsTabStream(), 'Log stream should be visible').toBeVisible()
-            ]);
-        const endTime = performance.now();
-        const elapsedTime = (endTime - startTime) / 1000;
-        const result = {"Log stream": elapsedTime};
-        return result;
-        }
+        ]);
+    }
 
     public async assertLogsNotFound() {
         await expect(this.logStreamNoMessages(), 'Logs not found').toBeVisible();
-        }
+    }
 }
