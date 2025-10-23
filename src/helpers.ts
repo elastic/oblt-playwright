@@ -321,7 +321,7 @@ export async function writeJsonReport(
       : `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
     duration: testInfo.duration,
-    ...(testInfo.errors.length > 0 && { errors: testInfo.errors }),
+    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map(e => e.message).join('\n') } }),
     cluster_name: cluster_name,
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
