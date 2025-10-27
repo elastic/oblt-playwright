@@ -15,7 +15,7 @@ export default class ServicesPage {
     private readonly servicesTransactionsTab = () => this.page.getByTestId('transactionsTab');
     private readonly transactionErrorsNotFound = () => this.page.locator('xpath=//div[@data-test-subj="topErrorsForTransactionTable"]//*[text()="No errors found for this transaction group"]');
     private readonly mostImpactfulTransaction = () => this.page.locator('xpath=//div[@data-test-subj="transactionsGroupTable"]//tbody[@class="css-0"]//tr[1]//a[1]');
-    private readonly failedTransactionCorrelationsTab = () => this.page.getByRole('tab', { name: 'Failed transaction correlations' });
+    private readonly failedTransactionCorrelationsTab = () => this.page.locator('xpath=//button[@data-test-subj="apmFailedTransactionsCorrelationsTabButton"]');
     private readonly noSignificantCorrelations = () => this.page.locator('xpath=//div[@data-test-subj="apmCorrelationsTable"]//*[contains(text(),"No significant correlations")]');
     private readonly filterByCorrelationValueButton = () => this.page.locator('xpath=//div[@data-test-subj="apmCorrelationsTable"]//tbody[@class="css-0"]//tr[1]//td[4]//span[1]//button[1]');
     private readonly filterByFieldValueButton = () => this.page.getByRole('button', { name: 'Field value', exact: true });
