@@ -21,7 +21,7 @@ test.beforeAll('Fetch cluster data', async ({ }) => {
   doc_count = await getDocCount();
 });
 
-test.beforeEach(async ({ discoverPage, page, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ discoverPage, page, sideNav }) => {
   logger.info('Selecting the default Kibana space');
   await sideNav.goto();
   await selectDefaultSpace(clusterData.version.build_flavor, page);

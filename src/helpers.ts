@@ -162,15 +162,15 @@ export async function fetchClusterData() {
 
 export async function checkKibanaAvailability(page: Page) {
   try {
-    const response = await page.goto(KIBANA_HOST, { 
+    const response = await page.goto(KIBANA_HOST, {
       timeout: 30000,
-      waitUntil: 'domcontentloaded' 
+      waitUntil: 'domcontentloaded'
     });
-    
+
     if (!response || !response.ok()) {
       throw new Error(`Kibana is not available. Status: ${response?.status()}`);
     }
-    
+
     return {
       available: true,
       status: response.status(),
@@ -252,40 +252,40 @@ export async function getDocCount() {
     }
   }
 
-const fetchPromises = indices.map(async (item) => {
-  const url = `${ELASTICSEARCH_HOST}/${item}/_count`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      "accept": "*/*",
-      "Authorization": `ApiKey ${API_KEY}`,
-      "Content-Type": "application/json",
-      "kbn-xsrf": "reporting"
-    },
-    body: JSON.stringify(request_body)
+  const fetchPromises = indices.map(async (item) => {
+    const url = `${ELASTICSEARCH_HOST}/${item}/_count`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        "accept": "*/*",
+        "Authorization": `ApiKey ${API_KEY}`,
+        "Content-Type": "application/json",
+        "kbn-xsrf": "reporting"
+      },
+      body: JSON.stringify(request_body)
+    });
+
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+
+    const jsonDataNode = JSON.parse(await response.text());
+
+    switch (item) {
+      case `apm-*,logs-*.otel-*,logs-apm*,metrics-*.otel-*,metrics-apm*,traces-*.otel-*,traces-apm*`:
+        count.apm = jsonDataNode.count;
+        break;
+      case `logs-*`:
+        count.logs = jsonDataNode.count;
+        break;
+      case `metrics-*`:
+        count.metrics = jsonDataNode.count;
+        break;
+    }
   });
 
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-
-  const jsonDataNode = JSON.parse(await response.text());
-
-  switch (item) {
-    case `apm-*,logs-*.otel-*,logs-apm*,metrics-*.otel-*,metrics-apm*,traces-*.otel-*,traces-apm*`:
-      count.apm = jsonDataNode.count;
-      break;
-    case `logs-*`:
-      count.logs = jsonDataNode.count;
-      break;
-    case `metrics-*`:
-      count.metrics = jsonDataNode.count;
-      break;
-  }
-});
-
-await Promise.all(fetchPromises);
-return count;
+  await Promise.all(fetchPromises);
+  return count;
 }
 
 export async function writeJsonReport(
@@ -298,7 +298,6 @@ export async function writeJsonReport(
 ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
-  let hostsObject: {} = {};
   let files: string[] = [];
 
   const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
@@ -319,7 +318,7 @@ export async function writeJsonReport(
       : `Last ${TIME_VALUE} ${TIME_UNIT}`,
     status: testInfo.status,
     duration: testInfo.duration,
-    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map(e => e.message).join('\n') } }),
+    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map(e => (e.message ? e.message.replace(/\u001b\[[0-9;]*m|\u001b/g, '') : '')).join('\n') } }),
     cluster_name: cluster_name,
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
@@ -375,7 +374,7 @@ export async function printResults(reportFiles: string[]) {
             }
           });
         }
-        
+
         if (data.length === 0) {
           data.push({ step: 'No passed steps found' });
         }
@@ -420,20 +419,17 @@ export async function testStep(
 
     return result;
   } catch (error) {
-    const endTimePerf: number = performance.now();
     const end: string = new Date().toISOString();
-    const duration: number = Math.round(endTimePerf - startTimePerf);
-    
+
     stepData.push({
       [title]: {
         start,
         end,
-        description,
         status: 'failed',
-        error: error instanceof Error ? error.message : String(error)
+        error: error.message.replace(/\u001b\[[0-9;]*m|\u001b/g, '')
       }
     });
-    
+
     throw error;
   }
 }

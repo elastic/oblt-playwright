@@ -1,4 +1,6 @@
 import { expect, Page } from "@playwright/test";
+import { logger } from '../../logger.ts';
+import { waitForOneOf } from "../../../src/helpers.ts";
 
 export default class DiscoverPage {
     page: Page;
@@ -8,6 +10,7 @@ export default class DiscoverPage {
     }
 
     public readonly discoverTab = () => this.page.getByTestId('discoverTab');
+    private readonly skipTour = () => this.page.locator('xpath=//div[@data-test-subj="nav-tour-step-sidenav-home"]//*[text()="Skip tour"]');
     private readonly dataView = () => this.page.getByTestId('discover-dataView-switch-link');
     private readonly dataViewInput = () => this.page.locator('xpath=//*[@data-test-subj="changeDataViewPopover"]//input');
     private readonly dataViewLogs = () => this.page.locator('xpath=//li[@value="logs-*"]');
@@ -35,6 +38,17 @@ export default class DiscoverPage {
     }
 
     public async selectLogsDataView() {
+        logger.info("Checking for welcome tour pop-up");
+        const [index] = await waitForOneOf([
+            this.skipTour(),
+            this.dataView()
+        ]);
+        const skipWelcomeTour = index === 0;
+        if (skipWelcomeTour) {
+            logger.info("Skipping the welcome tour");
+            await this.skipTour().click();
+        }
+        logger.info("Selecting logs data view");
         await this.dataView().click();
         await this.dataViewInput().fill('logs-*');
         await this.dataViewLogs().click();
