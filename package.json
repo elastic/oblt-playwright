@@ -9,7 +9,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.55.1",
-    "@types/node": "^24.6.2"
+    "@types/node": "^24.9.2"
   },
   "dependencies": {
     "console-table-printer": "^2.14.6",
