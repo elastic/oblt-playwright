@@ -40,7 +40,7 @@ test("Authentication", async ({ page }, testInfo) => {
 
       logger.info("Logging in to Kibana (Serverless)");
       const [result] = await waitForOneOf([
-        page.locator('xpath=//div[@id="navigation-root"]'),
+        page.locator('xpath=//a[@href="/app/discover#/"]'),
         page.locator('xpath=//h1[contains(text(),"Select your space")]'),
         page.locator('xpath=//div[@data-test-id="login-error"]'),
       ]);
