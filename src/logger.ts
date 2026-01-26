@@ -1,4 +1,8 @@
 import winston from 'winston';
+import {
+  CI,
+  REPORT_DIR,
+} from '../src/env.ts';
 
 const customLevels = {
   levels: {
@@ -15,26 +19,39 @@ const customLevels = {
   }
 };
 
-const customFileFormat = winston.format.printf(({ message, timestamp }) => {
-  return `${timestamp}: ${message}`;
-});
+const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
 
-export const logger = winston.createLogger({
+const logger = winston.createLogger({
   levels: customLevels.levels,
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.json()
+  ),
   transports: [
-    new winston.transports.Console({
-      level: 'info',
+    new winston.transports.File({
+      filename: `${outputDirectory}/execution.json.log`,
       format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp({
-          format: 'YYYY-MM-DD HH:mm:ss',
-        }),
-        winston.format.printf(({ timestamp, level, message }) => {
-          return `${timestamp} [${level}]: ${message}`;
-        })
+        winston.format.timestamp(),
+        winston.format.json()
       )
-    })
+    }),
   ],
 });
 
+if (process.env.CI !== 'true') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.timestamp({
+        format: 'YYYY-MM-DD HH:mm:ss',
+      }),
+      winston.format.printf(({ timestamp, level, message }) => {
+        return `${timestamp} [${level}]: ${message}`;
+      })
+    )
+  }));
+}
+
 winston.addColors(customLevels.colors);
+
+export default logger;

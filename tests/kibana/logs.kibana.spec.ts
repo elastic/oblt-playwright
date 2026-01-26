@@ -8,45 +8,44 @@ import {
   testStep,
   writeJsonReport
 } from "../../src/helpers.ts";
-import { logger } from '../../src/logger.ts';
 
 let clusterData: any;
 let doc_count: object;
 let reports: string[] = [];
 const testStartTime: string = new Date().toISOString();
 
-test.beforeAll('Fetch cluster data', async ({ }) => {
-  logger.info('Fetching cluster data');
+test.beforeAll('Fetch cluster data', async ({ log }) => {
+  log.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();
 });
 
-test.beforeEach(async ({ discoverPage, page, sideNav }) => {
-  logger.info('Selecting the default Kibana space');
+test.beforeEach(async ({ discoverPage, page, sideNav, log }) => {
+  log.info('Selecting the default Kibana space');
   await sideNav.goto();
   await selectDefaultSpace(clusterData.version.build_flavor, page);
-  logger.info('Navigating to the "Discover" section');
+  log.info('Navigating to the "Discover" section');
   await page.goto('/app/discover');
-  logger.info('Selecting the "Logs" data view');
+  log.info('Selecting the "Logs" data view');
   await discoverPage.selectLogsDataView();
 });
 
-test.afterEach('Log test results', async ({ }, testInfo) => {
+test.afterEach('Log test results', async ({ log }, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
+  const reportFiles = await writeJsonReport(log, clusterData, testInfo, testStartTime, doc_count, stepData);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 
-test.afterAll('Print test results', async ({ }) => {
+test.afterAll('Print test results', async ({}) => {
   await printResults(reports);
 });
 
-test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, notifications, page }, testInfo) => {
+test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, notifications, page, log }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
+    log.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -68,12 +67,12 @@ test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, n
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 });
 
-test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar, notifications, page }, testInfo) => {
+test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar, notifications, page, log }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
+    log.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -94,11 +93,11 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
-  logger.info('Waiting for 30s before proceeding to the next step...');
+  log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
+    log.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
     await discoverPage.clickFieldStatsTab();
     await Promise.race([
       Promise.all([
@@ -118,12 +117,12 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
   }, 'Navigating to the "Field Statistics" tab and asserting doc count');
 });
 
-test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifications, page }, testInfo) => {
+test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifications, page, log }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
   await testStep('step01', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
+    log.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -144,11 +143,11 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
-  logger.info('Waiting for 30s before proceeding to the next step...');
+  log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
   await testStep('step02', stepData, page, async () => {
-    logger.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
+    log.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
     await discoverPage.clickPatternsTab();
     await Promise.race([
       Promise.all([
@@ -168,9 +167,9 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
         throw new Error('Test is failed: Chart failed to load');
       }),
     ]);
-    logger.info('Clicking on the filter pattern button');
+    log.info('Clicking on the filter pattern button');
     await discoverPage.clickFilterPatternButton();
-    logger.info('Asserting visibility of the chart, canvas, and data grid row');
+    log.info('Asserting visibility of the chart, canvas, and data grid row');
     await discoverPage.assertChartIsRendered();
     await discoverPage.assertVisibilityCanvas();
     await discoverPage.assertVisibilityDataGridRow();

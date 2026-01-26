@@ -20,10 +20,14 @@ import {
   TIME_VALUE,
   REPORT_DIR,
 } from '../src/env.ts';
+import {
+  oblt_playwright,
+  oblt_playwright_logs
+} from '../src/index_templates.ts';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from './logger.ts';
 import { Table } from 'console-table-printer';
+import { Logger } from "winston";
 
 const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
 
@@ -187,8 +191,8 @@ export function getDatePickerLogMessage(): string {
     : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
 }
 
-export async function importDashboards(browser: Browser, inputFile: string) {
-  logger.info('Checking if Playwright dashboards are available');
+export async function importDashboards(log: Logger, browser: Browser, inputFile: string) {
+  log.info('Checking if Playwright dashboards are available');
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto('/app/management/kibana/objects');
@@ -197,13 +201,13 @@ export async function importDashboards(browser: Browser, inputFile: string) {
   await page.waitForTimeout(2000);
   const noItems = await page.locator('xpath=//div[@data-test-subj="savedObjectsTable"]//span[contains(text(), "No items found")]').isVisible();
   if (noItems) {
-    logger.info('Importing dashboards...');
+    log.info('Importing dashboards...');
     await page.getByRole('button', { name: 'Import' }).click();
     await page.locator('xpath=//input[@type="file"]').setInputFiles(inputFile);
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Import")]').click();
     await page.locator('xpath=//div[contains(@class, "euiFlyoutFooter")]//span[contains(text(),"Done")]').click();
   } else {
-    logger.info('Dashboard(s) already exist.');
+    log.info('Dashboard(s) already exist.');
   }
   await context.close();
 }
@@ -289,6 +293,7 @@ export async function getDocCount() {
 }
 
 export async function writeJsonReport(
+  log: Logger,
   clusterData: any,
   testInfo: TestInfo,
   testStartTime: string,
@@ -306,7 +311,7 @@ export async function writeJsonReport(
   if (!fs.existsSync(outputDirectory)) {
     fs.mkdirSync(outputDirectory, { recursive: true });
   }
-  logger.info(`Saving report file to ${outputDirectory}`);
+  log.info(`Saving report file to ${outputDirectory}`);
   const outputPath = path.join(outputDirectory, fileName);
 
   const reportData = {
@@ -473,87 +478,22 @@ export async function checkIndexTemplateExists(templateName: string): Promise<bo
   return response.ok;
 }
 
-export async function createIndexTemplate(templateName: string) {
-  const url = `${REPORT_CLUSTER_ES}/_index_template/${templateName}`;
+export async function createIndexTemplate(name: string) {
+  const url = `${REPORT_CLUSTER_ES}/_index_template/${name}`;
+  let template_name: {} = {};
+  
+  switch (name) {
+    case "oblt-playwright":
+        template_name = oblt_playwright;
+        break;
+    case "playwright-logs":
+        template_name = oblt_playwright_logs;
+        break;
+  }
+
   const body = {
-    index_patterns: [`${templateName}`],
-    template: {
-      mappings: {
-        properties: {
-          title: { type: 'text' },
-          startTime: { type: 'date' },
-          doc_count: {
-            properties: {
-              apm: { type: 'long' },
-              logs: { type: 'long' },
-              metrics: { type: 'long' },
-            },
-          },
-          period: { type: 'keyword' },
-          status: { type: 'keyword' },
-          duration: { type: 'float' },
-          errors: { type: 'object' },
-          cluster_name: { type: 'keyword' },
-          build_flavor: { type: 'keyword' },
-          steps: {
-            properties: {
-              step01: {
-                properties: {
-                  error: { type: 'keyword' },
-                  duration: { type: 'long' },
-                  description: { type: 'text' },
-                  start: { type: 'date' },
-                  end: { type: 'date' },
-                  status: { type: 'keyword' },
-                },
-              },
-              step02: {
-                properties: {
-                  error: { type: 'keyword' },
-                  duration: { type: 'long' },
-                  description: { type: 'text' },
-                  start: { type: 'date' },
-                  end: { type: 'date' },
-                  status: { type: 'keyword' },
-                },
-              },
-              step03: {
-                properties: {
-                  error: { type: 'keyword' },
-                  duration: { type: 'long' },
-                  description: { type: 'text' },
-                  start: { type: 'date' },
-                  end: { type: 'date' },
-                  status: { type: 'keyword' },
-                },
-              },
-              step04: {
-                properties: {
-                  error: { type: 'keyword' },
-                  duration: { type: 'long' },
-                  description: { type: 'text' },
-                  start: { type: 'date' },
-                  end: { type: 'date' },
-                  status: { type: 'keyword' },
-                },
-              },
-              step05: {
-                properties: {
-                  error: { type: 'keyword' },
-                  duration: { type: 'long' },
-                  description: { type: 'text' },
-                  start: { type: 'date' },
-                  end: { type: 'date' },
-                  status: { type: 'keyword' },
-                },
-              },
-            },
-          },
-          cacheStats: { type: 'object' },
-          measurements: { type: 'object' },
-        },
-      },
-    },
+    index_patterns: [`${name}`],
+    template: template_name,
   };
   const response = await fetch(url, {
     method: 'PUT',
