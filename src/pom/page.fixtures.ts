@@ -14,82 +14,96 @@ import ServicesPage from "./pages/services.page";
 import SideNav from "./components/side_nav.component";
 import SpaceSelector from "./components/space_selector.component";
 import TracesPage from "./pages/traces.page";
+import { Logger } from "winston";
+import logger from '../logger';
 
-export const test = base.extend<{
+type Fixtures = {
     dashboardPage: DashboardPage,
     datasetsPage: DatasetsPage,
-    datePicker: DatePicker, 
+    datePicker: DatePicker,
     dependenciesPage: DependenciesPage,
     headerBar: HeaderBar,
-    hostsPage: HostsPage, 
-    inventoryPage: InventoryPage, 
-    discoverPage: DiscoverPage, 
+    hostsPage: HostsPage,
+    inventoryPage: InventoryPage,
+    discoverPage: DiscoverPage,
     managementPage: ManagementPage,
     notifications: Notifications,
     onboardingPage: OnboardingPage,
     servicesPage: ServicesPage,
-    sideNav: SideNav, 
+    sideNav: SideNav,
     spaceSelector: SpaceSelector,
-    tracesPage: TracesPage
-    }>
+    tracesPage: TracesPage,
+    log: Logger
+};
+
+export const test = base.extend<Fixtures>
     ({
-        dashboardPage: async({page}, use) => {
+        log: async ({}, use, testInfo) => {
+            const contextLogger = logger.child({
+                project: testInfo.project.name,
+                testName: testInfo.title,
+                workerIndex: testInfo.workerIndex,
+            });
+            await use(contextLogger);
+        },
+
+        dashboardPage: async ({ page }, use) => {
             await use(new DashboardPage(page));
         },
 
-        datasetsPage: async({page}, use) => {
+        datasetsPage: async ({ page }, use) => {
             await use(new DatasetsPage(page));
         },
 
-        datePicker: async({page}, use) => {
+        datePicker: async ({ page }, use) => {
             await use(new DatePicker(page));
         },
 
-        dependenciesPage: async({page}, use) => {
+        dependenciesPage: async ({ page }, use) => {
             await use(new DependenciesPage(page));
         },
 
-        headerBar: async({page}, use) => {
+        headerBar: async ({ page }, use) => {
             await use(new HeaderBar(page));
         },
 
-        hostsPage: async({page}, use) => {
+        hostsPage: async ({ page }, use) => {
             await use(new HostsPage(page));
         },
-        
-        inventoryPage: async({page}, use) => {
+
+        inventoryPage: async ({ page }, use) => {
             await use(new InventoryPage(page));
         },
 
-        discoverPage: async({page}, use) => {
+        discoverPage: async ({ page }, use) => {
             await use(new DiscoverPage(page));
         },
 
-        managementPage: async({page}, use) => {
+        managementPage: async ({ page }, use) => {
             await use(new ManagementPage(page));
         },
 
-        notifications: async({page}, use) => {
+        notifications: async ({ page }, use) => {
             await use(new Notifications(page));
         },
 
-        onboardingPage: async({page}, use) => {
+        onboardingPage: async ({ page }, use) => {
             await use(new OnboardingPage(page));
         },
 
-        servicesPage: async({page}, use) => {
+        servicesPage: async ({ page }, use) => {
             await use(new ServicesPage(page));
         },
 
-        sideNav: async({page}, use) => {
+        sideNav: async ({ page }, use) => {
             await use(new SideNav(page));
         },
 
-        spaceSelector: async({page}, use) => {
+        spaceSelector: async ({ page }, use) => {
             await use(new SpaceSelector(page));
         },
 
-        tracesPage: async({page}, use) => {
+        tracesPage: async ({ page }, use) => {
             await use(new TracesPage(page));
         }
     });

@@ -10,32 +10,32 @@ import {
   testStep, 
   writeJsonReport
  } from "../../src/helpers.ts";
-import { logger } from '../../src/logger.ts';
 import DashboardPage from '../../src/pom/pages/dashboard.page.ts';
 import DatePicker from '../../src/pom/components/date_picker.component.ts';
 import HeaderBar from '../../src/pom/components/header_bar.component.ts';
+import { Logger } from "winston";
 
 let clusterData: any;
 let doc_count: object;
 let reports: string[] = [];
 const testStartTime: string = new Date().toISOString();
 
-test.beforeAll(async ({ browser }) => {
-  await importDashboards(browser, 'src/data/saved-objects/k8s_dashboards.ndjson');
-  logger.info('Fetching cluster data');
+test.beforeAll(async ({ browser, log }) => {
+  await importDashboards(log, browser, 'src/data/saved-objects/k8s_dashboards.ndjson');
+  log.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();
 });
 
-test.beforeEach(async ({ page, sideNav, spaceSelector }) => {
+test.beforeEach(async ({ page }) => {
   await page.goto('/');
   await selectDefaultSpace(clusterData.version.build_flavor, page);
   await page.goto('/app/dashboards');
 });
 
-test.afterEach('Log test results', async ({}, testInfo) => {
+test.afterEach('Log test results', async ({ log }, testInfo) => {
   const stepData = (testInfo as any).stepData;
-  const reportFiles = await writeJsonReport(clusterData, testInfo, testStartTime, doc_count, stepData);
+  const reportFiles = await writeJsonReport(log, clusterData, testInfo, testStartTime, doc_count, stepData);
   reports.push(...reportFiles.filter(item => typeof item === 'string'));
 });
 
@@ -43,18 +43,18 @@ test.afterAll('Print test results', async ({}) => {
   await printResults(reports);
 });
 
-async function testBody(title: string, page: Page, dashboardPage: DashboardPage, datePicker: DatePicker, headerBar: HeaderBar) {
+async function testBody(title: string, page: Page, dashboardPage: DashboardPage, datePicker: DatePicker, headerBar: HeaderBar, log: Logger) {
   let stepData: object[] = [];
   await testStep('step01', stepData, page, async () => {
     await dashboardPage.assertVisibilityHeading();
     await dashboardPage.assertVisibilityTable();
-    logger.info('Searching for the dashboard: ' + title);
+    log.info('Searching for the dashboard: ' + title);
     await dashboardPage.searchDashboard(title);
     await page.getByRole('link', { name: title }).click();
   }, 'Searching for the dashboard');
 
   await testStep('step02', stepData, page, async () => {
-    logger.info(`${getDatePickerLogMessage()} and asserting the visualization: ` + title);
+    log.info(`${getDatePickerLogMessage()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
     await Promise.race([
@@ -83,12 +83,12 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
   { title: "Percentile CPU Usage per container" },
 ].forEach(({ title }) => {
   test.describe(() => {
-    test.afterEach('Write file report', async ({}, testInfo) => {
+    test.afterEach('Write file report', async ({ log }, testInfo) => {
       const stepData = (testInfo as any).stepData || [];
-      await writeJsonReport(clusterData, testInfo, testStartTime, stepData);
+      await writeJsonReport(log, clusterData, testInfo, testStartTime, stepData);
     });
-    test(`${title}`, async ({ page, dashboardPage, datePicker, headerBar }, testInfo) => {
-      const stepData = await testBody(title, page, dashboardPage, datePicker, headerBar);
+    test(`${title}`, async ({ page, dashboardPage, datePicker, headerBar, log }, testInfo) => {
+      const stepData = await testBody(title, page, dashboardPage, datePicker, headerBar, log);
       (testInfo as any).stepData = stepData;
     });
   });
