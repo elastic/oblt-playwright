@@ -84,7 +84,7 @@ export const oblt_playwright_logs = {
           project: { type: 'keyword' },
           testName: { type: 'keyword' },
           timestamp: { type: 'date' },
-          workerIndex: { type: 'int' },
+          workerIndex: { type: 'integer' },
         },
       },
     }
