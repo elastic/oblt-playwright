@@ -1,5 +1,6 @@
 name: "Serverless"
 on:
+  workflow_dispatch:
   # schedule:
   #   - cron: "0 * * * *"
   #   - cron: "15 * * * *"
@@ -59,7 +60,7 @@ jobs:
       name: Run tests (APM)
       timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: github.event.schedule == '0 * * * *'
+      if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -101,7 +102,7 @@ jobs:
       name: Run tests (Data Set Quality)
       timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: github.event.schedule == '15 * * * *'
+      if: github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -143,7 +144,7 @@ jobs:
     name: Run tests (Infrastructure)
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.event.schedule == '30 * * * *'
+    if: github.event.schedule == '30 * * * *' || github.event_name == 'workflow_dispatch'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -185,7 +186,7 @@ jobs:
     name: Run tests (Logs)
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.event.schedule == '45 * * * *'
+    if: github.event.schedule == '45 * * * *' || github.event_name == 'workflow_dispatch'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
