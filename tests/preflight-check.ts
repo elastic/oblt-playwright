@@ -1,7 +1,7 @@
-import { test } from '../src/pom/page.fixtures.ts';
+import { test } from '../src/pom/page-fixtures.ts';
 import { expect } from "@playwright/test";
-import { checkKibanaAvailability } from "../src/helpers/test.utils.ts";
-import { fetchClusterData, getDocCount } from "../src/helpers/api.client.ts";
+import { checkKibanaAvailability } from "../src/helpers/test-utils.ts";
+import { fetchClusterData, getDocCount } from "../src/helpers/api-client.ts";
 import { checkIndexExists, checkIndexTemplateExists, createIndexTemplate, createIndex } from "../src/helpers/setup.ts";
 import { ABSOLUTE_TIME_RANGE, END_DATE, START_DATE, TIME_UNIT, TIME_VALUE } from "../src/env.ts";
 

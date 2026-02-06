@@ -29,7 +29,7 @@ export default defineConfig({
   projects: [
     {
       name: 'preflight_check',
-      testMatch: 'preflight_check.ts',
+      testMatch: 'preflight-check.ts',
       dependencies: [],
     },
     {

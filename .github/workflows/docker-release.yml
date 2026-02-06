@@ -11,7 +11,7 @@ on:
       - "Dockerfile"
       - "src/**"
       - "tests/**"
-      - ".github/workflows/docker_release.yml"
+      - ".github/workflows/docker-release.yml"
       - "package*.json"
       - "playwright.config*.ts"
   push:
@@ -21,7 +21,7 @@ on:
       - "Dockerfile"
       - "src/**"
       - "tests/**"
-      - ".github/workflows/docker_release.yml"
+      - ".github/workflows/docker-release.yml"
       - "package*.json"
       - "playwright.config*.ts"
 
