@@ -61,7 +61,7 @@ test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, n
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 });
 
-test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar, notifications, page, log }, testInfo) => {
+test.only('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar, notifications, page, log }, testInfo) => {
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
