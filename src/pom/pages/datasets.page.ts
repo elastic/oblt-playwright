@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class DatasetsPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class DatasetsPage extends BasePage {
 
     private readonly qualityPoor = () => this.page.locator('xpath=(//h3)[1]');
     private readonly qualityDegraded = () => this.page.locator('xpath=(//h3)[2]');

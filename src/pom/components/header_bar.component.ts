@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class HeaderBar {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class HeaderBar extends BasePage {
 
     private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
 

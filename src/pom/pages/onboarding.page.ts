@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class OnboardingPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class OnboardingPage extends BasePage {
 
     private readonly useCaseLogs = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-logs"]//input[@type="radio"]');
     private readonly useCaseInfra = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-infra"]//input[@type="radio"]');

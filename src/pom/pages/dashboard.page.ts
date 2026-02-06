@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class DashboardPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class DashboardPage extends BasePage {
 
     private readonly dashboardHeading = () => this.page.locator('xpath=//*[@id="dashboardListingHeading"]');
     private readonly dashboardTable = () => this.page.locator('xpath=//tbody[@class="css-0"]');

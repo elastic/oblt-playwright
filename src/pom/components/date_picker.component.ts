@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import { 
     ABSOLUTE_TIME_RANGE, 
     START_DATE, 
@@ -6,13 +6,9 @@ import {
     TIME_VALUE, 
     TIME_UNIT 
     } from '../../env.ts';
+import { BasePage } from "../base.page";
 
-export default class DatePicker {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class DatePicker extends BasePage {
 
     private readonly datePicker = () => this.page.getByTestId('superDatePickerToggleQuickMenuButton');
     private readonly datePickerStartDatePopoverButton = () => this.page.getByTestId('superDatePickerstartDatePopoverButton');

@@ -1,13 +1,9 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import logger from '../../logger.ts';
 import { waitForOneOf } from "../../../src/helpers.ts";
+import { BasePage } from "../base.page";
 
-export default class DiscoverPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class DiscoverPage extends BasePage {
 
     public readonly discoverTab = () => this.page.getByTestId('discoverTab');
     private readonly skipTour = () => this.page.locator('xpath=//div[@data-test-subj="nav-tour-step-sidenav-home"]//*[text()="Skip tour"]');
