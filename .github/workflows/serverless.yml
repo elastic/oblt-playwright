@@ -60,7 +60,7 @@ jobs:
       name: Run tests (APM)
       timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+      if: github.event.schedule == '0 * * * *'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -102,7 +102,7 @@ jobs:
       name: Run tests (Data Set Quality)
       timeout-minutes: 15
       runs-on: ubuntu-latest
-      if: github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch'
+      if: github.event.schedule == '15 * * * *'
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
@@ -144,7 +144,7 @@ jobs:
     name: Run tests (Infrastructure)
     timeout-minutes: 15
     runs-on: ubuntu-latest
-    if: github.event.schedule == '30 * * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '30 * * * *'
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
@@ -224,9 +224,6 @@ jobs:
 
   upload:
     needs:
-      - apm
-      - datasets
-      - infra
       - logs
     if: always()
     name: Upload test reports to Elasticsearch
