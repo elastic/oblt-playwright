@@ -1,6 +1,6 @@
 import { Page } from "@playwright/test";
 import { Logger } from "winston";
-import logger from '../logger';
+import logger from '../logger.ts';
 
 export abstract class BasePage {
     protected readonly log: Logger;
