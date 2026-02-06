@@ -10,3 +10,4 @@ playwright/.auth
 /playwright/.cache/
 /.env
 .DS_Store
+.vscode/

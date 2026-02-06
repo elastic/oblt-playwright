@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test";
-import { logger } from '../../logger.ts';
+import logger from '../../logger.ts';
 import { waitForOneOf } from "../../../src/helpers.ts";
 
 export default class DiscoverPage {
