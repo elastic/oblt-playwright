@@ -47,63 +47,63 @@ export const test = base.extend<Fixtures>
             await use(contextLogger);
         },
 
-        dashboardPage: async ({ page }, use) => {
-            await use(new DashboardPage(page));
+        dashboardPage: async ({ page, log }, use) => {
+            await use(new DashboardPage(page, log));
         },
 
-        datasetsPage: async ({ page }, use) => {
-            await use(new DatasetsPage(page));
+        datasetsPage: async ({ page, log }, use) => {
+            await use(new DatasetsPage(page, log));
         },
 
-        datePicker: async ({ page }, use) => {
-            await use(new DatePicker(page));
+        datePicker: async ({ page, log }, use) => {
+            await use(new DatePicker(page, log));
         },
 
-        dependenciesPage: async ({ page }, use) => {
-            await use(new DependenciesPage(page));
+        dependenciesPage: async ({ page, log }, use) => {
+            await use(new DependenciesPage(page, log));
         },
 
-        headerBar: async ({ page }, use) => {
-            await use(new HeaderBar(page));
+        headerBar: async ({ page, log }, use) => {
+            await use(new HeaderBar(page, log));
         },
 
-        hostsPage: async ({ page }, use) => {
-            await use(new HostsPage(page));
+        hostsPage: async ({ page, log }, use) => {
+            await use(new HostsPage(page, log));
         },
 
-        inventoryPage: async ({ page }, use) => {
-            await use(new InventoryPage(page));
+        inventoryPage: async ({ page, log }, use) => {
+            await use(new InventoryPage(page, log));
         },
 
-        discoverPage: async ({ page }, use) => {
-            await use(new DiscoverPage(page));
+        discoverPage: async ({ page, log }, use) => {
+            await use(new DiscoverPage(page, log));
         },
 
-        managementPage: async ({ page }, use) => {
-            await use(new ManagementPage(page));
+        managementPage: async ({ page, log }, use) => {
+            await use(new ManagementPage(page, log));
         },
 
-        notifications: async ({ page }, use) => {
-            await use(new Notifications(page));
+        notifications: async ({ page, log }, use) => {
+            await use(new Notifications(page, log));
         },
 
-        onboardingPage: async ({ page }, use) => {
-            await use(new OnboardingPage(page));
+        onboardingPage: async ({ page, log }, use) => {
+            await use(new OnboardingPage(page, log));
         },
 
-        servicesPage: async ({ page }, use) => {
-            await use(new ServicesPage(page));
+        servicesPage: async ({ page, log }, use) => {
+            await use(new ServicesPage(page, log));
         },
 
-        sideNav: async ({ page }, use) => {
-            await use(new SideNav(page));
+        sideNav: async ({ page, log }, use) => {
+            await use(new SideNav(page, log));
         },
 
-        spaceSelector: async ({ page }, use) => {
-            await use(new SpaceSelector(page));
+        spaceSelector: async ({ page, log }, use) => {
+            await use(new SpaceSelector(page, log));
         },
 
-        tracesPage: async ({ page }, use) => {
-            await use(new TracesPage(page));
+        tracesPage: async ({ page, log }, use) => {
+            await use(new TracesPage(page, log));
         }
     });

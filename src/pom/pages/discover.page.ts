@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test";
-import logger from '../../logger.ts';
 import { waitForOneOf } from "../../helpers/test-utils.ts";
 import { BasePage } from "../base.page";
 
@@ -34,17 +33,17 @@ export default class DiscoverPage extends BasePage {
     }
 
     public async selectLogsDataView() {
-        logger.info("Checking for welcome tour pop-up");
+        this.log.info("Checking for welcome tour pop-up");
         const [index] = await waitForOneOf([
             this.skipTour(),
             this.dataView()
         ]);
         const skipWelcomeTour = index === 0;
         if (skipWelcomeTour) {
-            logger.info("Skipping the welcome tour");
+            this.log.info("Skipping the welcome tour");
             await this.skipTour().click();
         }
-        logger.info("Selecting logs data view");
+        this.log.info("Selecting logs data view");
         await this.dataView().click();
         await this.dataViewInput().fill('logs-*');
         await this.dataViewLogs().click();
