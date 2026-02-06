@@ -1,16 +1,9 @@
 import { test } from '../../src/pom/page.fixtures.ts';
 import { expect, Page } from "@playwright/test";
-import { 
-  fetchClusterData, 
-  getDatePickerLogMessage,
-  getDocCount,
-  getPodData, 
-  importDashboards,
-  printResults,
-  selectDefaultSpace, 
-  testStep, 
-  writeJsonReport 
- } from "../../src/helpers.ts";
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test.utils.ts";
+import { fetchClusterData, getDocCount, getPodData } from "../../src/helpers/api.client.ts";
+import { writeJsonReport, printResults } from "../../src/helpers/reporter.ts";
+import { importDashboards } from "../../src/helpers/setup.ts";
 
 let clusterData: any;
 let doc_count: object;
