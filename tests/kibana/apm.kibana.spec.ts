@@ -1,14 +1,7 @@
 import { test } from '../../src/pom/page.fixtures.ts';
-import {
-  checkApmData,
-  fetchClusterData,
-  getDatePickerLogMessage,
-  getDocCount,
-  printResults,
-  selectDefaultSpace,
-  testStep,
-  writeJsonReport
-} from '../../src/helpers.ts';
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from '../../src/helpers/test.utils.ts';
+import { checkApmData, fetchClusterData, getDocCount } from '../../src/helpers/api.client.ts';
+import { writeJsonReport, printResults } from '../../src/helpers/reporter.ts';
 
 let clusterData: any;
 let doc_count: object;
