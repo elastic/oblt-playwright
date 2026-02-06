@@ -6,7 +6,7 @@ import {
 import {
   oblt_playwright,
   oblt_playwright_logs
-} from '../index_templates.ts';
+} from '../index-templates.ts';
 import { Logger } from "winston";
 
 export async function importDashboards(log: Logger, browser: Browser, inputFile: string) {

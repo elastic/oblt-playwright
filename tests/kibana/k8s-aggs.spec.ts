@@ -1,12 +1,12 @@
 import { Page } from '@playwright/test';
-import { test } from '../../src/pom/page.fixtures.ts';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test.utils.ts";
-import { fetchClusterData, getDocCount } from "../../src/helpers/api.client.ts";
+import { test } from '../../src/pom/page-fixtures.ts';
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test-utils.ts";
+import { fetchClusterData, getDocCount } from "../../src/helpers/api-client.ts";
 import { writeJsonReport, printResults } from "../../src/helpers/reporter.ts";
 import { importDashboards } from "../../src/helpers/setup.ts";
 import DashboardPage from '../../src/pom/pages/dashboard.page.ts';
-import DatePicker from '../../src/pom/components/date_picker.component.ts';
-import HeaderBar from '../../src/pom/components/header_bar.component.ts';
+import DatePicker from '../../src/pom/components/date-picker.component.ts';
+import HeaderBar from '../../src/pom/components/header-bar.component.ts';
 import { Logger } from "winston";
 
 let clusterData: any;
@@ -15,7 +15,7 @@ let reports: string[] = [];
 const testStartTime: string = new Date().toISOString();
 
 test.beforeAll(async ({ browser, log }) => {
-  await importDashboards(log, browser, 'src/data/saved-objects/k8s_dashboards.ndjson');
+  await importDashboards(log, browser, 'src/data/saved-objects/k8s-dashboards.ndjson');
   log.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();

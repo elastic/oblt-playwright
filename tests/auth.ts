@@ -1,8 +1,8 @@
-import { test } from '../src/pom/page.fixtures.ts';
+import { test } from '../src/pom/page-fixtures.ts';
 import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
-import { testStep, waitForOneOf } from "../src/helpers/test.utils.ts";
-import { fetchClusterData } from "../src/helpers/api.client.ts";
+import { testStep, waitForOneOf } from "../src/helpers/test-utils.ts";
+import { fetchClusterData } from "../src/helpers/api-client.ts";
 import { writeJsonReport } from "../src/helpers/reporter.ts";
 import { KIBANA_HOST, KIBANA_USERNAME, KIBANA_PASSWORD } from "../src/env.ts";
 

@@ -3,7 +3,7 @@
 // Fill out KIBANA_HOST & API_KEY env variables.
 
 // Run the script:
-// npx playwright test synth_monitors.api.spec.ts --project api --reporter line
+// npx playwright test synth-monitors.api.spec.ts --project api --reporter line
 
 import {test, expect} from '@playwright/test';
 

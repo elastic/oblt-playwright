@@ -246,4 +246,4 @@ jobs:
         path: /home/runner/work/oblt-playwright/
         
     - name: Upload test report to Elasticsearch
-      run: bash ./src/utils/upload_to_es.sh
+      run: bash ./src/utils/upload-to-es.sh

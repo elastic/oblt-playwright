@@ -1,7 +1,7 @@
-import { test } from '../../src/pom/page.fixtures.ts';
+import { test } from '../../src/pom/page-fixtures.ts';
 import { expect, Page } from "@playwright/test";
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test.utils.ts";
-import { fetchClusterData, getDocCount, getPodData } from "../../src/helpers/api.client.ts";
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test-utils.ts";
+import { fetchClusterData, getDocCount, getPodData } from "../../src/helpers/api-client.ts";
 import { writeJsonReport, printResults } from "../../src/helpers/reporter.ts";
 import { importDashboards } from "../../src/helpers/setup.ts";
 
@@ -18,7 +18,7 @@ test.beforeAll('Check pod data', async ({ browser, request, log }) => {
   log.info('Fetching cluster data');
   clusterData = await fetchClusterData();
   doc_count = await getDocCount();
-  await importDashboards(log, browser, 'src/data/saved-objects/k8s_dashboards.ndjson');
+  await importDashboards(log, browser, 'src/data/saved-objects/k8s-dashboards.ndjson');
 });
 
 test.beforeEach(async ({ page, sideNav, log }) => {
