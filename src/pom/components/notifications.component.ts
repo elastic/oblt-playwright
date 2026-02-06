@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class Notifications {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class Notifications extends BasePage {
 
     private readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Error while fetching resource"]');
     private readonly errorIncrementCount = () => this.page.locator(`xpath=//p[@data-test-subj="errorToastMessage"]//*[contains(text(),"already closed, can't increment ref count")]`);

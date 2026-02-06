@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class AlertsPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class AlertsPage extends BasePage {
 
     // Top level Alerts page locators
     private readonly manageRulesButton = () => this.page.getByTestId('manageRulesPageButton');

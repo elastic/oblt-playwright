@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class SideNav {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class SideNav extends BasePage {
 
     public async goto() {
         await this.page.goto('/');

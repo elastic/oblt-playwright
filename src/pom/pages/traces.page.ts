@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class TracesPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-      }
+export default class TracesPage extends BasePage {
 
     private readonly tracesExplorerTab = () => this.page.getByRole('tab', { name: 'Explorer' });
     private readonly explorerSearchField = () => this.page.getByPlaceholder('Filter your data using KQL syntax');

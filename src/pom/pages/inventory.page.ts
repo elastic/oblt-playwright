@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class InventoryPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class InventoryPage extends BasePage {
     
     private readonly dismiss = () => this.page.locator('xpath=//span[contains(text(),"Dismiss")]');
     private readonly autoRefreshButton = () => this.page.locator('xpath=//button[@data-test-subj="infraWaffleTimeControlsAutoRefreshButton"]');

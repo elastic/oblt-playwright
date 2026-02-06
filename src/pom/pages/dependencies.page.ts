@@ -1,11 +1,7 @@
-import { expect, Page } from "@playwright/test";
+import { expect } from "@playwright/test";
+import { BasePage } from "../base.page";
 
-export default class DependenciesPage {
-    page: Page;
-
-    constructor(page: Page) {
-        this.page = page;
-    }
+export default class DependenciesPage extends BasePage {
 
     private readonly dependenciesOperationsTab = () => this.page.getByRole('tab', { name: 'Operations' });
     private readonly dependencyTableRow = () => this.page.locator('xpath=//tbody[@class="css-0"]//tr[1]//a[1]');
