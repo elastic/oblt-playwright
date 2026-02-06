@@ -4,7 +4,7 @@ import { BasePage } from "../base.page";
 
 export default class DiscoverPage extends BasePage {
 
-    public readonly discoverTab = () => this.page.getByTestId('discoverTab');
+    private readonly discoverTab = () => this.page.getByTestId('discoverTab');
     private readonly skipTour = () => this.page.locator('xpath=//div[@data-test-subj="nav-tour-step-sidenav-home"]//*[text()="Skip tour"]');
     private readonly dataView = () => this.page.getByTestId('discover-dataView-switch-link');
     private readonly dataViewInput = () => this.page.locator('xpath=//*[@data-test-subj="changeDataViewPopover"]//input');
@@ -24,7 +24,7 @@ export default class DiscoverPage extends BasePage {
     private readonly fieldStatsTab = () => this.page.getByTestId('dscViewModeFieldStatsButton');
     private readonly fieldStatsDocCount = () => this.page.locator('xpath=//div[@data-test-subj="dataVisualizerTableContainer"]//tbody//tr[1]//td[@data-test-subj="dataVisualizerTableColumnDocumentsCount"]');
     private readonly patternsTab = () => this.page.getByTestId('dscViewModePatternAnalysisButton');
-    public readonly logPatternsRowToggle = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//td[@data-test-subj="aiopsLogPatternsExpandRowToggle"]');
+    private readonly logPatternsRowToggle = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//td[@data-test-subj="aiopsLogPatternsExpandRowToggle"]');
     private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
     private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
 

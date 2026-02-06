@@ -7,9 +7,9 @@ export default class OnboardingPage extends BasePage {
     private readonly useCaseInfra = () => this.page.locator('xpath=//div[@data-test-subj="observabilityOnboardingUseCaseCard-infra"]//input[@type="radio"]');
     private readonly logsAutoDetect = () => this.page.locator('xpath=//button[contains(text(), "Auto-detect logs and metrics")]');
     private readonly kubernetes = () => this.page.locator('xpath=//button[contains(text(), "Kubernetes")]');
-    public readonly contentNotLoaded = () => this.page.locator('xpath=//h2[contains(text(),"Unable to load content")]');
+    private readonly contentNotLoaded = () => this.page.locator('xpath=//h2[contains(text(),"Unable to load content")]');
     private readonly retryButton = () => this.page.getByTestId('observabilityOnboardingAutoDetectPanelGoBackButton');
-    public readonly codeBlock = () => this.page.locator('xpath=//code[@data-code-language="text"]');
+    private readonly codeBlock = () => this.page.locator('xpath=//code[@data-code-language="text"]');
     private readonly copyToClipboardButton = () => this.page.getByTestId('observabilityOnboardingCopyToClipboardButton');
     private readonly inProgressIndicator = () => this.page.locator('xpath=//div[contains(text(), "Waiting for installation to complete...")]');
     private readonly receivedDataIndicator = () => this.page.locator('xpath=//div[contains(text(), "Your data is ready to explore!")]');
