@@ -67,7 +67,10 @@ export async function createPerfCollector(page: Page, log: Logger) {
       // --- CDP Performance domain (delta from baseline) ---
       const { metrics } = await cdpSession.send('Performance.getMetrics');
       const current = new Map(metrics.map((m: { name: string; value: number }) => [m.name, m.value]));
-      const delta = (name: string) => (current.get(name) ?? 0) - (baseline?.get(name) ?? 0);
+      if (!baseline) {
+        throw new Error('PerfMetrics: collect() called before takeBaseline(); call takeBaseline() first to record baseline counters.');
+      }
+      const delta = (name: string) => (current.get(name) ?? 0) - (baseline.get(name) ?? 0);
 
       const result = {
         lcp,
