@@ -65,5 +65,16 @@ export default defineConfig({
       },
       dependencies: [],
     },
+    {
+      name: 'bb',
+      testDir: process.env.PPB_TEST_DIR,
+      testMatch: '**\/*.kibana.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1200},
+        storageState: STORAGE_STATE,
+      },
+      dependencies: ['auth'],
+    }
   ],
 });
