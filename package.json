@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "exports": {
+    ".": "./package.json",
     "./env": "./src/env.ts",
     "./helpers/api-client": "./src/helpers/api-client.ts",
     "./helpers/reporter": "./src/helpers/reporter.ts",
