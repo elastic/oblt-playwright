@@ -14,7 +14,7 @@ import ServicesPage from "./pages/services.page";
 import SideNav from "./components/side-nav.component";
 import SpaceSelector from "./components/space-selector.component";
 import TracesPage from "./pages/traces.page";
-import { createPerfCollector, PerfCollector } from "../helpers/perf-metrics.ts";
+import { createPerfCollector, PerfCollector } from "../helpers/perf-metrics";
 import { Logger } from "winston";
 import logger from '../logger';
 
