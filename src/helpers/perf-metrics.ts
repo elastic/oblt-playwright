@@ -29,6 +29,11 @@ export async function createPerfCollector(page: Page, log: Logger) {
     },
 
     async collect() {
+      // Enforce that takeBaseline() must be called before collect()
+      if (baseline === null) {
+        throw new Error('PerfMetrics: takeBaseline() must be called before collect()');
+      }
+
       // --- Web Vitals (in-page query) ---
       const { lcp, fcp } = await page.evaluate(() => {
         return new Promise<{ lcp: number | null; fcp: number | null }>((resolve) => {
@@ -67,7 +72,7 @@ export async function createPerfCollector(page: Page, log: Logger) {
       // --- CDP Performance domain (delta from baseline) ---
       const { metrics } = await cdpSession.send('Performance.getMetrics');
       const current = new Map(metrics.map((m: { name: string; value: number }) => [m.name, m.value]));
-      const delta = (name: string) => (current.get(name) ?? 0) - (baseline?.get(name) ?? 0);
+      const delta = (name: string) => (current.get(name) ?? 0) - (baseline.get(name) ?? 0);
 
       const result = {
         lcp,
