@@ -23,6 +23,7 @@ export async function writeJsonReport(
   docsCount?: object,
   stepData?: object[],
   cacheStats?: object,
+  perfMetrics?: object,
 ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
@@ -51,6 +52,7 @@ export async function writeJsonReport(
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
     ...(cacheStats && { cacheStats }),
+    ...(perfMetrics && { performanceMetrics: perfMetrics }),
   };
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
   return files;
@@ -109,6 +111,32 @@ export async function printResults(reportFiles: string[]) {
 
         p.addRows(data, { separator: true });
         p.printTable();
+
+        if (jsonData.performanceMetrics) {
+          const pm = jsonData.performanceMetrics;
+          const perfTable = new Table({
+            title: `Performance Metrics`,
+            columns: [
+              { name: 'metric', title: 'Metric', color: "yellow" },
+              { name: 'value', title: 'Value', color: "green" },
+            ],
+          });
+
+          const ms = (v: any) => v != null ? `${v} ms` : 'N/A';
+          perfTable.addRows([
+            { metric: 'LCP (Largest Contentful Paint)', value: ms(pm.lcp) },
+            { metric: 'FCP (First Contentful Paint)', value: ms(pm.fcp) },
+            { metric: 'TTFB (Time to First Byte)', value: ms(pm.ttfb) },
+            { metric: 'DOM Content Loaded', value: ms(pm.domContentLoaded) },
+            { metric: 'Page Load', value: ms(pm.load) },
+            { metric: 'Script Duration', value: ms(pm.scriptDuration) },
+            { metric: 'Layout Duration', value: ms(pm.layoutDuration) },
+            { metric: 'Recalc Style Duration', value: ms(pm.recalcStyleDuration) },
+            { metric: 'Task Duration', value: ms(pm.taskDuration) },
+            { metric: 'JS Heap Used', value: pm.jsHeapUsedSize != null ? `${pm.jsHeapUsedSize} MB` : 'N/A' },
+          ], { separator: true });
+          perfTable.printTable();
+        }
 
       } catch (innerError: any) {
         console.error(`Error processing file '${file}':`, innerError.message);

@@ -8,7 +8,7 @@
   "author": "Andrei Bialenik",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.55.1",
+    "@playwright/test": "^1.57.0",
     "@types/node": "^25.0.10"
   },
   "dependencies": {
