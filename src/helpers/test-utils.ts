@@ -99,6 +99,40 @@ export function getDatePickerLogMessage(): string {
     : `Setting the search interval of last ${TIME_VALUE} ${TIME_UNIT}`;
 }
 
+const TIME_UNIT_MAP: Record<string, string> = {
+  'Seconds': 's', 'seconds': 's', 's': 's',
+  'Minutes': 'm', 'minutes': 'm', 'm': 'm',
+  'Hours': 'h', 'hours': 'h', 'h': 'h',
+  'Days': 'd', 'days': 'd', 'd': 'd',
+  'Weeks': 'w', 'weeks': 'w', 'w': 'w',
+  'Months': 'M', 'months': 'M', 'M': 'M',
+  'Years': 'y', 'years': 'y', 'y': 'y',
+};
+
+/**
+ * Builds a Kibana app URL with time range parameters encoded in the Rison _g state.
+ * Uses environment variables (START_DATE/END_DATE or TIME_VALUE/TIME_UNIT) by default.
+ * @param appPath - Kibana app path, e.g. '/app/discover'
+ */
+export function buildKibanaUrl(appPath: string): string {
+  let timeFrom: string;
+  let timeTo: string;
+
+  if (ABSOLUTE_TIME_RANGE && START_DATE && END_DATE) {
+    timeFrom = `'${START_DATE}'`;
+    timeTo = `'${END_DATE}'`;
+  } else if (TIME_VALUE && TIME_UNIT) {
+    const shortUnit = TIME_UNIT_MAP[TIME_UNIT] || TIME_UNIT;
+    timeFrom = `now-${TIME_VALUE}${shortUnit}`;
+    timeTo = 'now';
+  } else {
+    timeFrom = 'now-15m';
+    timeTo = 'now';
+  }
+
+  return `${appPath}#/?_g=(time:(from:${timeFrom},to:${timeTo}))`;
+}
+
 export async function checkKibanaAvailability(page: Page) {
   try {
     const response = await page.goto(KIBANA_HOST, {
