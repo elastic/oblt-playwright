@@ -1,9 +1,9 @@
-import { test } from '../../src/pom/page-fixtures.ts';
+import { test } from 'oblt-playwright/pom/page-fixtures';
 import { expect, Page } from "@playwright/test";
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test-utils.ts";
-import { fetchClusterData, getDocCount, getPodData } from "../../src/helpers/api-client.ts";
-import { writeJsonReport, printResults } from "../../src/helpers/reporter.ts";
-import { importDashboards } from "../../src/helpers/setup.ts";
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { fetchClusterData, getDocCount, getPodData } from 'oblt-playwright/helpers/api-client';
+import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
+import { importDashboards } from 'oblt-playwright/helpers/setup';
 
 let clusterData: any;
 let doc_count: object;

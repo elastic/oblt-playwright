@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import { API_KEY } from './src/env.ts';
+import { API_KEY } from 'oblt-playwright/env';
 import path from 'path';
 
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { ELASTICSEARCH_HOST, REMOTE_CLUSTERS, REMOTE_CCS_CLUSTER_01, REMOTE_CCS_CLUSTER_02, REMOTE_CCS_CLUSTER_03, REMOTE_CCS_CLUSTER_04, RANGE } from '../../src/env.ts';
+import { ELASTICSEARCH_HOST, REMOTE_CLUSTERS, REMOTE_CCS_CLUSTER_01, REMOTE_CCS_CLUSTER_02, REMOTE_CCS_CLUSTER_03, REMOTE_CCS_CLUSTER_04, RANGE } from 'oblt-playwright/env';
 
 const envVar = REMOTE_CLUSTERS;
 let metrics: string;
