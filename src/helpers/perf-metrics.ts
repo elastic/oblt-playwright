@@ -70,7 +70,8 @@ export async function createPerfCollector(page: Page, log: Logger) {
       if (!baseline) {
         throw new Error('PerfMetrics: collect() called before takeBaseline(); call takeBaseline() first to record baseline counters.');
       }
-      const delta = (name: string) => (current.get(name) ?? 0) - (baseline.get(name) ?? 0);
+      const base = baseline;
+      const delta = (name: string) => (current.get(name) ?? 0) - (base.get(name) ?? 0);
 
       const result = {
         lcp,
