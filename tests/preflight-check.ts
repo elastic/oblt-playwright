@@ -1,9 +1,9 @@
-import { test } from '../src/pom/page-fixtures.ts';
+import { test } from 'oblt-playwright/pom/page-fixtures';
 import { expect } from "@playwright/test";
-import { checkKibanaAvailability } from "../src/helpers/test-utils.ts";
-import { fetchClusterData, getDocCount } from "../src/helpers/api-client.ts";
-import { checkIndexExists, checkIndexTemplateExists, createIndexTemplate, createIndex } from "../src/helpers/setup.ts";
-import { ABSOLUTE_TIME_RANGE, END_DATE, START_DATE, TIME_UNIT, TIME_VALUE } from "../src/env.ts";
+import { checkKibanaAvailability } from 'oblt-playwright/helpers/test-utils';
+import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
+import { checkIndexExists, checkIndexTemplateExists, createIndexTemplate, createIndex } from 'oblt-playwright/helpers/setup';
+import { ABSOLUTE_TIME_RANGE, END_DATE, START_DATE, TIME_UNIT, TIME_VALUE } from 'oblt-playwright/env';
 
 test("Environment check", async ({ page, log }) => {
     log.info("Checking Elasticsearch availability...");

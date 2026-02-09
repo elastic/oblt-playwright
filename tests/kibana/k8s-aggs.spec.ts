@@ -1,12 +1,12 @@
 import { Page } from '@playwright/test';
-import { test } from '../../src/pom/page-fixtures.ts';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test-utils.ts";
-import { fetchClusterData, getDocCount } from "../../src/helpers/api-client.ts";
-import { writeJsonReport, printResults } from "../../src/helpers/reporter.ts";
-import { importDashboards } from "../../src/helpers/setup.ts";
-import DashboardPage from '../../src/pom/pages/dashboard.page.ts';
-import DatePicker from '../../src/pom/components/date-picker.component.ts';
-import HeaderBar from '../../src/pom/components/header-bar.component.ts';
+import { test } from 'oblt-playwright/pom/page-fixtures';
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
+import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
+import { importDashboards } from 'oblt-playwright/helpers/setup';
+import DashboardPage from 'oblt-playwright/pom/pages/dashboard.page';
+import DatePicker from 'oblt-playwright/pom/components/date-picker.component';
+import HeaderBar from 'oblt-playwright/pom/components/header-bar.component';
 import { Logger } from "winston";
 
 let clusterData: any;

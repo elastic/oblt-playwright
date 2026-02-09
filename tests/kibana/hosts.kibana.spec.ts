@@ -1,7 +1,7 @@
-import { test } from '../../src/pom/page-fixtures.ts';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from "../../src/helpers/test-utils.ts";
-import { fetchClusterData, getDocCount, getHostData } from "../../src/helpers/api-client.ts";
-import { writeJsonReport, printResults } from "../../src/helpers/reporter.ts";
+import { test } from 'oblt-playwright/pom/page-fixtures';
+import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { fetchClusterData, getDocCount, getHostData } from 'oblt-playwright/helpers/api-client';
+import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 
 let clusterData: any;
 let doc_count: object;

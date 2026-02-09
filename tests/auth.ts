@@ -1,10 +1,10 @@
-import { test } from '../src/pom/page-fixtures.ts';
+import { test } from 'oblt-playwright/pom/page-fixtures';
 import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
-import { testStep, waitForOneOf } from "../src/helpers/test-utils.ts";
-import { fetchClusterData } from "../src/helpers/api-client.ts";
-import { writeJsonReport } from "../src/helpers/reporter.ts";
-import { KIBANA_HOST, KIBANA_USERNAME, KIBANA_PASSWORD } from "../src/env.ts";
+import { testStep, waitForOneOf } from 'oblt-playwright/helpers/test-utils';
+import { fetchClusterData } from 'oblt-playwright/helpers/api-client';
+import { writeJsonReport } from 'oblt-playwright/helpers/reporter';
+import { KIBANA_HOST, KIBANA_USERNAME, KIBANA_PASSWORD } from 'oblt-playwright/env';
 
 let clusterData: any;
 const testStartTime: string = new Date().toISOString();
