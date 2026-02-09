@@ -14,6 +14,7 @@ import ServicesPage from "./pages/services.page";
 import SideNav from "./components/side-nav.component";
 import SpaceSelector from "./components/space-selector.component";
 import TracesPage from "./pages/traces.page";
+import { createPerfCollector, PerfCollector } from "../helpers/perf-metrics.ts";
 import { Logger } from "winston";
 import logger from '../logger';
 
@@ -29,6 +30,7 @@ type Fixtures = {
     managementPage: ManagementPage,
     notifications: Notifications,
     onboardingPage: OnboardingPage,
+    perfMetrics: PerfCollector,
     servicesPage: ServicesPage,
     sideNav: SideNav,
     spaceSelector: SpaceSelector,
@@ -101,6 +103,12 @@ export const test = base.extend<Fixtures>
 
         spaceSelector: async ({ page, log }, use) => {
             await use(new SpaceSelector(page, log));
+        },
+
+        perfMetrics: async ({ page, log }, use) => {
+            const perf = await createPerfCollector(page, log);
+            await use(perf);
+            await perf.dispose();
         },
 
         tracesPage: async ({ page, log }, use) => {
