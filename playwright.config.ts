@@ -17,6 +17,7 @@ export default defineConfig({
   use: {
     browserName: 'chromium',
     baseURL: process.env.KIBANA_HOST,
+    ignoreHTTPSErrors: true,
     trace: 'on-first-retry',
     testIdAttribute: 'data-test-subj',
     video: {

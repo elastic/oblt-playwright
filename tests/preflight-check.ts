@@ -1,90 +1,131 @@
 import { test } from 'oblt-playwright/pom/page-fixtures';
 import { expect } from "@playwright/test";
 import { checkKibanaAvailability } from 'oblt-playwright/helpers/test-utils';
-import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
+import { fetchClusterData, getDocCount, ensureDataViews, DataView } from 'oblt-playwright/helpers/api-client';
 import { checkIndexExists, checkIndexTemplateExists, createIndexTemplate, createIndex } from 'oblt-playwright/helpers/setup';
 import { ABSOLUTE_TIME_RANGE, END_DATE, START_DATE, TIME_UNIT, TIME_VALUE } from 'oblt-playwright/env';
 
-test("Environment check", async ({ page, log }) => {
-    log.info("Checking Elasticsearch availability...");
-    const clusterData: any = await fetchClusterData();
-    expect(clusterData).toBeDefined();
-    expect(clusterData.cluster_name).toBeDefined();
-    expect(clusterData.version).toBeDefined();
-    log.info(`Elasticsearch is available.`);
-    
-    log.info("Checking Kibana availability...");
-    const kibanaStatus: any = await checkKibanaAvailability(page);
-    expect(kibanaStatus.available).toBe(true);
-    expect(kibanaStatus.status).toBe(200);
-    log.info(`Kibana is available.`);
-})
+test.describe('Preflight checks', () => {
+    test.describe.configure({ mode: 'serial' });
 
-test("Time range configuration check", async ({ log }) => {
-    log.info("Checking time range configuration...");
-    if (ABSOLUTE_TIME_RANGE) {
-        expect(START_DATE, "START_DATE must be set when ABSOLUTE_TIME_RANGE is true").toBeDefined();
-        expect(START_DATE, "START_DATE must not be empty when ABSOLUTE_TIME_RANGE is true").not.toBe('');
-        expect(END_DATE, "END_DATE must be set when ABSOLUTE_TIME_RANGE is true").toBeDefined();
-        expect(END_DATE, "END_DATE must not be empty when ABSOLUTE_TIME_RANGE is true").not.toBe('');
-        log.info("Absolute time range is configured correctly.");
-    } else {
-        expect(TIME_UNIT, "TIME_UNIT must be set when ABSOLUTE_TIME_RANGE is false").toBeDefined();
-        expect(TIME_UNIT, "TIME_UNIT must not be empty when ABSOLUTE_TIME_RANGE is false").not.toBe('');
-        expect(TIME_VALUE, "TIME_VALUE must be set when ABSOLUTE_TIME_RANGE is false").toBeDefined();
-        expect(TIME_VALUE, "TIME_VALUE must not be empty when ABSOLUTE_TIME_RANGE is false").not.toBe('');
-        log.info("Relative time range is configured correctly.");
-    }
-});
+    test("Environment check", async ({ page, log }) => {
+        log.info("Checking Elasticsearch availability...");
+        const clusterData: any = await fetchClusterData();
+        expect(clusterData).toBeDefined();
+        expect(clusterData.cluster_name).toBeDefined();
+        expect(clusterData.version).toBeDefined();
+        log.info(`Elasticsearch is available.`);
 
-test("Test data check", async ({ log }) => {
-    log.info('Checking test data...');
-    const doc_count: { apm: number; logs: number; metrics: number } = await getDocCount();
-    
-    expect(doc_count.apm).not.toBeNull();
-    expect(doc_count.apm).toBeGreaterThan(0);
-    
-    expect(doc_count.logs).not.toBeNull();
-    expect(doc_count.logs).toBeGreaterThan(0);
-    
-    expect(doc_count.metrics).not.toBeNull();
-    expect(doc_count.metrics).toBeGreaterThan(0);
-    
-    log.info(`Document count: APM: ${doc_count.apm}, Logs: ${doc_count.logs}, Metrics: ${doc_count.metrics}`);
-})
+        log.info("Checking Kibana availability...");
+        const kibanaStatus: any = await checkKibanaAvailability(page);
+        expect(kibanaStatus.available).toBe(true);
+        expect(kibanaStatus.status).toBe(200);
+        log.info(`Kibana is available.`);
+    })
 
-test("Reporting cluster check", async ({ log }) => {
-    const indices: string[] = [
-        'oblt-playwright',
-        'playwright-logs'
-    ];
-
-    for (const indexName of indices) {
-        log.info(`Checking if index '${indexName}' exists...`);
-        let indexExists = await checkIndexExists(indexName);
-
-        if (indexExists) {
-            log.info(`Index '${indexName}' exists.`);
+    test("Time range configuration check", async ({ log }) => {
+        log.info("Checking time range configuration...");
+        if (ABSOLUTE_TIME_RANGE) {
+            expect(START_DATE, "START_DATE must be set when ABSOLUTE_TIME_RANGE is true").toBeDefined();
+            expect(START_DATE, "START_DATE must not be empty when ABSOLUTE_TIME_RANGE is true").not.toBe('');
+            expect(END_DATE, "END_DATE must be set when ABSOLUTE_TIME_RANGE is true").toBeDefined();
+            expect(END_DATE, "END_DATE must not be empty when ABSOLUTE_TIME_RANGE is true").not.toBe('');
+            log.info("Absolute time range is configured correctly.");
         } else {
-            log.warn(`Index '${indexName}' does not exist. Checking for index template...`);
-            const templateExists = await checkIndexTemplateExists(indexName);
-
-            if (templateExists) {
-                log.info(`Index template '${indexName}' exists. Creating index...`);
-                await createIndex(indexName);
-                indexExists = await checkIndexExists(indexName);
-                expect(indexExists).toBeTruthy();
-                log.info(`Index '${indexName}' created successfully.`);
-            } else {
-                log.warn(`Index template '${indexName}' does not exist. Creating index template...`);
-                await createIndexTemplate(indexName);
-                log.info(`Index template '${indexName}' created successfully. Creating index...`);
-                await createIndex(indexName);
-                indexExists = await checkIndexExists(indexName);
-                expect(indexExists).toBeTruthy();
-                log.info(`Index '${indexName}' created successfully.`);
-            }
+            expect(TIME_UNIT, "TIME_UNIT must be set when ABSOLUTE_TIME_RANGE is false").toBeDefined();
+            expect(TIME_UNIT, "TIME_UNIT must not be empty when ABSOLUTE_TIME_RANGE is false").not.toBe('');
+            expect(TIME_VALUE, "TIME_VALUE must be set when ABSOLUTE_TIME_RANGE is false").toBeDefined();
+            expect(TIME_VALUE, "TIME_VALUE must not be empty when ABSOLUTE_TIME_RANGE is false").not.toBe('');
+            log.info("Relative time range is configured correctly.");
         }
-        expect(indexExists).toBeTruthy();
-    }
+    });
+
+    test("Test data check", async ({ log }) => {
+        log.info('Checking test data...');
+        const doc_count: { apm: number; logs: number; metrics: number } = await getDocCount();
+
+        expect(doc_count.apm).not.toBeNull();
+        expect(doc_count.apm).toBeGreaterThan(0);
+
+        expect(doc_count.logs).not.toBeNull();
+        expect(doc_count.logs).toBeGreaterThan(0);
+
+        expect(doc_count.metrics).not.toBeNull();
+        expect(doc_count.metrics).toBeGreaterThan(0);
+
+        log.info(`Document count: APM: ${doc_count.apm}, Logs: ${doc_count.logs}, Metrics: ${doc_count.metrics}`);
+    })
+
+    test("Data views check", async ({ request, log }) => {
+        const requiredDataViews: DataView[] = [
+            {
+                name: 'metrics-*',
+                pattern: 'metrics-*',
+                timestampField: '@timestamp',
+            },
+            {
+                name: 'logs-*',
+                pattern: 'logs-*',
+                timestampField: '@timestamp',
+            },
+            {
+                name: 'APM',
+                pattern: 'apm-*,logs-apm*,metrics-apm*,traces-apm*',
+                timestampField: '@timestamp',
+            },
+        ];
+
+        log.info('Checking data views...');
+        const { existing, created } = await ensureDataViews(request, requiredDataViews, log);
+        if (created.length) {
+            log.info(`Created data views: ${created.map(v => v.name).join(', ')}`);
+        } else {
+            log.info('All required data views already exist.');
+        }
+
+        const existingNameSet = new Set(existing.map(v => (v?.name ?? '').trim()));
+
+        for (const spec of requiredDataViews) {
+            expect(
+                existingNameSet.has(spec.name),
+                `Expected data view to exist by exact name: name="${spec.name}"`,
+            ).toBeTruthy();
+        }
+    });
+
+    test("Reporting cluster check", async ({ log }) => {
+        const indices: string[] = [
+            'oblt-playwright',
+            'playwright-logs'
+        ];
+
+        for (const indexName of indices) {
+            log.info(`Checking if index '${indexName}' exists...`);
+            let indexExists = await checkIndexExists(indexName);
+
+            if (indexExists) {
+                log.info(`Index '${indexName}' exists.`);
+            } else {
+                log.warn(`Index '${indexName}' does not exist. Checking for index template...`);
+                const templateExists = await checkIndexTemplateExists(indexName);
+
+                if (templateExists) {
+                    log.info(`Index template '${indexName}' exists. Creating index...`);
+                    await createIndex(indexName);
+                    indexExists = await checkIndexExists(indexName);
+                    expect(indexExists).toBeTruthy();
+                    log.info(`Index '${indexName}' created successfully.`);
+                } else {
+                    log.warn(`Index template '${indexName}' does not exist. Creating index template...`);
+                    await createIndexTemplate(indexName);
+                    log.info(`Index template '${indexName}' created successfully. Creating index...`);
+                    await createIndex(indexName);
+                    indexExists = await checkIndexExists(indexName);
+                    expect(indexExists).toBeTruthy();
+                    log.info(`Index '${indexName}' created successfully.`);
+                }
+            }
+            expect(indexExists).toBeTruthy();
+        }
+    });
 });
