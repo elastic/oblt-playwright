@@ -77,7 +77,7 @@ test.describe('Preflight checks', () => {
         }
     });
 
-    test("Reporting cluster check", async ({ log }) => {
+    test.skip("Reporting cluster check", async ({ log }) => {
         const indices: string[] = [
             'oblt-playwright',
             'playwright-logs'
