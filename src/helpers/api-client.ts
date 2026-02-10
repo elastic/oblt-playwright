@@ -240,7 +240,14 @@ export async function createDataView(
 ): Promise<any> {
   const response = await request.post('/api/data_views/data_view', {
     headers: kibanaDefaultHeaders(),
-    data: { data_view: spec, override: false },
+    data: {
+      data_view: {
+        name: spec.name,
+        title: spec.pattern,
+        timeFieldName: spec.timestampField,
+      },
+      override: false,
+    },
   });
 
   if (response.status() !== 200) {
