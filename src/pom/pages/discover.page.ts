@@ -7,7 +7,7 @@ export default class DiscoverPage extends BasePage {
     private readonly skipTour = () => this.page.locator('xpath=//div[@data-test-subj="nav-tour-step-sidenav-home"]//*[text()="Skip tour"]');
     private readonly dataViewSwitch = () => this.page.getByTestId('discover-dataView-switch-link');
     private readonly dataViewInput = () => this.page.locator('xpath=//*[@data-test-subj="changeDataViewPopover"]//input');
-    private readonly dataViewList = (dataView: string) => this.page.locator(`xpath=//li[@value="${dataView}"]`);
+    private readonly dataViewList = (dataView: string) => this.page.locator('[role="option"]').filter({ hasText: dataView }).first();
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
@@ -26,6 +26,7 @@ export default class DiscoverPage extends BasePage {
     private readonly logPatternsRowToggle = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//td[@data-test-subj="aiopsLogPatternsExpandRowToggle"]');
     private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
     private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
+    private readonly discoverNoResults = () => this.page.getByTestId('discoverNoResults');
 
     public async clickDataView() {
         await this.dataViewSwitch().click();
@@ -45,6 +46,7 @@ export default class DiscoverPage extends BasePage {
         this.log.info(`Selecting "${dataView}" data view`);
         await this.dataViewSwitch().click();
         await this.dataViewInput().fill(dataView);
+        await expect(this.dataViewList(dataView)).toBeVisible();
         await this.dataViewList(dataView).click();
     }
 
@@ -108,6 +110,10 @@ export default class DiscoverPage extends BasePage {
 
     public async assertPatternsNotLoaded() {
         await expect(this.patternsNotLoaded()).toBeVisible();
+    }
+
+    public async assertDiscoverNoResults() {
+        await expect(this.discoverNoResults()).toBeVisible();
     }
 
     public async filterByKubernetesContainer() {

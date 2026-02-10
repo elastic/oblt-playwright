@@ -57,6 +57,9 @@ test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, n
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
+      discoverPage.assertDiscoverNoResults().then(() => {
+        throw new Error('Test is failed: Discover shows no results');
+      }),
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 });
@@ -84,6 +87,9 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
+      discoverPage.assertDiscoverNoResults().then(() => {
+        throw new Error('Test is failed: Discover shows no results');
+      }),
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
@@ -106,6 +112,9 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
+      }),
+      discoverPage.assertDiscoverNoResults().then(() => {
+        throw new Error('Test is failed: Discover shows no results');
       }),
     ]);
   }, 'Navigating to the "Field Statistics" tab and asserting doc count');
@@ -134,6 +143,9 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
       }),
+      discoverPage.assertDiscoverNoResults().then(() => {
+        throw new Error('Test is failed: Discover shows no results');
+      }),
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
 
@@ -159,6 +171,9 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
         throw new Error('Test is failed: Chart failed to load');
+      }),
+      discoverPage.assertDiscoverNoResults().then(() => {
+        throw new Error('Test is failed: Discover shows no results');
       }),
     ]);
     log.info('Clicking on the filter pattern button');
