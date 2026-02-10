@@ -32,7 +32,7 @@ export default class DiscoverPage extends BasePage {
         await this.dataView().click();
     }
 
-    public async selectLogsDataView() {
+    public async selectDataView(dataView: string) {
         this.log.info("Checking for welcome tour pop-up");
         const [index] = await waitForOneOf([
             this.skipTour(),
@@ -43,9 +43,9 @@ export default class DiscoverPage extends BasePage {
             this.log.info("Skipping the welcome tour");
             await this.skipTour().click();
         }
-        this.log.info("Selecting logs data view");
+        this.log.info(`Selecting "${dataView}" data view`);
         await this.dataView().click();
-        await this.dataViewInput().fill('logs-*');
+        await this.dataViewInput().fill(dataView);
         await this.dataViewLogs().click();
     }
 
