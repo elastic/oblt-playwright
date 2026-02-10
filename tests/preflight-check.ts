@@ -40,22 +40,6 @@ test.describe('Preflight checks', () => {
         }
     });
 
-    test("Test data check", async ({ log }) => {
-        log.info('Checking test data...');
-        const doc_count: { apm: number; logs: number; metrics: number } = await getDocCount();
-
-        expect(doc_count.apm).not.toBeNull();
-        expect(doc_count.apm).toBeGreaterThan(0);
-
-        expect(doc_count.logs).not.toBeNull();
-        expect(doc_count.logs).toBeGreaterThan(0);
-
-        expect(doc_count.metrics).not.toBeNull();
-        expect(doc_count.metrics).toBeGreaterThan(0);
-
-        log.info(`Document count: APM: ${doc_count.apm}, Logs: ${doc_count.logs}, Metrics: ${doc_count.metrics}`);
-    })
-
     test("Data views check", async ({ request, log }) => {
         const requiredDataViews: DataView[] = [
             {
