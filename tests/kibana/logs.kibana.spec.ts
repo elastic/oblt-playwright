@@ -21,7 +21,7 @@ test.beforeEach(async ({ discoverPage, page, sideNav, log }) => {
   log.info('Navigating to the "Discover" section');
   await page.goto('/app/discover');
   log.info('Selecting the "Logs" data view');
-  await discoverPage.selectLogsDataView();
+  await discoverPage.selectDataView('logs-*');
 });
 
 test.afterEach('Log test results', async ({ log }, testInfo) => {
