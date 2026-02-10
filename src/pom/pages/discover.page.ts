@@ -4,11 +4,10 @@ import { BasePage } from "../base.page";
 
 export default class DiscoverPage extends BasePage {
 
-    private readonly discoverTab = () => this.page.getByTestId('discoverTab');
     private readonly skipTour = () => this.page.locator('xpath=//div[@data-test-subj="nav-tour-step-sidenav-home"]//*[text()="Skip tour"]');
-    private readonly dataView = () => this.page.getByTestId('discover-dataView-switch-link');
+    private readonly dataViewSwitch = () => this.page.getByTestId('discover-dataView-switch-link');
     private readonly dataViewInput = () => this.page.locator('xpath=//*[@data-test-subj="changeDataViewPopover"]//input');
-    private readonly dataViewLogs = () => this.page.locator('xpath=//li[@value="logs-*"]');
+    private readonly dataViewList = (dataView: string) => this.page.locator(`xpath=//li[@value="${dataView}"]`);
     private readonly logsSearchField = () => this.page.getByPlaceholder('Search field names');
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
@@ -29,14 +28,14 @@ export default class DiscoverPage extends BasePage {
     private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
 
     public async clickDataView() {
-        await this.dataView().click();
+        await this.dataViewSwitch().click();
     }
 
     public async selectDataView(dataView: string) {
         this.log.info("Checking for welcome tour pop-up");
         const [index] = await waitForOneOf([
             this.skipTour(),
-            this.dataView()
+            this.dataViewSwitch()
         ]);
         const skipWelcomeTour = index === 0;
         if (skipWelcomeTour) {
@@ -44,9 +43,9 @@ export default class DiscoverPage extends BasePage {
             await this.skipTour().click();
         }
         this.log.info(`Selecting "${dataView}" data view`);
-        await this.dataView().click();
+        await this.dataViewSwitch().click();
         await this.dataViewInput().fill(dataView);
-        await this.dataViewLogs().click();
+        await this.dataViewList(dataView).click();
     }
 
     public async clickFieldStatsTab() {
