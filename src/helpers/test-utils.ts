@@ -110,11 +110,13 @@ const TIME_UNIT_MAP: Record<string, string> = {
 };
 
 /**
- * Builds a Kibana app URL with time range parameters encoded in the Rison _g state.
+ * Builds a Kibana app URL with optional app state (_a) and global time range (_g)
+ * encoded in Kibana Rison query params.
  * Uses environment variables (START_DATE/END_DATE or TIME_VALUE/TIME_UNIT) by default.
  * @param appPath - Kibana app path, e.g. '/app/discover'
+ * @param appState - Optional Kibana app state, e.g. "(index:'<data-view-id>')"
  */
-export function buildKibanaUrl(appPath: string): string {
+export function buildKibanaUrl(appPath: string, appState?: string): string {
   let timeFrom: string;
   let timeTo: string;
 
@@ -130,7 +132,9 @@ export function buildKibanaUrl(appPath: string): string {
     timeTo = 'now';
   }
 
-  return `${appPath}#/?_g=(time:(from:${timeFrom},to:${timeTo}))`;
+  const appPathNormalized = appPath.replace(/#\/?\?.*$/, '');
+  const appStatePart = appState ? `_a=${appState}&` : '';
+  return `${appPathNormalized}#/?${appStatePart}_g=(time:(from:${timeFrom},to:${timeTo}))`;
 }
 
 export async function checkKibanaAvailability(page: Page) {
