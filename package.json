@@ -23,7 +23,7 @@
     "@types/node": "^25.2.0"
   },
   "dependencies": {
-    "console-table-printer": "^2.14.6",
+    "console-table-printer": "^2.15.0",
     "winston": "^3.18.3"
   }
 }
