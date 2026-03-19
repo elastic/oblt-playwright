@@ -68,8 +68,8 @@ export default defineConfig({
     },
     {
       name: 'bb',
-      testDir: process.env.PPB_TEST_DIR,
-      testMatch: '**\/*.kibana.spec.ts',
+      testDir: process.env.PLAYWRIGHT_TEST_DIR,
+      testMatch: '**\/*.bb.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
