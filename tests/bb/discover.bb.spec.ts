@@ -1,8 +1,9 @@
 import * as fs from 'fs';
 import { test } from '../../src/pom/page-fixtures';
+import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
 import { testStep, buildKibanaUrl } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, listDataViews } from '../../src/helpers/api-client';
-import { writeJsonReport, printResults } from '../../src/helpers/reporter';
+import { writeJsonReport, writeNetworkTraceReport, printResults } from '../../src/helpers/reporter';
 
 interface Scenario {
   name: string;
@@ -81,11 +82,15 @@ for (const scenario of scenarios) {
 
     test.afterEach('Log test results', async ({ log }, testInfo) => {
       const perfData = (testInfo as any).perfData;
+      const networkTrace = (testInfo as any).networkTrace as NetworkTraceCapture | null | undefined;
       const stepData = (testInfo as any).stepData;
       const reportFiles = await writeJsonReport(
         log, clusterData, testInfo, testStartTime, doc_count,
         stepData, undefined, perfData
       );
+      if (networkTrace) {
+        await writeNetworkTraceReport(log, clusterData, testInfo, testStartTime, networkTrace, perfData ?? undefined);
+      }
       reports.push(...reportFiles.filter(item => typeof item === 'string'));
     });
 
@@ -106,56 +111,87 @@ for (const scenario of scenarios) {
       : `Opening ${KIBANA_APP_PATH} with url-embedded _a target and collecting full navigation metrics`;
 
     test(testName,
-      async ({ discoverPage, headerBar, notifications, perfMetrics, page, log }, testInfo) => {
+      async ({ discoverPage, notifications, perfMetrics, page, log }, testInfo) => {
         let stepData: object[] = [];
         let perfData: object | null = null;
+        let networkTrace: NetworkTraceCapture | null = null;
+        let traceCollectionStarted = false;
         (testInfo as any).stepData = stepData;
         (testInfo as any).perfData = perfData;
+        (testInfo as any).networkTrace = networkTrace;
 
-        await testStep('step01', stepData, page, async () => {
-          let appState: string;
-          const { appPath, appState: urlAppState } = getUrlEmbeddedAppState(KIBANA_APP_PATH);
-          if (DATA_VIEW_TITLE) {
-            if (!dataViewId) {
-              throw new Error(`Data view id was not resolved for data_view "${DATA_VIEW_TITLE}"`);
+        const networkTraceCollector = await createNetworkTraceCollector(page, log, {
+          maxNetworkRequests: 2000,
+          slowRequestCount: 5,
+        });
+
+        try {
+          await testStep('step01', stepData, page, async () => {
+            let appState: string;
+            const { appPath, appState: urlAppState } = getUrlEmbeddedAppState(KIBANA_APP_PATH);
+            if (DATA_VIEW_TITLE) {
+              if (!dataViewId) {
+                throw new Error(`Data view id was not resolved for data_view "${DATA_VIEW_TITLE}"`);
+              }
+              appState = `(index:'${dataViewId}')`;
+            } else if (urlAppState) {
+              appState = normalizeTarget(urlAppState);
+            } else {
+              throw new Error('Neither DATA_VIEW_TITLE nor a url-embedded _a target are configured');
             }
-            appState = `(index:'${dataViewId}')`;
-          } else if (urlAppState) {
-            appState = normalizeTarget(urlAppState);
-          } else {
-            throw new Error('Neither DATA_VIEW_TITLE nor a url-embedded _a target are configured');
+
+            const kibanaUrl = buildKibanaUrl(appPath, appState);
+            log.info(logNavigate);
+            await perfMetrics.takeBaseline();
+            await networkTraceCollector.start();
+            traceCollectionStarted = true;
+            await page.goto(kibanaUrl);
+            const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
+            await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
+            await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
+
+            log.info('Asserting visibility of the chart canvas and data grid row');
+            await Promise.race([
+              discoverPage.assertVisibilityDataGridRow(),
+              notifications.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed: Error while fetching resource');
+              }),
+              notifications.assertErrorIncrementCount().then(() => {
+                throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+              }),
+              discoverPage.assertHistogramEmbeddedError().then(() => {
+                throw new Error('Test is failed: Chart failed to load');
+              }),
+              discoverPage.assertDiscoverNoResults().then(() => {
+                throw new Error('Test is failed: Discover shows no results');
+              }),
+            ]);
+
+            log.info('Step 1 settled, collecting full performance metrics');
+            const collectedPerfMetrics = await perfMetrics.collect();
+            networkTrace = await networkTraceCollector.collect();
+            traceCollectionStarted = false;
+
+            perfData = {
+              ...collectedPerfMetrics,
+              networkTraceId: networkTrace.traceId,
+              networkSummary: networkTrace.summary,
+              slowestRequests: networkTrace.slowestRequests,
+            };
+            (testInfo as any).perfData = perfData;
+            (testInfo as any).networkTrace = networkTrace;
+          }, stepDescription);
+        } finally {
+          if (traceCollectionStarted && !networkTrace) {
+            try {
+              networkTrace = await networkTraceCollector.collect();
+              (testInfo as any).networkTrace = networkTrace;
+            } catch (error: any) {
+              log.warn(`Network trace collection could not be completed: ${error.message}`);
+            }
           }
-
-          const kibanaUrl = buildKibanaUrl(appPath, appState);
-          log.info(logNavigate);
-          await page.goto(kibanaUrl);
-
-          await perfMetrics.takeBaseline();
-          const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
-          await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
-          await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
-
-          log.info('Asserting visibility of the chart canvas and data grid row');
-          await Promise.race([
-            discoverPage.assertVisibilityDataGridRow(),
-            notifications.assertErrorFetchingResource().then(() => {
-              throw new Error('Test is failed: Error while fetching resource');
-            }),
-            notifications.assertErrorIncrementCount().then(() => {
-              throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
-            }),
-            discoverPage.assertHistogramEmbeddedError().then(() => {
-              throw new Error('Test is failed: Chart failed to load');
-            }),
-            discoverPage.assertDiscoverNoResults().then(() => {
-              throw new Error('Test is failed: Discover shows no results');
-            }),
-          ]);
-
-          log.info('Step 1 settled, collecting full performance metrics');
-          perfData = await perfMetrics.collect();
-          (testInfo as any).perfData = perfData;
-        }, stepDescription);
+          await networkTraceCollector.dispose();
+        }
       });
   });
 }

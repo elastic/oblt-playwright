@@ -12,8 +12,33 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Table } from 'console-table-printer';
 import { Logger } from "winston";
+import { NetworkTraceCapture } from './network-trace';
 
 const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
+
+function ensureOutputDirectory() {
+  if (!fs.existsSync(outputDirectory)) {
+    fs.mkdirSync(outputDirectory, { recursive: true });
+  }
+}
+
+function buildReportFileBase(testStartTime: string, testTitle: string): string {
+  return `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testTitle.replace(/\s/g, "_").toLowerCase()}`;
+}
+
+function buildPeriodLabel() {
+  return ABSOLUTE_TIME_RANGE
+    ? `From ${START_DATE} to ${END_DATE}`
+    : `Last ${TIME_VALUE} ${TIME_UNIT}`;
+}
+
+function stripAnsi(value: string | undefined): string {
+  if (!value) {
+    return '';
+  }
+
+  return value.replace(/\u001b\[[0-9;]*m|\u001b/g, '');
+}
 
 export async function writeJsonReport(
   log: Logger,
@@ -29,12 +54,10 @@ export async function writeJsonReport(
   let cluster_name: any = clusterData.cluster_name;
   let files: string[] = [];
 
-  const fileName = `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testInfo.title.replace(/\s/g, "_").toLowerCase()}.json`;
+  const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}.json`;
   files.push(fileName);
 
-  if (!fs.existsSync(outputDirectory)) {
-    fs.mkdirSync(outputDirectory, { recursive: true });
-  }
+  ensureOutputDirectory();
   log.info(`Saving report file to ${outputDirectory}`);
   const outputPath = path.join(outputDirectory, fileName);
 
@@ -42,12 +65,10 @@ export async function writeJsonReport(
     title: testInfo.title,
     startTime: testStartTime,
     doc_count: docsCount,
-    period: ABSOLUTE_TIME_RANGE
-      ? `From ${START_DATE} to ${END_DATE}`
-      : `Last ${TIME_VALUE} ${TIME_UNIT}`,
+    period: buildPeriodLabel(),
     status: testInfo.status,
     duration: testInfo.duration,
-    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map(e => (e.message ? e.message.replace(/\u001b\[[0-9;]*m|\u001b/g, '') : '')).join('\n') } }),
+    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map((error) => stripAnsi(error.message)).join('\n') } }),
     cluster_name: cluster_name,
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
@@ -56,6 +77,43 @@ export async function writeJsonReport(
   };
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
   return files;
+}
+
+export async function writeNetworkTraceReport(
+  log: Logger,
+  clusterData: any,
+  testInfo: TestInfo,
+  testStartTime: string,
+  networkTrace: NetworkTraceCapture,
+  perfMetrics?: object,
+) {
+  ensureOutputDirectory();
+
+  const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}.network-trace.json`;
+  const outputPath = path.join(outputDirectory, fileName);
+
+  const traceReportData = {
+    title: testInfo.title,
+    startTime: testStartTime,
+    period: buildPeriodLabel(),
+    status: testInfo.status,
+    duration: testInfo.duration,
+    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map((error) => stripAnsi(error.message)).join('\n') } }),
+    cluster_name: clusterData.cluster_name,
+    build_flavor: clusterData.version.build_flavor,
+    networkTraceId: networkTrace.traceId,
+    performanceMetrics: perfMetrics,
+    networkSummary: networkTrace.summary,
+    slowestRequests: networkTrace.slowestRequests,
+    captureStartedAt: networkTrace.captureStartedAt,
+    captureEndedAt: networkTrace.captureEndedAt,
+    maxNetworkRequests: networkTrace.maxNetworkRequests,
+    requests: networkTrace.requests,
+  };
+
+  log.info(`Saving network trace file to ${outputPath}`);
+  fs.writeFileSync(outputPath, JSON.stringify(traceReportData, null, 2));
+  return fileName;
 }
 
 export async function printResults(reportFiles: string[]) {
@@ -124,18 +182,45 @@ export async function printResults(reportFiles: string[]) {
 
           const ms = (v: any) => v != null ? `${v} ms` : 'N/A';
           perfTable.addRows([
-            { metric: 'LCP (Largest Contentful Paint)', value: ms(pm.lcp) },
-            { metric: 'FCP (First Contentful Paint)', value: ms(pm.fcp) },
-            { metric: 'TTFB (Time to First Byte)', value: ms(pm.ttfb) },
-            { metric: 'DOM Content Loaded', value: ms(pm.domContentLoaded) },
-            { metric: 'Page Load', value: ms(pm.load) },
-            { metric: 'Script Duration', value: ms(pm.scriptDuration) },
-            { metric: 'Layout Duration', value: ms(pm.layoutDuration) },
-            { metric: 'Recalc Style Duration', value: ms(pm.recalcStyleDuration) },
-            { metric: 'Task Duration', value: ms(pm.taskDuration) },
-            { metric: 'JS Heap Used', value: pm.jsHeapUsedSize != null ? `${pm.jsHeapUsedSize} MB` : 'N/A' },
+            { metric: 'LCP (Largest Contentful Paint)', value: ms(pm.lcpMs) },
+            { metric: 'FCP (First Contentful Paint)', value: ms(pm.fcpMs) },
+            { metric: 'TTFB (Time to First Byte)', value: ms(pm.ttfbMs) },
+            { metric: 'DOM Content Loaded', value: ms(pm.domContentLoadedMs) },
+            { metric: 'Page Load', value: ms(pm.loadMs) },
+            { metric: 'Script Duration', value: ms(pm.scriptDurationMs) },
+            { metric: 'Layout Duration', value: ms(pm.layoutDurationMs) },
+            { metric: 'Recalc Style Duration', value: ms(pm.recalcStyleDurationMs) },
+            { metric: 'Task Duration', value: ms(pm.taskDurationMs) },
+            { metric: 'JS Heap Used', value: pm.jsHeapUsedSizeMb != null ? `${pm.jsHeapUsedSizeMb} MB` : 'N/A' },
+            { metric: 'Network Trace Id', value: pm.networkTraceId ?? 'N/A' },
+            { metric: 'Finished Requests', value: pm.networkSummary?.finishedRequests != null ? String(pm.networkSummary.finishedRequests) : 'N/A' },
+            { metric: 'Failed Requests', value: pm.networkSummary?.failedRequests != null ? String(pm.networkSummary.failedRequests) : 'N/A' },
+            { metric: 'Dropped Requests', value: pm.networkSummary?.droppedRequestStarts != null ? String(pm.networkSummary.droppedRequestStarts) : 'N/A' },
           ], { separator: true });
           perfTable.printTable();
+
+          if (Array.isArray(pm.slowestRequests) && pm.slowestRequests.length > 0) {
+            const slowRequestsTable = new Table({
+              title: `Slowest Network Requests`,
+              columns: [
+                { name: 'method', title: 'Method', color: 'yellow' },
+                { name: 'status', title: 'Status' },
+                { name: 'duration', title: 'Duration', color: 'green' },
+                { name: 'url', title: 'URL', maxLen: 80 },
+              ],
+            });
+
+            slowRequestsTable.addRows(
+              pm.slowestRequests.map((request: any) => ({
+                method: request.method,
+                status: request.status ?? 'N/A',
+                duration: request.durationMs != null ? `${request.durationMs} ms` : 'N/A',
+                url: request.url,
+              })),
+              { separator: true },
+            );
+            slowRequestsTable.printTable();
+          }
         }
 
       } catch (innerError: any) {

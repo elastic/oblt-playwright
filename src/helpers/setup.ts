@@ -5,6 +5,7 @@ import {
 } from '../env.ts';
 import {
   oblt_playwright,
+  oblt_playwright_network_traces,
   oblt_playwright_logs
 } from '../index-templates.ts';
 import { Logger } from "winston";
@@ -60,6 +61,9 @@ export async function createIndexTemplate(name: string) {
     case "oblt-playwright":
         template_name = oblt_playwright;
         break;
+    case "oblt-playwright-network-traces":
+      template_name = oblt_playwright_network_traces;
+      break;
     case "playwright-logs":
         template_name = oblt_playwright_logs;
         break;

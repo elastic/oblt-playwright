@@ -80,6 +80,7 @@ test.describe('Preflight checks', () => {
     test.skip("Reporting cluster check", async ({ log }) => {
         const indices: string[] = [
             'oblt-playwright',
+            'oblt-playwright-network-traces',
             'playwright-logs'
         ];
 
