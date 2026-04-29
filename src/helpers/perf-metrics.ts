@@ -29,39 +29,42 @@ export async function createPerfCollector(page: Page, log: Logger) {
     },
 
     async collect() {
-      // --- Web Vitals (in-page query) ---
-      const { lcp, fcp } = await page.evaluate(() => {
-        return new Promise<{ lcp: number | null; fcp: number | null }>((resolve) => {
+      // --- Web Vitals + Navigation Timing (single in-page query) ---
+      const { lcpMs, fcpMs, ttfbMs, domContentLoadedMs, loadMs } = await page.evaluate(() => {
+        return new Promise<{
+          lcpMs: number | null;
+          fcpMs: number | null;
+          ttfbMs: number;
+          domContentLoadedMs: number;
+          loadMs: number;
+        }>((resolve) => {
           const paintEntries = performance.getEntriesByType('paint');
-          const fcpEntry = paintEntries.find(e => e.name === 'first-contentful-paint');
-          const fcp = fcpEntry ? Math.round(fcpEntry.startTime) : null;
+          const fcpEntry = paintEntries.find((e) => e.name === 'first-contentful-paint');
+          const fcpMs = fcpEntry ? Math.round(fcpEntry.startTime) : null;
 
-          let lcp: number | null = null;
+          const entries = performance.getEntriesByType('navigation');
+          const nav = (entries[0] as PerformanceNavigationTiming | undefined);
+          const ttfbMs = nav ? Math.round(nav.responseStart - nav.requestStart) : 0;
+          const domContentLoadedMs = nav ? Math.round(nav.domContentLoadedEventEnd - nav.startTime) : 0;
+          const loadMs = nav && nav.loadEventEnd > 0 ? Math.round(nav.loadEventEnd - nav.startTime) : 0;
+
+          let lcpMs: number | null = null;
           try {
             const observer = new PerformanceObserver((list) => {
-              const entries = list.getEntries();
-              if (entries.length > 0) {
-                lcp = Math.round(entries[entries.length - 1].startTime);
+              const lcpEntries = list.getEntries();
+              if (lcpEntries.length > 0) {
+                lcpMs = Math.round(lcpEntries[lcpEntries.length - 1].startTime);
               }
             });
             observer.observe({ type: 'largest-contentful-paint', buffered: true });
-            setTimeout(() => { observer.disconnect(); resolve({ lcp, fcp }); }, 100);
+            setTimeout(() => {
+              observer.disconnect();
+              resolve({ lcpMs, fcpMs, ttfbMs, domContentLoadedMs, loadMs });
+            }, 100);
           } catch {
-            resolve({ lcp: null, fcp });
+            resolve({ lcpMs: null, fcpMs, ttfbMs, domContentLoadedMs, loadMs });
           }
         });
-      });
-
-      // --- Navigation Timing (in-page query) ---
-      const { ttfb, domContentLoaded, load } = await page.evaluate(() => {
-        const entries = performance.getEntriesByType('navigation');
-        if (!entries.length) return { ttfb: 0, domContentLoaded: 0, load: 0 };
-        const nav = entries[0] as PerformanceNavigationTiming;
-        return {
-          ttfb: Math.round(nav.responseStart - nav.requestStart),
-          domContentLoaded: Math.round(nav.domContentLoadedEventEnd - nav.startTime),
-          load: nav.loadEventEnd > 0 ? Math.round(nav.loadEventEnd - nav.startTime) : 0,
-        };
       });
 
       // --- CDP Performance domain (delta from baseline) ---
@@ -74,22 +77,22 @@ export async function createPerfCollector(page: Page, log: Logger) {
       const delta = (name: string) => (current.get(name) ?? 0) - (base.get(name) ?? 0);
 
       const result = {
-        lcp,
-        fcp,
-        ttfb,
-        domContentLoaded,
-        load,
-        scriptDuration: Math.round(delta('ScriptDuration') * 1000),
-        layoutDuration: Math.round(delta('LayoutDuration') * 1000),
-        recalcStyleDuration: Math.round(delta('RecalcStyleDuration') * 1000),
-        taskDuration: Math.round(delta('TaskDuration') * 1000),
-        jsHeapUsedSize: Math.round((current.get('JSHeapUsedSize') ?? 0) / (1024 * 1024)),
+        lcpMs,
+        fcpMs,
+        ttfbMs,
+        domContentLoadedMs,
+        loadMs,
+        scriptDurationMs: Math.round(delta('ScriptDuration') * 1000),
+        layoutDurationMs: Math.round(delta('LayoutDuration') * 1000),
+        recalcStyleDurationMs: Math.round(delta('RecalcStyleDuration') * 1000),
+        taskDurationMs: Math.round(delta('TaskDuration') * 1000),
+        jsHeapUsedSizeMb: Math.round((current.get('JSHeapUsedSize') ?? 0) / (1024 * 1024)),
       };
 
       log.info(
-        `PerfMetrics collected: LCP=${result.lcp ?? 'N/A'}ms, ` +
-        `FCP=${result.fcp ?? 'N/A'}ms, TTFB=${result.ttfb}ms, ` +
-        `DOMContentLoaded=${result.domContentLoaded}ms, Load=${result.load}ms`
+        `PerfMetrics collected: LCP=${result.lcpMs ?? 'N/A'}ms, ` +
+        `FCP=${result.fcpMs ?? 'N/A'}ms, TTFB=${result.ttfbMs}ms, ` +
+        `DOMContentLoaded=${result.domContentLoadedMs}ms, Load=${result.loadMs}ms`
       );
 
       return result;

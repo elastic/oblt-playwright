@@ -1,3 +1,63 @@
+const requestTimingProperties = {
+  requestId: { type: 'keyword' },
+  url: { type: 'keyword' },
+  method: { type: 'keyword' },
+  resourceType: { type: 'keyword' },
+  status: { type: 'short' },
+  mimeType: { type: 'keyword' },
+  protocol: { type: 'keyword' },
+  fromDiskCache: { type: 'boolean' },
+  fromServiceWorker: { type: 'boolean' },
+  encodedDataLength: { type: 'long' },
+  startTimeEpochMs: { type: 'date' },
+  ttfbMs: { type: 'long' },
+  durationMs: { type: 'long' },
+  finished: { type: 'boolean' },
+  failed: { type: 'boolean' },
+  errorText: { type: 'keyword' },
+};
+
+const networkSummaryProperties = {
+  finishedRequests: { type: 'long' },
+  failedRequests: { type: 'long' },
+  inflightRequests: { type: 'long' },
+  droppedRequestStarts: { type: 'long' },
+  totalEncodedDataLength: { type: 'long' },
+};
+
+const slowRequestProperties = {
+  requestId: { type: 'keyword' },
+  url: { type: 'keyword' },
+  method: { type: 'keyword' },
+  resourceType: { type: 'keyword' },
+  status: { type: 'short' },
+  ttfbMs: { type: 'long' },
+  durationMs: { type: 'long' },
+  encodedDataLength: { type: 'long' },
+  failed: { type: 'boolean' },
+};
+
+const performanceMetricsProperties = {
+  lcpMs: { type: 'long' },
+  fcpMs: { type: 'long' },
+  ttfbMs: { type: 'long' },
+  domContentLoadedMs: { type: 'long' },
+  loadMs: { type: 'long' },
+  scriptDurationMs: { type: 'long' },
+  layoutDurationMs: { type: 'long' },
+  recalcStyleDurationMs: { type: 'long' },
+  taskDurationMs: { type: 'long' },
+  jsHeapUsedSizeMb: { type: 'long' },
+  networkTraceId: { type: 'keyword' },
+  networkSummary: {
+    properties: networkSummaryProperties,
+  },
+  slowestRequests: {
+    type: 'nested',
+    properties: slowRequestProperties,
+  },
+};
+
 export const oblt_playwright = {
       mappings: {
         properties: {
@@ -72,20 +132,42 @@ export const oblt_playwright = {
           },
           cacheStats: { type: 'object' },
           performanceMetrics: {
-            properties: {
-              lcp: { type: 'long' },
-              fcp: { type: 'long' },
-              ttfb: { type: 'long' },
-              domContentLoaded: { type: 'long' },
-              load: { type: 'long' },
-              scriptDuration: { type: 'long' },
-              layoutDuration: { type: 'long' },
-              recalcStyleDuration: { type: 'long' },
-              taskDuration: { type: 'long' },
-              jsHeapUsedSize: { type: 'long' },
-            },
+            properties: performanceMetricsProperties,
           },
           measurements: { type: 'object' },
+        },
+      },
+    }
+
+export const oblt_playwright_network_traces = {
+      mappings: {
+        properties: {
+          title: { type: 'text' },
+          startTime: { type: 'date' },
+          period: { type: 'keyword' },
+          status: { type: 'keyword' },
+          duration: { type: 'float' },
+          errors: { type: 'object' },
+          cluster_name: { type: 'keyword' },
+          build_flavor: { type: 'keyword' },
+          networkTraceId: { type: 'keyword' },
+          captureStartedAt: { type: 'date' },
+          captureEndedAt: { type: 'date' },
+          maxNetworkRequests: { type: 'long' },
+          performanceMetrics: {
+            properties: performanceMetricsProperties,
+          },
+          networkSummary: {
+            properties: networkSummaryProperties,
+          },
+          slowestRequests: {
+            type: 'nested',
+            properties: slowRequestProperties,
+          },
+          requests: {
+            type: 'nested',
+            properties: requestTimingProperties,
+          },
         },
       },
     }
