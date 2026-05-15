@@ -40,6 +40,54 @@ function stripAnsi(value: string | undefined): string {
   return value.replace(/\u001b\[[0-9;]*m|\u001b/g, '');
 }
 
+// Strips the origin (scheme + host + optional port) from a URL so the report
+// shows just `/path?query`. Host-agnostic — works for any cluster, not just
+// localhost. Falls back to the raw URL if it isn't parseable.
+function stripUrlOrigin(url: string | undefined): string {
+  if (!url) {
+    return '';
+  }
+  try {
+    const parsed = new URL(url);
+    return `${parsed.pathname}${parsed.search}`;
+  } catch {
+    return url;
+  }
+}
+
+// Renders a slowest-requests table with Type and Cache columns. The Cache
+// column shows `disk` for `fromDiskCache: true` so a reader can immediately
+// see whether a fast/slow result is explained by cache state rather than
+// real backend behaviour. Skips silently if there are no rows.
+function printSlowestRequestsTable(title: string, requests: any[] | undefined) {
+  if (!Array.isArray(requests) || requests.length === 0) {
+    return;
+  }
+  const table = new Table({
+    title,
+    columns: [
+      { name: 'method', title: 'Method', color: 'yellow' },
+      { name: 'status', title: 'Status' },
+      { name: 'type', title: 'Type' },
+      { name: 'cache', title: 'Cache' },
+      { name: 'duration', title: 'Duration', color: 'green' },
+      { name: 'url', title: 'URL', maxLen: 80 },
+    ],
+  });
+  table.addRows(
+    requests.map((request: any) => ({
+      method: request.method,
+      status: request.status ?? 'N/A',
+      type: request.resourceType ?? 'N/A',
+      cache: request.fromDiskCache ? 'disk' : '',
+      duration: request.durationMs != null ? `${request.durationMs} ms` : 'N/A',
+      url: stripUrlOrigin(request.url),
+    })),
+    { separator: true },
+  );
+  table.printTable();
+}
+
 export async function writeJsonReport(
   log: Logger,
   clusterData: any,
@@ -199,27 +247,19 @@ export async function printResults(reportFiles: string[]) {
           ], { separator: true });
           perfTable.printTable();
 
-          if (Array.isArray(pm.slowestRequests) && pm.slowestRequests.length > 0) {
-            const slowRequestsTable = new Table({
-              title: `Slowest Network Requests`,
-              columns: [
-                { name: 'method', title: 'Method', color: 'yellow' },
-                { name: 'status', title: 'Status' },
-                { name: 'duration', title: 'Duration', color: 'green' },
-                { name: 'url', title: 'URL', maxLen: 80 },
-              ],
-            });
-
-            slowRequestsTable.addRows(
-              pm.slowestRequests.map((request: any) => ({
-                method: request.method,
-                status: request.status ?? 'N/A',
-                duration: request.durationMs != null ? `${request.durationMs} ms` : 'N/A',
-                url: request.url,
-              })),
-              { separator: true },
-            );
-            slowRequestsTable.printTable();
+          // Stratify the slowest-requests output into API and static-asset
+          // tables. The API table is the stable cross-run signal (Kibana
+          // API responses are not disk-cached); the static-asset table is
+          // informational and will naturally vary depending on browser
+          // cache state. Fall back to the unified `slowestRequests` when
+          // a report was generated before stratification was added.
+          const hasStratified =
+            Array.isArray(pm.slowestApiRequests) || Array.isArray(pm.slowestStaticRequests);
+          if (hasStratified) {
+            printSlowestRequestsTable('Slowest API Requests', pm.slowestApiRequests);
+            printSlowestRequestsTable('Slowest Static Assets', pm.slowestStaticRequests);
+          } else {
+            printSlowestRequestsTable('Slowest Network Requests', pm.slowestRequests);
           }
         }
 

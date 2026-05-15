@@ -30,7 +30,9 @@ const slowRequestProperties = {
   url: { type: 'keyword' },
   method: { type: 'keyword' },
   resourceType: { type: 'keyword' },
+  category: { type: 'keyword' },
   status: { type: 'short' },
+  fromDiskCache: { type: 'boolean' },
   ttfbMs: { type: 'long' },
   durationMs: { type: 'long' },
   encodedDataLength: { type: 'long' },
@@ -53,6 +55,14 @@ const performanceMetricsProperties = {
     properties: networkSummaryProperties,
   },
   slowestRequests: {
+    type: 'nested',
+    properties: slowRequestProperties,
+  },
+  slowestApiRequests: {
+    type: 'nested',
+    properties: slowRequestProperties,
+  },
+  slowestStaticRequests: {
     type: 'nested',
     properties: slowRequestProperties,
   },
@@ -161,6 +171,14 @@ export const oblt_playwright_network_traces = {
             properties: networkSummaryProperties,
           },
           slowestRequests: {
+            type: 'nested',
+            properties: slowRequestProperties,
+          },
+          slowestApiRequests: {
+            type: 'nested',
+            properties: slowRequestProperties,
+          },
+          slowestStaticRequests: {
             type: 'nested',
             properties: slowRequestProperties,
           },

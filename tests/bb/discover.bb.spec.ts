@@ -177,6 +177,8 @@ for (const scenario of scenarios) {
               networkTraceId: networkTrace.traceId,
               networkSummary: networkTrace.summary,
               slowestRequests: networkTrace.slowestRequests,
+              slowestApiRequests: networkTrace.slowestApiRequests,
+              slowestStaticRequests: networkTrace.slowestStaticRequests,
             };
             (testInfo as any).perfData = perfData;
             (testInfo as any).networkTrace = networkTrace;
