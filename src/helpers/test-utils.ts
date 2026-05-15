@@ -110,31 +110,45 @@ const TIME_UNIT_MAP: Record<string, string> = {
 };
 
 /**
+ * Resolves a Kibana time range from environment variables and returns it as
+ * Rison-ready `from`/`to` strings (e.g. `now-15m` / `now` for relative, or
+ * `'2025-01-01T00:00:00.000Z'` / `'2025-01-02T00:00:00.000Z'` for absolute).
+ *
+ * Priority:
+ *   1. ABSOLUTE_TIME_RANGE + START_DATE + END_DATE (absolute)
+ *   2. TIME_VALUE + TIME_UNIT (relative)
+ *   3. Default: last 15 minutes
+ *
+ * Use this when you need the raw `from`/`to` values to inject into an
+ * app-specific URL state (e.g. Hosts' `_a.dateRange`). For the standard
+ * Kibana hash-routed `_g.time` URL shape, prefer `buildKibanaUrl`.
+ */
+export function resolveKibanaTimeRangeRison(): { from: string; to: string } {
+  if (ABSOLUTE_TIME_RANGE && START_DATE && END_DATE) {
+    return { from: `'${START_DATE}'`, to: `'${END_DATE}'` };
+  }
+  if (TIME_VALUE && TIME_UNIT) {
+    const shortUnit = TIME_UNIT_MAP[TIME_UNIT] || TIME_UNIT;
+    return { from: `now-${TIME_VALUE}${shortUnit}`, to: 'now' };
+  }
+  return { from: 'now-15m', to: 'now' };
+}
+
+/**
  * Builds a Kibana app URL with optional app state (_a) and global time range (_g)
- * encoded in Kibana Rison query params.
+ * encoded as hash params. Suitable for apps that use hash-based routing AND read
+ * time range from `_g.time` (e.g. Discover). NOT suitable for the Hosts app,
+ * which uses query-string routing and persists time range at `_a.dateRange`.
+ *
  * Uses environment variables (START_DATE/END_DATE or TIME_VALUE/TIME_UNIT) by default.
  * @param appPath - Kibana app path, e.g. '/app/discover'
  * @param appState - Optional Kibana app state, e.g. "(index:'<data-view-id>')"
  */
 export function buildKibanaUrl(appPath: string, appState?: string): string {
-  let timeFrom: string;
-  let timeTo: string;
-
-  if (ABSOLUTE_TIME_RANGE && START_DATE && END_DATE) {
-    timeFrom = `'${START_DATE}'`;
-    timeTo = `'${END_DATE}'`;
-  } else if (TIME_VALUE && TIME_UNIT) {
-    const shortUnit = TIME_UNIT_MAP[TIME_UNIT] || TIME_UNIT;
-    timeFrom = `now-${TIME_VALUE}${shortUnit}`;
-    timeTo = 'now';
-  } else {
-    timeFrom = 'now-15m';
-    timeTo = 'now';
-  }
-
+  const { from, to } = resolveKibanaTimeRangeRison();
   const appPathNormalized = appPath.replace(/#\/?\?.*$/, '');
   const appStatePart = appState ? `_a=${appState}&` : '';
-  return `${appPathNormalized}#/?${appStatePart}_g=(time:(from:${timeFrom},to:${timeTo}))`;
+  return `${appPathNormalized}#/?${appStatePart}_g=(time:(from:${from},to:${to}))`;
 }
 
 export async function checkKibanaAvailability(page: Page) {

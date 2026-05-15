@@ -21,10 +21,18 @@ export type NetworkRequestTiming = {
   errorText?: string;
 };
 
+// `api`     — Document, XHR, Fetch, EventSource. Dynamic, server-computed,
+//              not disk-cached. The signal we typically care about for
+//              backend-driven benchmarks.
+// `static`  — Script, Stylesheet, Font, Image, Media, Manifest, TextTrack.
+//              Cacheable. Run-to-run variance is dominated by disk cache state.
+// `other`   — anything else (WebSocket, Ping, Preflight, Other, ...).
+export type NetworkRequestCategory = 'api' | 'static' | 'other';
+
 export type SlowNetworkRequest = Pick<
   NetworkRequestTiming,
-  'requestId' | 'url' | 'method' | 'resourceType' | 'status' | 'ttfbMs' | 'durationMs' | 'encodedDataLength' | 'failed'
->;
+  'requestId' | 'url' | 'method' | 'resourceType' | 'status' | 'ttfbMs' | 'durationMs' | 'encodedDataLength' | 'failed' | 'fromDiskCache'
+> & { category: NetworkRequestCategory };
 
 export type NetworkTraceSummary = {
   finishedRequests: number;
@@ -40,7 +48,13 @@ export type NetworkTraceCapture = {
   captureEndedAt: string;
   maxNetworkRequests: number;
   summary: NetworkTraceSummary;
+  // Top-N slowest across all categories (kept for backward compatibility).
   slowestRequests: SlowNetworkRequest[];
+  // Top-N slowest within each category. Stratifying makes the report stable
+  // across runs: API performance and asset-cache effects can be inspected
+  // independently rather than fighting for the same top-N slots.
+  slowestApiRequests: SlowNetworkRequest[];
+  slowestStaticRequests: SlowNetworkRequest[];
   requests: NetworkRequestTiming[];
 };
 
@@ -53,6 +67,18 @@ type InProgressRequest = NetworkRequestTiming & {
   requestStartTs?: number;
 };
 
+const API_RESOURCE_TYPES = new Set(['Document', 'XHR', 'Fetch', 'EventSource']);
+const STATIC_RESOURCE_TYPES = new Set([
+  'Script', 'Stylesheet', 'Font', 'Image', 'Media', 'Manifest', 'TextTrack',
+]);
+
+function categorizeRequest(resourceType: string | undefined): NetworkRequestCategory {
+  if (!resourceType) return 'other';
+  if (API_RESOURCE_TYPES.has(resourceType)) return 'api';
+  if (STATIC_RESOURCE_TYPES.has(resourceType)) return 'static';
+  return 'other';
+}
+
 // Keep the report-facing slow-request list small and stable even if the full trace schema grows.
 function toSlowNetworkRequest(request: NetworkRequestTiming): SlowNetworkRequest {
   return {
@@ -61,10 +87,12 @@ function toSlowNetworkRequest(request: NetworkRequestTiming): SlowNetworkRequest
     method: request.method,
     resourceType: request.resourceType,
     status: request.status,
+    fromDiskCache: request.fromDiskCache,
     ttfbMs: request.ttfbMs,
     durationMs: request.durationMs,
     encodedDataLength: request.encodedDataLength,
     failed: request.failed,
+    category: categorizeRequest(request.resourceType),
   };
 }
 
@@ -250,17 +278,24 @@ export async function createNetworkTraceCollector(
         ),
       };
 
+      const sortedSlow = completedRequests
+        .slice()
+        .sort(bySlowestRequest)
+        .map(toSlowNetworkRequest);
+
       const trace: NetworkTraceCapture = {
         traceId: activeTraceId,
         captureStartedAt,
         captureEndedAt: new Date().toISOString(),
         maxNetworkRequests,
         summary,
-        slowestRequests: completedRequests
-          .slice()
-          .sort(bySlowestRequest)
-          .slice(0, slowRequestCount)
-          .map(toSlowNetworkRequest),
+        slowestRequests: sortedSlow.slice(0, slowRequestCount),
+        slowestApiRequests: sortedSlow
+          .filter((request) => request.category === 'api')
+          .slice(0, slowRequestCount),
+        slowestStaticRequests: sortedSlow
+          .filter((request) => request.category === 'static')
+          .slice(0, slowRequestCount),
         requests: completedRequests.slice(),
       };
 
