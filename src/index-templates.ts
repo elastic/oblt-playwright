@@ -39,7 +39,7 @@ const slowRequestProperties = {
   failed: { type: 'boolean' },
 };
 
-const performanceMetricsProperties = {
+const corePerformanceMetricsProperties = {
   lcpMs: { type: 'long' },
   fcpMs: { type: 'long' },
   ttfbMs: { type: 'long' },
@@ -51,6 +51,10 @@ const performanceMetricsProperties = {
   taskDurationMs: { type: 'long' },
   jsHeapUsedSizeMb: { type: 'long' },
   networkTraceId: { type: 'keyword' },
+};
+
+const performanceMetricsProperties = {
+  ...corePerformanceMetricsProperties,
   networkSummary: {
     properties: networkSummaryProperties,
   },
@@ -142,7 +146,7 @@ export const oblt_playwright = {
           },
           cacheStats: { type: 'object' },
           performanceMetrics: {
-            properties: performanceMetricsProperties,
+            properties: corePerformanceMetricsProperties,
           },
           measurements: { type: 'object' },
         },
