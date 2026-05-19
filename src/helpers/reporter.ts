@@ -55,6 +55,12 @@ function stripUrlOrigin(url: string | undefined): string {
   }
 }
 
+// Cap on rows rendered into the console-friendly slowest-requests table.
+// The JSON report keeps a wider list (see `slowRequestCount` at the collector
+// call site) for offline drill-down; the console view stays compact so it
+// doesn't drown out the rest of the per-test summary.
+const PRINTED_SLOWEST_REQUESTS = 5;
+
 // Renders a slowest-requests table with Type and Cache columns. The Cache
 // column shows `disk` for `fromDiskCache: true` so a reader can immediately
 // see whether a fast/slow result is explained by cache state rather than
@@ -75,7 +81,7 @@ function printSlowestRequestsTable(title: string, requests: any[] | undefined) {
     ],
   });
   table.addRows(
-    requests.map((request: any) => ({
+    requests.slice(0, PRINTED_SLOWEST_REQUESTS).map((request: any) => ({
       method: request.method,
       status: request.status ?? 'N/A',
       type: request.resourceType ?? 'N/A',
@@ -156,7 +162,6 @@ export async function writeNetworkTraceReport(
     captureStartedAt: networkTrace.captureStartedAt,
     captureEndedAt: networkTrace.captureEndedAt,
     maxNetworkRequests: networkTrace.maxNetworkRequests,
-    requests: networkTrace.requests,
   };
 
   log.info(`Saving network trace file to ${outputPath}`);
