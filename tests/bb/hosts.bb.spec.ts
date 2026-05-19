@@ -68,6 +68,26 @@ function hasDesiredHostsState(url: string, hostLimit: number, from: string, to: 
 const HOSTS_APP_PATH = '/app/metrics/hosts';
 const scenarios = loadScenarios();
 
+// Each scenario runs the measured navigation three times to expose both
+// cold-cache cost (first hit) and warmed steady-state cost (subsequent hits).
+// The bootstrap navigation is shared across all three and is NOT counted as
+// an iteration; it only exists to read Hosts' canonical URL shape.
+type IterationDescriptor = {
+  label: 'cold' | 'warm1' | 'warm2';
+  step: 'step01' | 'step02' | 'step03';
+};
+const ITERATIONS: IterationDescriptor[] = [
+  { label: 'cold', step: 'step01' },
+  { label: 'warm1', step: 'step02' },
+  { label: 'warm2', step: 'step03' },
+];
+
+type IterationResult = {
+  label: IterationDescriptor['label'];
+  perfData: object;
+  networkTrace: NetworkTraceCapture;
+};
+
 for (const scenario of scenarios) {
   test.describe(`Hosts - ${scenario.name}`, () => {
     let clusterData: any;
@@ -85,17 +105,39 @@ for (const scenario of scenarios) {
     });
 
     test.afterEach('Log test results', async ({ log }, testInfo) => {
-      const perfData = (testInfo as any).perfData;
-      const networkTrace = (testInfo as any).networkTrace as NetworkTraceCapture | null | undefined;
       const stepData = (testInfo as any).stepData;
-      const reportFiles = await writeJsonReport(
-        log, clusterData, testInfo, testStartTime, doc_count,
-        stepData, undefined, perfData
-      );
-      if (networkTrace) {
-        await writeNetworkTraceReport(log, clusterData, testInfo, testStartTime, networkTrace, perfData ?? undefined);
+      const iterations = (testInfo as any).iterations as IterationResult[] | undefined;
+
+      if (Array.isArray(iterations) && iterations.length > 0) {
+        // Per-iteration reports: one JSON + one network-trace file per
+        // iteration, suffixed and title-tagged so cold/warm1/warm2 are
+        // distinguishable both on disk and in the printed console output.
+        for (const iteration of iterations) {
+          const fileNameSuffix = `_${iteration.label}`;
+          const titleSuffix = ` [${iteration.label}]`;
+          const reportFiles = await writeJsonReport(
+            log, clusterData, testInfo, testStartTime, doc_count,
+            stepData, undefined, iteration.perfData,
+            { fileNameSuffix, titleSuffix },
+          );
+          if (iteration.networkTrace) {
+            await writeNetworkTraceReport(
+              log, clusterData, testInfo, testStartTime, iteration.networkTrace,
+              iteration.perfData,
+              { fileNameSuffix, titleSuffix },
+            );
+          }
+          reports.push(...reportFiles.filter(item => typeof item === 'string'));
+        }
+      } else {
+        // Fallback path for partial runs (e.g. test failed before any
+        // iteration completed): still emit a report with whatever stepData
+        // was captured so the failure is recorded.
+        const reportFiles = await writeJsonReport(
+          log, clusterData, testInfo, testStartTime, doc_count, stepData,
+        );
+        reports.push(...reportFiles.filter(item => typeof item === 'string'));
       }
-      reports.push(...reportFiles.filter(item => typeof item === 'string'));
     });
 
     test.afterAll('Print test results', async ({}) => {
@@ -103,7 +145,7 @@ for (const scenario of scenarios) {
     });
 
     const testName = `Hosts - ${scenario.name}`;
-    const stepDescription = `Opening ${HOSTS_APP_PATH} with host_limit=${HOST_LIMIT} and zoom=${ZOOM} via bootstrap+rewrite; measuring only the desired-state navigation`;
+    const stepDescription = `Opening ${HOSTS_APP_PATH} with host_limit=${HOST_LIMIT} and zoom=${ZOOM}: bootstrap + 3 measured iterations (cold, warm1, warm2)`;
 
     test(testName,
       async ({ headerBar, hostsPage, notifications, perfMetrics, page, log }, testInfo) => {
@@ -115,12 +157,10 @@ for (const scenario of scenarios) {
         const normalizedLoad = "hostsView-metricChart-normalizedLoad1m";
 
         let stepData: object[] = [];
-        let perfData: object | null = null;
-        let networkTrace: NetworkTraceCapture | null = null;
+        const iterations: IterationResult[] = [];
         let traceCollectionStarted = false;
         (testInfo as any).stepData = stepData;
-        (testInfo as any).perfData = perfData;
-        (testInfo as any).networkTrace = networkTrace;
+        (testInfo as any).iterations = iterations;
 
         const networkTraceCollector = await createNetworkTraceCollector(page, log, {
           maxNetworkRequests: 2000,
@@ -128,189 +168,172 @@ for (const scenario of scenarios) {
         });
 
         try {
-          await testStep('step01', stepData, page, async () => {
-            const { from, to } = resolveKibanaTimeRangeRison();
+          const { from, to } = resolveKibanaTimeRangeRison();
+          log.info(`Resolved Hosts target state: dateRange:(from:${from},to:${to}), limit:${HOST_LIMIT}`);
 
-            log.info(`Resolved Hosts target state: dateRange:(from:${from},to:${to}), limit:${HOST_LIMIT}`);
+          // 0) Install zoom hook BEFORE any navigation. `addInitScript`
+          //    runs on every new document at the earliest possible moment,
+          //    so the page renders at the target zoom from the first paint
+          //    rather than re-layouting mid-test. This is important because
+          //    lower zoom reveals more visualizations; we want all charts
+          //    laid out before measurement starts.
+          log.info(`Installing zoom hook (target zoom: ${ZOOM})`);
+          await page.addInitScript((z) => {
+            const apply = () => {
+              if (document.body) {
+                document.body.style.zoom = String(z);
+                return true;
+              }
+              return false;
+            };
+            if (apply()) return;
+            const obs = new MutationObserver(() => {
+              if (apply()) obs.disconnect();
+            });
+            obs.observe(document.documentElement, { childList: true, subtree: false });
+          }, ZOOM);
 
-            // 0) Install zoom hook BEFORE any navigation. `addInitScript`
-            //    runs on every new document at the earliest possible moment,
-            //    so the page renders at the target zoom from the first paint
-            //    rather than re-layouting mid-test. This is important because
-            //    lower zoom reveals more visualizations; we want all charts
-            //    laid out before measurement starts.
-            log.info(`Installing zoom hook (target zoom: ${ZOOM})`);
-            await page.addInitScript((z) => {
-              const apply = () => {
-                if (document.body) {
-                  document.body.style.zoom = String(z);
-                  return true;
-                }
-                return false;
-              };
-              if (apply()) return;
-              const obs = new MutationObserver(() => {
-                if (apply()) obs.disconnect();
-              });
-              obs.observe(document.documentElement, { childList: true, subtree: false });
-            }, ZOOM);
+          // 1) Bootstrap navigation. Not an iteration, not measured. Its
+          //    only purpose is to let Hosts hydrate to its canonical URL
+          //    shape so we can read every field it expects in `_a` without
+          //    baking field names into this code. The first scenario-state
+          //    navigation that follows is treated as the COLD measurement.
+          log.info(`Bootstrapping ${HOSTS_APP_PATH} (URL-state setup; not measured)`);
+          await page.goto(HOSTS_APP_PATH);
+          const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
+          await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
+          await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
 
-            // 1) Bootstrap navigation. Not measured. Lets Hosts hydrate to
-            //    its canonical URL shape so we can read every field it
-            //    expects in `_a` without baking field names into this code.
-            log.info(`Bootstrapping ${HOSTS_APP_PATH} (warm-up; not measured)`);
-            await page.goto(HOSTS_APP_PATH);
-            const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
+          // 2) Wait for the full-state marker. `controlPanels=` is the
+          //    last thing Hosts writes during init; when present alongside
+          //    `_a=(`, the URL has Hosts' complete canonical state and
+          //    `upsertHostsState` will produce a real rewrite (not a no-op).
+          log.info('Waiting for Hosts to write its canonical state to the URL');
+          await page.waitForFunction(
+            () => /[?&]controlPanels=/.test(location.search) && /[?&]_a=\(/.test(location.search),
+            null,
+            { timeout: 60_000 }
+          );
+          const bootstrapUrl = page.url();
+          log.info(`Hosts canonical URL captured: ${bootstrapUrl}`);
+
+          // 3) Upsert desired dateRange/limit, preserving every other field
+          //    Hosts wrote. The result still looks "complete" to Hosts, so
+          //    it accepts our values instead of replacing them with the
+          //    persisted default state.
+          const desiredUrl = upsertHostsState(bootstrapUrl, HOST_LIMIT, from, to);
+          log.info(`Desired URL with scenario state: ${desiredUrl}`);
+
+          // Helpers shared by every measured iteration so each navigation
+          // resolves the same way and any drift in URL state is caught
+          // before metrics are collected.
+          const navigateAndConfirmDesiredState = async () => {
+            await page.goto(desiredUrl);
             await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
             await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
 
-            // 2) Wait for the full-state marker. `controlPanels=` is the
-            //    last thing Hosts writes during init; when present alongside
-            //    `_a=(`, the URL has Hosts' complete canonical state and
-            //    `upsertHostsState` will produce a real rewrite (not a no-op).
-            log.info('Waiting for Hosts to write its canonical state to the URL');
             await page.waitForFunction(
-              () => /[?&]controlPanels=/.test(location.search) && /[?&]_a=\(/.test(location.search),
-              null,
-              { timeout: 60_000 }
+              ({ from, to, limit }) => {
+                let search = '';
+                try { search = decodeURIComponent(location.search); } catch { search = location.search; }
+                return search.includes(`dateRange:(from:${from},to:${to})`)
+                  && search.includes(`limit:${limit}`);
+              },
+              { from, to, limit: HOST_LIMIT },
+              { timeout: 30_000 }
             );
-            const bootstrapUrl = page.url();
-            log.info(`Hosts canonical URL captured: ${bootstrapUrl}`);
 
-            // 3) Upsert desired dateRange/limit, preserving every other field
-            //    Hosts wrote. The result still looks "complete" to Hosts, so
-            //    it accepts our values instead of replacing them with the
-            //    persisted default state.
-            const desiredUrl = upsertHostsState(bootstrapUrl, HOST_LIMIT, from, to);
-            log.info(`Desired URL with scenario state: ${desiredUrl}`);
+            const settledUrl = page.url();
+            if (!hasDesiredHostsState(settledUrl, HOST_LIMIT, from, to)) {
+              throw new Error(`Hosts URL state drifted from desired. Final URL: ${settledUrl}`);
+            }
+            return settledUrl;
+          };
 
-            // Small local helpers shared between the warm-up and measured
-            // navigations so both paths behave identically.
-            const navigateAndConfirmDesiredState = async () => {
-              await page.goto(desiredUrl);
-              await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
-              await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
+          const waitForHostsFullyRendered = async () => {
+            await Promise.race([
+              Promise.all([
+                hostsPage.assertHostsNumber(),
+                hostsPage.assertVisibilityHostsTable(),
+                hostsPage.assertVisibilityVisualization(cpuUsageKPI),
+                hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
+                hostsPage.assertVisibilityVisualization(memoryUsageKPI),
+                hostsPage.assertVisibilityVisualization(diskUsageKPI),
+                hostsPage.assertVisibilityVisualization(cpuUsage),
+                hostsPage.assertVisibilityVisualization(normalizedLoad),
+                headerBar.assertLoadingIndicator(),
+              ]),
+              hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+              }),
+              hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+              }),
+              hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+              }),
+              hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
+                throw new Error('Test is failed because no visualization data available');
+              }),
+              notifications.assertErrorFetchingResource().then(() => {
+                throw new Error('Test is failed because Hosts data failed to load');
+              })
+            ]);
+          };
 
-              await page.waitForFunction(
-                ({ from, to, limit }) => {
-                  let search = '';
-                  try { search = decodeURIComponent(location.search); } catch { search = location.search; }
-                  return search.includes(`dateRange:(from:${from},to:${to})`)
-                    && search.includes(`limit:${limit}`);
-                },
-                { from, to, limit: HOST_LIMIT },
-                { timeout: 30_000 }
-              );
+          // 4) MEASURED iterations.
+          //
+          // The first iteration (`cold`) is the very first time the page
+          // is loaded with the scenario state, so it includes the one-time
+          // cold-cache cost: extra Lens chart chunks parsed by V8, cold
+          // Kibana endpoints (security/me, ml_capabilities, infra/host,
+          // ...) hit for the first time at this scenario, and any disk-
+          // cacheable static assets fetched from network.
+          //
+          // The two warm iterations (`warm1`, `warm2`) navigate to the
+          // exact same URL with the same `page.goto`, so each is a full
+          // page load (no bfcache / same-document optimisation), but
+          // served from a fully-warmed Kibana session. Comparing cold
+          // vs warm reveals how much of the observed cost is one-time
+          // bootstrap versus per-render work.
+          for (const iteration of ITERATIONS) {
+            await testStep(iteration.step, stepData, page, async () => {
+              log.info(`Iteration "${iteration.label}": taking perf baseline and starting network trace`);
+              await perfMetrics.takeBaseline();
+              await networkTraceCollector.start();
+              traceCollectionStarted = true;
 
-              const settledUrl = page.url();
-              if (!hasDesiredHostsState(settledUrl, HOST_LIMIT, from, to)) {
-                throw new Error(`Hosts URL state drifted from desired. Final URL: ${settledUrl}`);
-              }
-              return settledUrl;
-            };
+              log.info(`Iteration "${iteration.label}": navigating to desired URL`);
+              const finalUrl = await navigateAndConfirmDesiredState();
+              log.info(`Iteration "${iteration.label}": URL stabilized: ${finalUrl}`);
 
-            const waitForHostsFullyRendered = async () => {
-              await Promise.race([
-                Promise.all([
-                  hostsPage.assertHostsNumber(),
-                  hostsPage.assertVisibilityHostsTable(),
-                  hostsPage.assertVisibilityVisualization(cpuUsageKPI),
-                  hostsPage.assertVisibilityVisualization(normalizedLoadKPI),
-                  hostsPage.assertVisibilityVisualization(memoryUsageKPI),
-                  hostsPage.assertVisibilityVisualization(diskUsageKPI),
-                  hostsPage.assertVisibilityVisualization(cpuUsage),
-                  hostsPage.assertVisibilityVisualization(normalizedLoad),
-                  headerBar.assertLoadingIndicator(),
-                ]),
-                hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
-                  throw new Error('Test is failed because no visualization data available');
-                }),
-                hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
-                  throw new Error('Test is failed because no visualization data available');
-                }),
-                hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
-                  throw new Error('Test is failed because no visualization data available');
-                }),
-                hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
-                  throw new Error('Test is failed because no visualization data available');
-                }),
-                notifications.assertErrorFetchingResource().then(() => {
-                  throw new Error('Test is failed because Hosts data failed to load');
-                })
-              ]);
-            };
+              log.info(`Iteration "${iteration.label}": asserting visibility of elements on the Hosts page`);
+              await waitForHostsFullyRendered();
 
-            // 4) WARM-UP NAVIGATION — NOT measured.
-            //
-            // Why this exists:
-            //   The bootstrap above warms only the Hosts shell at *default*
-            //   state (limit:100, now-15m). The scenario state (e.g.
-            //   limit:500, now-30m) is strictly broader: more rows trigger
-            //   additional Lens chart chunks, wider time ranges pull more
-            //   data, and certain Kibana internal endpoints (security/me,
-            //   ml_capabilities, infra/host, ...) pay a one-time
-            //   cold-cache cost on first call after a Kibana restart.
-            //
-            //   If we measured the FIRST scenario-state navigation, those
-            //   one-time costs would land inside the measurement window
-            //   and dominate the captured numbers, masking the real
-            //   per-scenario render cost we're trying to compare. The same
-            //   problem would also make consecutive runs of the same
-            //   scenario diverge wildly depending on whether the chunks /
-            //   internal caches happened to be warm from a previous run.
-            //
-            //   By performing a throwaway navigation to the scenario URL
-            //   first and waiting for every visibility assertion to pass,
-            //   we guarantee that by the time we measure: (a) every JS
-            //   chunk the scenario state needs is parsed and in V8's code
-            //   cache, (b) every cold Kibana endpoint has been hit at
-            //   least once, and (c) the Hosts URL container is fully
-            //   hydrated. The measured navigation then reflects the
-            //   actual per-scenario cost on a fully-warm Kibana session,
-            //   which matches the experience of a returning user — the
-            //   population this benchmark is intended to model.
-            log.info('Warm-up navigation to desired URL (NOT measured)');
-            await navigateAndConfirmDesiredState();
-            await waitForHostsFullyRendered();
-            log.info('Warm-up complete; Hosts fully rendered. Starting measurement.');
+              log.info(`Iteration "${iteration.label}": settled, collecting full performance metrics`);
+              const collectedPerfMetrics = await perfMetrics.collect();
+              const networkTrace = await networkTraceCollector.collect();
+              traceCollectionStarted = false;
 
-            // 5) MEASURED navigation. perfMetrics baseline + network trace
-            //    start HERE so the captured metrics reflect ONLY the cost
-            //    of re-rendering Hosts on a fully-warm Kibana. `page.goto`
-            //    to the same URL forces a real navigation (no bfcache /
-            //    same-document optimisation), so we are still measuring a
-            //    full page load — just one served from warm caches/state.
-            await perfMetrics.takeBaseline();
-            await networkTraceCollector.start();
-            traceCollectionStarted = true;
-
-            const finalUrl = await navigateAndConfirmDesiredState();
-            log.info(`Hosts URL stabilized with desired state: ${finalUrl}`);
-
-            log.info('Asserting visibility of elements on the Hosts page');
-            await waitForHostsFullyRendered();
-
-            log.info('Step 1 settled, collecting full performance metrics');
-            const collectedPerfMetrics = await perfMetrics.collect();
-            networkTrace = await networkTraceCollector.collect();
-            traceCollectionStarted = false;
-
-            perfData = {
-              ...collectedPerfMetrics,
-              networkTraceId: networkTrace.traceId,
-              networkSummary: networkTrace.summary,
-              slowestRequests: networkTrace.slowestRequests,
-              slowestApiRequests: networkTrace.slowestApiRequests,
-              slowestStaticRequests: networkTrace.slowestStaticRequests,
-            };
-            (testInfo as any).perfData = perfData;
-            (testInfo as any).networkTrace = networkTrace;
-          }, stepDescription);
+              const perfData = {
+                iteration: iteration.label,
+                ...collectedPerfMetrics,
+                networkTraceId: networkTrace.traceId,
+                networkSummary: networkTrace.summary,
+                slowestRequests: networkTrace.slowestRequests,
+                slowestApiRequests: networkTrace.slowestApiRequests,
+                slowestStaticRequests: networkTrace.slowestStaticRequests,
+              };
+              iterations.push({ label: iteration.label, perfData, networkTrace });
+            }, `Hosts ${iteration.label} measurement: navigate to desired URL and collect perf + network trace`);
+          }
         } finally {
-          if (traceCollectionStarted && !networkTrace) {
+          if (traceCollectionStarted) {
             try {
-              networkTrace = await networkTraceCollector.collect();
-              (testInfo as any).networkTrace = networkTrace;
+              // Best-effort drain: an iteration started a capture but
+              // crashed before collect(). Discard the partial result so
+              // the CDP session is left in a clean state for dispose().
+              await networkTraceCollector.collect();
             } catch (error: any) {
               log.warn(`Network trace collection could not be completed: ${error.message}`);
             }
