@@ -23,11 +23,7 @@ function loadScenarios(): Scenario[] {
 }
 
 // Replaces `dateRange` and `limit` inside the `_a=(...)` segment of a Hosts
-// URL, preserving every other field Hosts wrote. Safe assumption: inside the
-// `_a=(...)` segment both `dateRange:` and `limit:` appear exactly once, and
-// no other query param (currently only `controlPanels=`) contains either
-// token. The caller MUST only invoke this once the URL has Hosts' canonical
-// `_a=(...)` written; otherwise the regexes are no-ops.
+// URL, preserving every other field Hosts wrote. 
 function upsertHostsState(url: string, hostLimit: number, from: string, to: string): string {
   let next: string;
   try {
@@ -144,7 +140,7 @@ for (const scenario of scenarios) {
       await printResults(reports);
     });
 
-    const testName = `Hosts - ${scenario.name}`;
+    const testName = `${scenario.name}`;
     const stepDescription = `Opening ${HOSTS_APP_PATH} with host_limit=${HOST_LIMIT} and zoom=${ZOOM}: bootstrap + 3 measured iterations (cold, warm1, warm2)`;
 
     test(testName,
@@ -285,15 +281,11 @@ for (const scenario of scenarios) {
           //
           // The first iteration (`cold`) is the very first time the page
           // is loaded with the scenario state, so it includes the one-time
-          // cold-cache cost: extra Lens chart chunks parsed by V8, cold
-          // Kibana endpoints (security/me, ml_capabilities, infra/host,
-          // ...) hit for the first time at this scenario, and any disk-
-          // cacheable static assets fetched from network.
+          // cold-cache cost.
           //
           // The two warm iterations (`warm1`, `warm2`) navigate to the
-          // exact same URL with the same `page.goto`, so each is a full
-          // page load (no bfcache / same-document optimisation), but
-          // served from a fully-warmed Kibana session. Comparing cold
+          // exact same URL, so each is a full page load, but
+          // but served from a fully-warmed Kibana session. Comparing cold
           // vs warm reveals how much of the observed cost is one-time
           // bootstrap versus per-render work.
           for (const iteration of ITERATIONS) {
@@ -330,9 +322,6 @@ for (const scenario of scenarios) {
         } finally {
           if (traceCollectionStarted) {
             try {
-              // Best-effort drain: an iteration started a capture but
-              // crashed before collect(). Discard the partial result so
-              // the CDP session is left in a clean state for dispose().
               await networkTraceCollector.collect();
             } catch (error: any) {
               log.warn(`Network trace collection could not be completed: ${error.message}`);

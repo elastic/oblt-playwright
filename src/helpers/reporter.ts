@@ -50,16 +50,16 @@ function stripAnsi(value: string | undefined): string {
   return value.replace(/\u001b\[[0-9;]*m|\u001b/g, '');
 }
 
-// Strips the origin (scheme + host + optional port) from a URL so the report
-// shows just `/path?query`. Host-agnostic — works for any cluster, not just
-// localhost. Falls back to the raw URL if it isn't parseable.
+// Strips the origin (scheme + host + optional port) and Kibana's build-hash
+// path prefix from a URL so the report shows just `/path?query`.
 function stripUrlOrigin(url: string | undefined): string {
   if (!url) {
     return '';
   }
   try {
     const parsed = new URL(url);
-    return `${parsed.pathname}${parsed.search}`;
+    const pathname = parsed.pathname.replace(/^\/[a-f0-9]{8,}(?=\/)/, '');
+    return `${pathname}${parsed.search}`;
   } catch {
     return url;
   }
@@ -176,7 +176,10 @@ export async function writeNetworkTraceReport(
     networkTraceId: networkTrace.traceId,
     performanceMetrics: perfMetrics,
     networkSummary: networkTrace.summary,
-    slowestRequests: networkTrace.slowestRequests,
+    slowestRequests: networkTrace.slowestRequests.map((request) => ({
+      ...request,
+      url: stripUrlOrigin(request.url),
+    })),
     captureStartedAt: networkTrace.captureStartedAt,
     captureEndedAt: networkTrace.captureEndedAt,
     maxNetworkRequests: networkTrace.maxNetworkRequests,
