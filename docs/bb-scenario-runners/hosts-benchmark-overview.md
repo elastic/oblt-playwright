@@ -4,7 +4,7 @@
 
 This test measures how fast the Kibana **Hosts** page renders and becomes usable for a defined scenario (time range, host limit, and zoom).
 
-It is designed to produce **stable, comparable** results across runs and scenarios.
+It captures **both cold-cache and warmed steady-state** performance so the two can be compared directly.
 
 ## What the test validates
 
@@ -19,48 +19,47 @@ For each Hosts scenario, the test confirms that:
 
 ## How measurement is conducted
 
-The test intentionally separates **setup/warm-up** from the **measured window**.
+The test runs a one-time URL-state setup, then performs **three measured navigations** back-to-back.
 
-### 1) Setup and state stabilization (not measured)
+### 1) URL-state setup (not measured)
 
-Before timing starts, the test:
+Before any measurement:
 
-- Opens Hosts once to let Kibana generate its canonical URL state.
-- Rewrites URL state to the desired scenario values (`dateRange`, `limit`).
-- Performs one full warm-up navigation to that desired URL.
-- Waits until all required visualizations are fully rendered.
+- A zoom hook is installed via `addInitScript` so every navigation renders at the scenario zoom from the first paint.
+- The Hosts page is opened once at its default state so Kibana writes its canonical URL shape (`_a=(...)` plus `controlPanels=`).
+- The captured URL is rewritten to the scenario values (`dateRange`, `limit`) while preserving every other field Hosts wrote.
 
-This stage exists because Kibana may rewrite URL state during boot and may load one-time assets/endpoints on first access. Including that in measurements would add noise and reduce comparability.
+This stage is required infrastructure (it discovers the canonical URL shape); it is **not** a performance warm-up.
 
-### 2) Measured navigation
+### 2) Three measured iterations
 
-Only after warm-up is complete, the test starts measurement:
+The same desired URL is loaded three times in a row. Each iteration:
 
-- Takes performance baseline snapshot.
-- Starts network trace capture.
-- Navigates again to the **same desired URL**.
-- Waits for:
-  - loading completion,
-  - correct URL state,
-  - full visualization readiness.
+- Takes a fresh performance baseline.
+- Starts a new network trace.
+- Navigates to the desired URL via `page.goto` (a full page load — no bfcache).
+- Waits for loading completion, correct URL state, and full visualization readiness.
+- Collects performance and network data, and emits its own JSON + network-trace report file.
 
-Then it collects performance and network data.
+The three iterations are labeled:
 
-## What is measured
+| Iteration | Label   | What it captures |
+| --------- | ------- | ---------------- |
+| 1         | `cold`  | First scenario-state load: includes one-time costs (Lens chart chunks parsed by V8, cold Kibana endpoints, disk-cacheable static assets fetched from network). |
+| 2         | `warm1` | Steady-state load on a fully-warmed Kibana session. |
+| 3         | `warm2` | Second steady-state sample; lets you sanity-check variance between consecutive warm runs. |
 
-The report includes:
+## What is reported
 
-- Browser timing metrics (for example LCP, FCP, TTFB, DOM Content Loaded, Page Load).
-- Runtime work metrics (script, layout, style recalculation, task duration, JS heap).
-- Network summary (finished/failed requests).
-- Slowest requests, split into:
-  - API requests
-  - static assets
+Each iteration produces:
 
-This split helps separate backend/data latency from static asset/cache effects.
+- A JSON report (`..._cold.json`, `..._warm1.json`, `..._warm2.json`) containing browser timing, runtime work metrics, and the network summary for that iteration.
+- A network-trace file (`..._cold.network-trace.json`, etc.) with the full per-request trace.
+
+The console output prints one performance table per iteration so cold and warm numbers can be compared side-by-side without opening the JSON files. Slowest requests are split into API and static-asset tables.
 
 ## Why this approach is used
 
-This benchmark targets **returning-user performance** (realistic day-to-day usage), not first-ever cold start.
-
-By warming up first and measuring the second navigation, the test minimizes one-time startup effects and focuses on scenario-specific render cost. This makes trend tracking and scenario comparison reliable for decision-making.
+- The **cold** iteration models a user landing on the scenario for the first time after a Kibana restart or a fresh browser session.
+- The **warm** iterations model the returning-user experience and provide the stable cross-run signal.
+- Running both in the same test, on the same page session, keeps the cold-vs-warm comparison fair: identical scenario, identical URL, identical assertions — only the cache state differs.

@@ -26,6 +26,16 @@ function buildReportFileBase(testStartTime: string, testTitle: string): string {
   return `${new Date(testStartTime).toISOString().replace(/:/g, '_')}_${testTitle.replace(/\s/g, "_").toLowerCase()}`;
 }
 
+// Per-iteration report support. `fileNameSuffix` distinguishes files on disk
+// when a single test produces several reports (e.g. `_cold`, `_warm1`,
+// `_warm2`). `titleSuffix` distinguishes those same reports in the rendered
+// console output. Both are additive and default to '' so existing callers
+// keep current behaviour.
+export type ReportOptions = {
+  fileNameSuffix?: string;
+  titleSuffix?: string;
+};
+
 function buildPeriodLabel() {
   return ABSOLUTE_TIME_RANGE
     ? `From ${START_DATE} to ${END_DATE}`
@@ -103,12 +113,16 @@ export async function writeJsonReport(
   stepData?: object[],
   cacheStats?: object,
   perfMetrics?: object,
+  options?: ReportOptions,
 ) {
   let build_flavor: any = clusterData.version.build_flavor;
   let cluster_name: any = clusterData.cluster_name;
   let files: string[] = [];
 
-  const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}.json`;
+  const fileSuffix = options?.fileNameSuffix ?? '';
+  const titleSuffix = options?.titleSuffix ?? '';
+
+  const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}${fileSuffix}.json`;
   files.push(fileName);
 
   ensureOutputDirectory();
@@ -116,7 +130,7 @@ export async function writeJsonReport(
   const outputPath = path.join(outputDirectory, fileName);
 
   const reportData = {
-    title: testInfo.title,
+    title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
     doc_count: docsCount,
     period: buildPeriodLabel(),
@@ -140,14 +154,18 @@ export async function writeNetworkTraceReport(
   testStartTime: string,
   networkTrace: NetworkTraceCapture,
   perfMetrics?: object,
+  options?: ReportOptions,
 ) {
   ensureOutputDirectory();
 
-  const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}.network-trace.json`;
+  const fileSuffix = options?.fileNameSuffix ?? '';
+  const titleSuffix = options?.titleSuffix ?? '';
+
+  const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}${fileSuffix}.network-trace.json`;
   const outputPath = path.join(outputDirectory, fileName);
 
   const traceReportData = {
-    title: testInfo.title,
+    title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
     period: buildPeriodLabel(),
     status: testInfo.status,
