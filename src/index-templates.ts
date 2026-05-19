@@ -71,7 +71,7 @@ const performanceMetricsProperties = {
 export const oblt_playwright = {
       mappings: {
         properties: {
-          title: { type: 'text' },
+          title: { type: 'text', fields: { keyword: { type: 'keyword', ignore_above: 256 } } },
           startTime: { type: 'date' },
           doc_count: {
             properties: {
@@ -152,7 +152,7 @@ export const oblt_playwright = {
 export const oblt_playwright_network_traces = {
       mappings: {
         properties: {
-          title: { type: 'text' },
+          title: { type: 'text', fields: { keyword: { type: 'keyword', ignore_above: 256 } } },
           startTime: { type: 'date' },
           period: { type: 'keyword' },
           status: { type: 'keyword' },

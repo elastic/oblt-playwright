@@ -124,7 +124,7 @@ for (const scenario of scenarios) {
 
         const networkTraceCollector = await createNetworkTraceCollector(page, log, {
           maxNetworkRequests: 2000,
-          slowRequestCount: 5,
+          slowRequestCount: 20,
         });
 
         try {
