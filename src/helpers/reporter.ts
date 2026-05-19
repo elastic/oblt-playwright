@@ -65,6 +65,22 @@ function stripUrlOrigin(url: string | undefined): string {
   }
 }
 
+// Strips origins from all slow-request URL arrays that may be present in a
+// perfMetrics object, so full hostnames never appear in indexed report data.
+function sanitizePerfMetrics(metrics: object): object {
+  const m = metrics as any;
+  const stripUrls = (requests: any[] | undefined) =>
+    Array.isArray(requests)
+      ? requests.map((r) => ({ ...r, url: stripUrlOrigin(r.url) }))
+      : requests;
+  return {
+    ...m,
+    ...(m.slowestRequests !== undefined && { slowestRequests: stripUrls(m.slowestRequests) }),
+    ...(m.slowestApiRequests !== undefined && { slowestApiRequests: stripUrls(m.slowestApiRequests) }),
+    ...(m.slowestStaticRequests !== undefined && { slowestStaticRequests: stripUrls(m.slowestStaticRequests) }),
+  };
+}
+
 // Cap on rows rendered into the console-friendly slowest-requests table.
 // The JSON report keeps a wider list (see `slowRequestCount` at the collector
 // call site) for offline drill-down; the console view stays compact so it
@@ -141,7 +157,7 @@ export async function writeJsonReport(
     build_flavor: build_flavor,
     steps: stepData ? stepData : null,
     ...(cacheStats && { cacheStats }),
-    ...(perfMetrics && { performanceMetrics: perfMetrics }),
+    ...(perfMetrics && { performanceMetrics: sanitizePerfMetrics(perfMetrics) }),
   };
   fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2));
   return files;
@@ -164,6 +180,9 @@ export async function writeNetworkTraceReport(
   const fileName = `${buildReportFileBase(testStartTime, testInfo.title)}${fileSuffix}.network-trace.json`;
   const outputPath = path.join(outputDirectory, fileName);
 
+  const stripRequestUrls = (requests: any[]) =>
+    requests.map((r) => ({ ...r, url: stripUrlOrigin(r.url) }));
+
   const traceReportData = {
     title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
@@ -174,12 +193,11 @@ export async function writeNetworkTraceReport(
     cluster_name: clusterData.cluster_name,
     build_flavor: clusterData.version.build_flavor,
     networkTraceId: networkTrace.traceId,
-    performanceMetrics: perfMetrics,
+    ...(perfMetrics && { performanceMetrics: sanitizePerfMetrics(perfMetrics) }),
     networkSummary: networkTrace.summary,
-    slowestRequests: networkTrace.slowestRequests.map((request) => ({
-      ...request,
-      url: stripUrlOrigin(request.url),
-    })),
+    slowestRequests: stripRequestUrls(networkTrace.slowestRequests),
+    slowestApiRequests: stripRequestUrls(networkTrace.slowestApiRequests),
+    slowestStaticRequests: stripRequestUrls(networkTrace.slowestStaticRequests),
     captureStartedAt: networkTrace.captureStartedAt,
     captureEndedAt: networkTrace.captureEndedAt,
     maxNetworkRequests: networkTrace.maxNetworkRequests,
@@ -273,12 +291,6 @@ export async function printResults(reportFiles: string[]) {
           ], { separator: true });
           perfTable.printTable();
 
-          // Stratify the slowest-requests output into API and static-asset
-          // tables. The API table is the stable cross-run signal (Kibana
-          // API responses are not disk-cached); the static-asset table is
-          // informational and will naturally vary depending on browser
-          // cache state. Fall back to the unified `slowestRequests` when
-          // a report was generated before stratification was added.
           const hasStratified =
             Array.isArray(pm.slowestApiRequests) || Array.isArray(pm.slowestStaticRequests);
           if (hasStratified) {
