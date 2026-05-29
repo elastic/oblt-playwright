@@ -175,7 +175,7 @@ Benchmark runners read scenario parameters from `BB_SCENARIOS_FILE`. Each scenar
 ```
 
 ```bash
-BB_SCENARIOS_FILE=./scenarios.json npx playwright test tests/bb/hosts.bb.spec.ts --project kibana --headed
+BB_SCENARIOS_FILE=./scenarios.json npx playwright test tests/bb/hosts.bb.spec.ts --project bb --headed
 ```
 
 The Hosts benchmark runner performs a setup navigation to discover Kibana's canonical URL state, then runs three measured navigations for each scenario: `cold`, `warm1`, and `warm2`. Each measured pass produces its own JSON report and network trace report, making cold-cache and warmed steady-state results directly comparable.
