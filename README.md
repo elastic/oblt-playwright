@@ -2,6 +2,13 @@
 
 A test framework for assessing the search performance of Elastic Observability solution across various deployment types from the end-user perspective, supporting the last released version.
 
+The framework provides two complementary ways to run Observability checks:
+
+- Kibana suites under `tests/kibana` cover fixed product journeys and assertions.
+- Benchmark scenario runners under `tests/bb` generate tests from external scenario definitions, so the same runner can measure different URLs, data views, host limits, zoom levels, and time ranges without changing test code.
+
+Benchmark runners also collect browser performance metrics and network traces. Reports include Web Vitals, navigation timing, Chrome runtime work metrics, request summaries, and the slowest API/static requests for each measured pass.
+
 ## 📦 Getting Started
 
 ### Prerequisites
@@ -55,6 +62,7 @@ REPORT_CLUSTER_API_KEY =
 ```typescript
 START_DATE = '2025-06-24T00:00:00.000Z' // Set when the absolute time range is used
 END_DATE = '2025-06-25T00:00:00.000Z' // Set when the absolute time range is used
+BB_SCENARIOS_FILE = './path/to/scenarios.json' // Set when running benchmark scenario runners
 // Predefined variables:
 TIME_UNIT_HOURS
 TIME_UNIT_DAYS
@@ -84,6 +92,8 @@ Tests are executed sequentially, with only one Kibana user at a given time.
 ### 📊 Test reports
 
 A custom reporter generates JSON files and sends them to a remote Elasticsearch reporting cluster. This is configured via the `REPORT_CLUSTER_ES` and `REPORT_CLUSTER_API_KEY` environmental variables.
+
+Benchmark scenario runners extend the main JSON report with performance metrics for each measured navigation. When a runner collects traces, it also writes an additional `*.network-trace.json` file containing the request summary and slowest request breakdown for the same measured navigation.
 
 ## 💻 Local usage
 
@@ -119,6 +129,7 @@ ABSOLUTE_TIME_RANGE = false // Set 'true' to use the absolute time range
 START_DATE = '2025-06-24T00:00:00.000Z' // Set when the absolute time range is used
 END_DATE = '2025-06-25T00:00:00.000Z' // Set when the absolute time range is used
 API_KEY =
+BB_SCENARIOS_FILE = './path/to/scenarios.json' // Set when running benchmark scenario runners
 ```
 
 #### 📂 Test report location
@@ -148,7 +159,29 @@ npx playwright test apm.kibana.spec.ts --project kibana --headed
 npx playwright test -g "APM - Services" --project kibana --headed
 ```
 
+#### Run benchmark scenarios
+
+Benchmark runners read scenario parameters from `BB_SCENARIOS_FILE`. Each scenario is filtered by its `section`, for example `hosts` scenarios are executed by `hosts.bb.spec.ts` and `discover` scenarios are executed by `discover.bb.spec.ts`.
+
+```json
+[
+  {
+    "name": "Hosts 500",
+    "section": "hosts",
+    "host_limit": 500,
+    "zoom": 0.9
+  }
+]
+```
+
+```bash
+BB_SCENARIOS_FILE=./scenarios.json npx playwright test tests/bb/hosts.bb.spec.ts --project kibana --headed
+```
+
+The Hosts benchmark runner performs a setup navigation to discover Kibana's canonical URL state, then runs three measured navigations for each scenario: `cold`, `warm1`, and `warm2`. Each measured pass produces its own JSON report and network trace report, making cold-cache and warmed steady-state results directly comparable.
+
 ## 📚 Additional Resources
 
 - [Test suites and required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/data-mapping.md)
 - Step definitions: [APM](https://github.com/elastic/oblt-playwright/blob/main/docs/test-apm.md) | [Dataset Quality](https://github.com/elastic/oblt-playwright/blob/main/docs/test-datasets.md) | [Hosts](https://github.com/elastic/oblt-playwright/blob/main/docs/test-hosts.md) | [Infrastructure](https://github.com/elastic/oblt-playwright/blob/main/docs/test-infra.md) | [Logs](https://github.com/elastic/oblt-playwright/blob/main/docs/test-logs.md)
+- Benchmark scenario runners: [Hosts overview](https://github.com/elastic/oblt-playwright/blob/main/docs/bb-scenario-runners/hosts-benchmark-overview.md)
