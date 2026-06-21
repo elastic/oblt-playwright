@@ -14,7 +14,7 @@ jobs:
     name: Install
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
  
       - name: Cache node_modules
@@ -50,7 +50,7 @@ jobs:
       outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
       steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 20
@@ -102,7 +102,7 @@ jobs:
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-node@v6
       with:
         node-version: 20
@@ -154,7 +154,7 @@ jobs:
     outputs:
         is_running: ${{ steps.set_output.outputs.is_running }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-node@v6
       with:
         node-version: 20
@@ -209,7 +209,7 @@ jobs:
         REPORT_CLUSTER_API_KEY: ${{ secrets.REPORT_CLUSTER_API_KEY }}
         REPORT_CLUSTER_ES: ${{ secrets.REPORT_CLUSTER_ES }}
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - uses: actions/setup-node@v6
       with:
         node-version: 20
