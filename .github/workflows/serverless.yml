@@ -31,7 +31,7 @@ jobs:
       - uses: actions/setup-node@v6
  
       - name: Cache node_modules
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         id: cache-node-modules
         with:
           path: |
@@ -39,7 +39,7 @@ jobs:
           key: modules-${{ hashFiles('package-lock.json') }}
  
       - name: Cache Playwright binaries
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         id: cache-playwright
         with:
           path: |
@@ -72,14 +72,14 @@ jobs:
         id: set_output
         run: echo "is_running=true" >> $GITHUB_OUTPUT
       - name: Cache node_modules
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
           key: modules-${{ hashFiles('package-lock.json') }}
   
       - name: Cache Playwright
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/ms-playwright
@@ -114,14 +114,14 @@ jobs:
         id: set_output
         run: echo "is_running=true" >> $GITHUB_OUTPUT
       - name: Cache node_modules
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             node_modules
           key: modules-${{ hashFiles('package-lock.json') }}
 
       - name: Cache Playwright
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cache/ms-playwright
@@ -156,14 +156,14 @@ jobs:
       id: set_output
       run: echo "is_running=true" >> $GITHUB_OUTPUT
     - name: Cache node_modules
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           node_modules
         key: modules-${{ hashFiles('package-lock.json') }}
  
     - name: Cache Playwright
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ~/.cache/ms-playwright
@@ -198,14 +198,14 @@ jobs:
       id: set_output
       run: echo "is_running=true" >> $GITHUB_OUTPUT
     - name: Cache node_modules
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           node_modules
         key: modules-${{ hashFiles('package-lock.json') }}
  
     - name: Cache Playwright
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ~/.cache/ms-playwright
