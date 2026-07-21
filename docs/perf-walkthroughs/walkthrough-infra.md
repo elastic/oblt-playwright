@@ -1,4 +1,4 @@
-[🔗 Test code](https://github.com/elastic/oblt-playwright/blob/main/tests/kibana/infra.kibana.spec.ts)
+[🔗 Test code](https://github.com/elastic/oblt-playwright/blob/main/tests/kibana/perf-walkthroughs/infra.walkthrough.spec.ts)
 ---
 | **Test**  | **Steps** |
 | :------------ | :------------ |
