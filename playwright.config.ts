@@ -42,8 +42,18 @@ export default defineConfig({
       dependencies: ['preflight_check'],
     },
     {
-      name: 'kibana',
-      testMatch: '**\/*.kibana.spec.ts',
+      name: 'walkthrough',
+      testMatch: '**\/*.walkthrough.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1200},
+        storageState: STORAGE_STATE,
+      },
+      dependencies: ['auth'],
+    },
+    {
+      name: 'journey',
+      testMatch: '**\/*.journey.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},

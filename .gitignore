@@ -11,3 +11,4 @@ playwright/.auth
 /.env
 .DS_Store
 .vscode/
+/code_snippet_auto_detect.sh
