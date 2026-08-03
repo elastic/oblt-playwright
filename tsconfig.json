@@ -4,8 +4,20 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolvePackageJsonExports": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "strict": true
-  }
+  },
+  "include": [
+    "features/**/*.ts",
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "playwright.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".features-gen"
+  ]
 }

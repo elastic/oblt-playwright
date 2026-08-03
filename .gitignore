@@ -12,3 +12,4 @@ playwright/.auth
 .DS_Store
 .vscode/
 /code_snippet_auto_detect.sh
+/.features-gen/

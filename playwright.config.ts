@@ -1,8 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
+import { defineBddConfig } from 'playwright-bdd';
 import { API_KEY } from 'oblt-playwright/env';
 import path from 'path';
 
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
+
+const bddTestDir = defineBddConfig({
+  paths: ['features/**/*.feature'],
+  require: ['features/steps/**/*.ts'],
+});
 
 export default defineConfig({
   testDir: './tests',
@@ -80,6 +86,17 @@ export default defineConfig({
       name: 'bb',
       testDir: process.env.PLAYWRIGHT_TEST_DIR,
       testMatch: '**\/*.bb.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: {width: 1920, height: 1200},
+        storageState: STORAGE_STATE,
+      },
+      dependencies: ['auth'],
+    },
+    {
+      name: 'bdd',
+      testDir: bddTestDir,
+      testMatch: '**\/*.feature.spec.js',
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
