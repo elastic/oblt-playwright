@@ -48,6 +48,7 @@ export default defineConfig({
     {
       name: 'walkthrough',
       testMatch: '**\/*.walkthrough.spec.ts',
+      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
@@ -89,6 +90,7 @@ export default defineConfig({
       name: 'bb',
       testDir: process.env.PLAYWRIGHT_TEST_DIR,
       testMatch: '**\/*.bb.spec.ts',
+      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
