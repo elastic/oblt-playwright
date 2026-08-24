@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect, Locator } from "@playwright/test";
 import { BasePage } from "../base.page";
 
 export default class SideNav extends BasePage {
@@ -8,8 +8,11 @@ export default class SideNav extends BasePage {
     }
 
     public readonly sideNav = () => this.page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]');
+    private readonly moreMenuTrigger = () => this.page.getByTestId('kbnChromeNav-moreMenuTrigger');
     private readonly discover = () => this.page.locator('xpath=//a[@id="discover"]');
-    private readonly dashboards = () => this.page.locator('xpath=//div[@class="euiFlyoutBody__overflowContent"]//*[contains(text(),"Dashboards")]');
+    private readonly mainNav = () => this.page.getByRole('navigation', { name: 'Main' });
+    private readonly agents = () => this.page.getByRole('link', { name: 'Agents', exact: true });
+    private readonly dashboards = () => this.mainNav().getByRole('link', { name: 'Dashboards', exact: true });
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
     private readonly applications = () => this.page.locator('xpath=//button//*[text()="Applications"]');
     private readonly services = () => this.page.getByRole('link', { name: 'Service inventory' });
@@ -28,6 +31,23 @@ export default class SideNav extends BasePage {
 
     public async clickDiscover() {
         await this.discover().click();
+        }
+
+    /**
+     * The "More" popover dismisses itself when the trigger shifts out from under
+     * a stationary pointer, which happens while a busy page is still settling.
+     * Re-hover until the wanted item is actionable instead of hovering once.
+     */
+    private async openMoreMenu(item: Locator, description: string) {
+        await expect(async () => {
+            await this.moreMenuTrigger().hover({ timeout: 5000 });
+            await expect(item, description).toBeVisible({ timeout: 5000 });
+            }).toPass({ timeout: 30000 });
+        }
+
+    public async clickAgents() {
+        await this.openMoreMenu(this.agents(), 'Agents navigation link');
+        await this.agents().click();
         }
 
     public async clickDashboards() {

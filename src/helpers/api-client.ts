@@ -10,7 +10,7 @@ import {
   START_DATE,
   TIME_UNIT,
   TIME_VALUE,
-} from '../env.ts';
+} from '../env';
 
 /**
  * Custom fetch wrapper for Elasticsearch requests.
@@ -219,6 +219,31 @@ export async function getCacheStats() {
   }
   const jsonDataNode = JSON.parse(await response.text());
   return jsonDataNode;
+}
+
+export async function deleteAgentBuilderAgent(
+  request: APIRequestContext,
+  id: string,
+): Promise<void> {
+  const headers: Record<string, string> = {
+    accept: 'application/json',
+    'kbn-xsrf': 'true',
+    'x-elastic-internal-origin': 'kibana',
+  };
+  if (API_KEY) {
+    headers.Authorization = `ApiKey ${API_KEY}`;
+  }
+
+  const response = await request.delete(`/api/agent_builder/agents/${id}`, { headers });
+
+  if (response.status() === 404) {
+    return;
+  }
+  if (!response.ok()) {
+    throw new Error(
+      `Failed to delete agent "${id}". Status: ${response.status()} ${await response.text()}`,
+    );
+  }
 }
 
 export type DataView = {

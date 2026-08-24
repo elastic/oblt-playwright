@@ -9,18 +9,28 @@
     "./helpers/reporter": "./src/helpers/reporter.ts",
     "./helpers/setup": "./src/helpers/setup.ts",
     "./helpers/test-utils": "./src/helpers/test-utils.ts",
-    "./pom/page-fixtures": "./src/pom/page-fixtures.ts",
+    "./fixtures/journey-fixtures": "./src/fixtures/journey-fixtures.ts",
+    "./fixtures/page-fixtures": "./src/fixtures/page-fixtures.ts",
     "./pom/base.page": "./src/pom/base.page.ts",
     "./pom/pages/*": "./src/pom/pages/*.ts",
     "./pom/components/*": "./src/pom/components/*.ts"
   },
-  "scripts": {},
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
   "keywords": [],
   "author": "Andrei Bialenik",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
-    "@types/node": "^26.0.1"
+    "@types/node": "^26.0.1",
+    "eslint": "^10.8.1",
+    "eslint-plugin-playwright": "^2.11.0",
+    "globals": "^17.11.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.0"
   },
   "dependencies": {
     "console-table-printer": "^2.14.6",

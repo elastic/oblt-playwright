@@ -1,4 +1,4 @@
-import { test } from 'oblt-playwright/pom/page-fixtures';
+import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
 import { testStep, waitForOneOf } from 'oblt-playwright/helpers/test-utils';

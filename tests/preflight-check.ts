@@ -1,4 +1,4 @@
-import { test } from 'oblt-playwright/pom/page-fixtures';
+import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { expect } from "@playwright/test";
 import { checkKibanaAvailability } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount, ensureDataViews, DataView } from 'oblt-playwright/helpers/api-client';

@@ -5,7 +5,7 @@ import {
     END_DATE, 
     TIME_VALUE, 
     TIME_UNIT 
-    } from '../../env.ts';
+    } from '../../env';
 import { BasePage } from "../base.page";
 
 export default class DatePicker extends BasePage {

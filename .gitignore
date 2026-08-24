@@ -1,4 +1,4 @@
-node_modules/
+/node_modules/
 /test-results/
 /test-reports/
 /playwright-report/
@@ -10,5 +10,7 @@ playwright/.auth
 /playwright/.cache/
 /.env
 .DS_Store
-.vscode/
+/.vscode/
 /code_snippet_auto_detect.sh
+/.features-gen/
+/.tmp/
