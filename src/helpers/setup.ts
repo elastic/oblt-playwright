@@ -2,12 +2,12 @@ import { Browser } from '@playwright/test';
 import {
   REPORT_CLUSTER_API_KEY,
   REPORT_CLUSTER_ES,
-} from '../env.ts';
+} from '../env';
 import {
   oblt_playwright,
   oblt_playwright_network_traces,
   oblt_playwright_logs
-} from '../index-templates.ts';
+} from '../index-templates';
 import { Logger } from "winston";
 
 export async function importDashboards(log: Logger, browser: Browser, inputFile: string) {

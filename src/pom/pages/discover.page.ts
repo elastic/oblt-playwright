@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { waitForOneOf } from "../../helpers/test-utils.ts";
+import { waitForOneOf } from "../../helpers/test-utils";
 import { BasePage } from "../base.page";
 
 export default class DiscoverPage extends BasePage {
@@ -27,6 +27,12 @@ export default class DiscoverPage extends BasePage {
     private readonly logPatternsFilterIn = () => this.page.locator('xpath=//div[@data-test-subj="aiopsLogPatternsTable"]//tr[1]//button[@data-test-subj="aiopsLogPatternsActionFilterInButton"]');
     private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
     private readonly discoverNoResults = () => this.page.getByTestId('discoverNoResults');
+    private readonly esqlEditor = () => this.page.getByTestId('ESQLEditor');
+    private readonly switchToClassicButton = () => this.page.getByRole('button', { name: 'Switch to Classic' });
+    private readonly queryInEsqlButton = () => this.page.getByRole('button', { name: 'Query in ES|QL' });
+    private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
+    private readonly resultChartCanvas = () => this.page.getByTestId('echChart').locator('canvas');
+    private readonly resultValue = (value: string) => this.page.getByText(value).filter({ visible: true }).first();
 
     public async clickDataView() {
         await this.dataViewSwitch().click();
@@ -120,5 +126,39 @@ export default class DiscoverPage extends BasePage {
         await this.datasetSelectorButton().click();
         await this.datasetKubernetes().click();
         await this.datasetKubernetesContainer().click();
+    }
+
+    /**
+     * Discover persists the query mode per user, so the starting mode is not
+     * guaranteed. Waits for either mode toggle to render before branching,
+     * otherwise the check runs against a Discover that has not mounted yet.
+     */
+    public async switchToEsqlMode() {
+        await expect(
+            this.switchToClassicButton().or(this.queryInEsqlButton()),
+            'Query mode toggle'
+        ).toBeVisible();
+        if (await this.queryInEsqlButton().isVisible()) {
+            this.log.info('Switching Discover to ES|QL mode');
+            await this.queryInEsqlButton().click();
+        }
+        await expect(this.esqlEditor(), 'ES|QL editor').toBeVisible();
+    }
+
+    public async runEsqlQuery(query: string) {
+        this.log.info(`Running the ES|QL query: ${query}`);
+        await this.esqlEditor().click();
+        await this.page.keyboard.press('ControlOrMeta+A');
+        await this.page.keyboard.insertText(query);
+        await expect(this.querySubmitButton(), 'Query submit button').toBeEnabled();
+        await this.querySubmitButton().click();
+    }
+
+    public async assertVisibilityResultValue(value: string, timeout?: number) {
+        await expect(this.resultValue(value), `"${value}" query result`).toBeVisible({ timeout });
+    }
+
+    public async assertVisibilityResultChart(timeout?: number) {
+        await expect(this.resultChartCanvas(), 'Query result chart').toBeVisible({ timeout });
     }
 }

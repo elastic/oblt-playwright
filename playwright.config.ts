@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
-import { API_KEY } from 'oblt-playwright/env';
+import { 
+  API_KEY,
+  ELASTICSEARCH_USER,
+  ELASTICSEARCH_PASSWORD
+  } from './src/env';
 import path from 'path';
 
 export const STORAGE_STATE = path.join(__dirname, 'playwright/.auth/user.json');
@@ -9,7 +13,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 1 : 1,
+  workers: process.env.CI ? 4 : 2,
   reporter: [['list', { printSteps: true }]],
   timeout: 300000,
   expect: {timeout: 180000},
@@ -44,6 +48,7 @@ export default defineConfig({
     {
       name: 'walkthrough',
       testMatch: '**\/*.walkthrough.spec.ts',
+      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
@@ -58,6 +63,11 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
+        // httpCredentials: {
+        //   username: ELASTICSEARCH_USER,
+        //   password: ELASTICSEARCH_PASSWORD,
+        //   origin: new URL(process.env.KIBANA_HOST!).origin,
+        // },
       },
       dependencies: ['auth'],
     },
@@ -80,6 +90,7 @@ export default defineConfig({
       name: 'bb',
       testDir: process.env.PLAYWRIGHT_TEST_DIR,
       testMatch: '**\/*.bb.spec.ts',
+      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},

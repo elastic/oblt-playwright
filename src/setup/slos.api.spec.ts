@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test';
-import { API_KEY, ELASTICSEARCH_HOST } from '../env.ts';
+import { API_KEY, ELASTICSEARCH_HOST } from '../env';
 
 async function teardown(request: any, sloName: string, sloId: string) {
   console.log(`Deleting SLO "${sloName}"...`);

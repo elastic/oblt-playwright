@@ -1,4 +1,4 @@
-import { test } from 'oblt-playwright/pom/page-fixtures';
+import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { expect, Page } from "@playwright/test";
 import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount, getPodData } from 'oblt-playwright/helpers/api-client';

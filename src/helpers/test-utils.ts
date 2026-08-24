@@ -10,7 +10,7 @@ import {
   START_DATE,
   TIME_UNIT,
   TIME_VALUE,
-} from '../env.ts';
+} from '../env';
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
 

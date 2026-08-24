@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { test } from '../../src/pom/page-fixtures';
+import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
 import { testStep, resolveKibanaTimeRangeRison } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, getHostData } from '../../src/helpers/api-client';

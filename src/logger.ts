@@ -2,7 +2,7 @@ import winston from 'winston';
 import {
   CI,
   REPORT_DIR,
-} from '../src/env.ts';
+} from './env';
 
 const customLevels = {
   levels: {

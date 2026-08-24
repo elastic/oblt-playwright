@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { test } from '../../src/pom/page-fixtures';
+import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
 import { testStep, buildKibanaUrl } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, listDataViews } from '../../src/helpers/api-client';
@@ -45,6 +45,24 @@ function getUrlEmbeddedAppState(targetUrl: string): { appPath: string; appState?
   }
 
   return { appPath: u };
+}
+
+function hasDesiredDiscoverState(url: string, expectedDataViewId?: string): boolean {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(url);
+  } catch {
+    decoded = url;
+  }
+
+  if (!decoded.includes('_a=')) {
+    return false;
+  }
+  if (!expectedDataViewId) {
+    return true;
+  }
+
+  return decoded.includes(`index:'${expectedDataViewId}'`) || decoded.includes(`index:${expectedDataViewId}`);
 }
 
 const scenarios = loadScenarios();
@@ -107,11 +125,11 @@ for (const scenario of scenarios) {
       : `Navigating directly to ${KIBANA_APP_PATH} via url-embedded _a target`;
 
     const stepDescription = DATA_VIEW_TITLE
-      ? `Opening ${KIBANA_APP_PATH} with ${DATA_VIEW_TITLE} data view id and collecting full navigation metrics`
-      : `Opening ${KIBANA_APP_PATH} with url-embedded _a target and collecting full navigation metrics`;
+      ? `Opening ${KIBANA_APP_PATH} with ${DATA_VIEW_TITLE} data view id using warm-up + measured pass and collecting full navigation metrics`
+      : `Opening ${KIBANA_APP_PATH} with url-embedded _a target using warm-up + measured pass and collecting full navigation metrics`;
 
     test(testName,
-      async ({ discoverPage, notifications, perfMetrics, page, log }, testInfo) => {
+      async ({ discoverPage, headerBar, notifications, perfMetrics, page, log }, testInfo) => {
         let stepData: object[] = [];
         let perfData: object | null = null;
         let networkTrace: NetworkTraceCapture | null = null;
@@ -122,7 +140,7 @@ for (const scenario of scenarios) {
 
         const networkTraceCollector = await createNetworkTraceCollector(page, log, {
           maxNetworkRequests: 2000,
-          slowRequestCount: 5,
+          slowRequestCount: 20,
         });
 
         try {
@@ -142,30 +160,53 @@ for (const scenario of scenarios) {
 
             const kibanaUrl = buildKibanaUrl(appPath, appState);
             log.info(logNavigate);
+            const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
+
+            const navigateAndConfirmDiscoverState = async () => {
+              await page.goto(kibanaUrl);
+              await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
+              await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
+
+              const finalUrl = page.url();
+              if (!hasDesiredDiscoverState(finalUrl, dataViewId)) {
+                throw new Error(`Discover URL did not contain expected app state. Final URL: ${finalUrl}`);
+              }
+            };
+
+            const waitForDiscoverLoadSettled = async () => {
+              await Promise.race([
+                headerBar.assertLoadingIndicator(),
+                notifications.assertErrorFetchingResource().then(() => {
+                  throw new Error('Test is failed: Error while fetching resource');
+                }),
+                notifications.assertErrorIncrementCount().then(() => {
+                  throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+                }),
+                discoverPage.assertHistogramEmbeddedError().then(() => {
+                  throw new Error('Test is failed: Chart failed to load');
+                }),
+                discoverPage.assertDiscoverNoResults().then(() => {
+                  throw new Error('Test is failed: Discover shows no results');
+                }),
+              ]);
+            };
+
+            // Warm-up pass (not measured): this loads one-time Discover assets
+            // and cold internal endpoints before we start timing, so the
+            // measured pass is more stable and comparable across runs.
+            log.info('Warm-up navigation to Discover target URL (NOT measured)');
+            await navigateAndConfirmDiscoverState();
+            log.info('Asserting Discover loading completion after warm-up pass');
+            await waitForDiscoverLoadSettled();
+
             await perfMetrics.takeBaseline();
             await networkTraceCollector.start();
             traceCollectionStarted = true;
-            await page.goto(kibanaUrl);
-            const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
-            await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
-            await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
 
-            log.info('Asserting visibility of the chart canvas and data grid row');
-            await Promise.race([
-              discoverPage.assertVisibilityDataGridRow(),
-              notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed: Error while fetching resource');
-              }),
-              notifications.assertErrorIncrementCount().then(() => {
-                throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
-              }),
-              discoverPage.assertHistogramEmbeddedError().then(() => {
-                throw new Error('Test is failed: Chart failed to load');
-              }),
-              discoverPage.assertDiscoverNoResults().then(() => {
-                throw new Error('Test is failed: Discover shows no results');
-              }),
-            ]);
+            log.info('Measured navigation to Discover target URL');
+            await navigateAndConfirmDiscoverState();
+            log.info('Asserting Discover loading completion after measured pass');
+            await waitForDiscoverLoadSettled();
 
             log.info('Step 1 settled, collecting full performance metrics');
             const collectedPerfMetrics = await perfMetrics.collect();

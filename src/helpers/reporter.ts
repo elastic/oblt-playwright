@@ -7,7 +7,7 @@ import {
   TIME_UNIT,
   TIME_VALUE,
   REPORT_DIR,
-} from '../env.ts';
+} from '../env';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Table } from 'console-table-printer';
@@ -48,6 +48,14 @@ function stripAnsi(value: string | undefined): string {
   }
 
   return value.replace(/\u001b\[[0-9;]*m|\u001b/g, '');
+}
+
+function formatErrorMessage(value: string): string {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^-\s*/, ''))
+    .filter(Boolean)
+    .join(' > ');
 }
 
 // Strips the origin (scheme + host + optional port) and Kibana's build-hash
@@ -122,7 +130,7 @@ function printSlowestRequestsTable(title: string, requests: any[] | undefined) {
 
 export async function writeJsonReport(
   log: Logger,
-  clusterData: any,
+  clusterData: any | undefined,
   testInfo: TestInfo,
   testStartTime: string,
   docsCount?: object,
@@ -131,8 +139,6 @@ export async function writeJsonReport(
   perfMetrics?: object,
   options?: ReportOptions,
 ) {
-  let build_flavor: any = clusterData.version.build_flavor;
-  let cluster_name: any = clusterData.cluster_name;
   let files: string[] = [];
 
   const fileSuffix = options?.fileNameSuffix ?? '';
@@ -145,16 +151,25 @@ export async function writeJsonReport(
   log.info(`Saving report file to ${outputDirectory}`);
   const outputPath = path.join(outputDirectory, fileName);
 
+  const errorMessages = testInfo.errors.map((error) => stripAnsi(error.message));
   const reportData = {
     title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
-    doc_count: docsCount,
-    period: buildPeriodLabel(),
+    ...(docsCount && {
+      doc_count: docsCount,
+      period: buildPeriodLabel(),
+    }),
     status: testInfo.status,
     duration: testInfo.duration,
-    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map((error) => stripAnsi(error.message)).join('\n') } }),
-    cluster_name: cluster_name,
-    build_flavor: build_flavor,
+    ...(errorMessages.length > 0 && {
+      errors: {
+        message: formatErrorMessage(errorMessages.join('\n')),
+      },
+    }),
+    ...(clusterData && {
+      cluster_name: clusterData.cluster_name,
+      build_flavor: clusterData.version?.build_flavor,
+    }),
     steps: stepData ? stepData : null,
     ...(cacheStats && { cacheStats }),
     ...(perfMetrics && { performanceMetrics: sanitizePerfMetrics(perfMetrics) }),

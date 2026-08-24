@@ -1,4 +1,4 @@
-import { test } from 'oblt-playwright/pom/page-fixtures';
+import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { selectDefaultSpace, testStep } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
