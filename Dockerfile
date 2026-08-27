@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY playwright.config.ts ./
-RUN npx -y playwright@1.55.1 install --with-deps
+RUN ./node_modules/.bin/playwright install --with-deps chromium
 COPY src/ ./src/
 COPY tests/ ./tests/
 
