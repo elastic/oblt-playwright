@@ -12,7 +12,7 @@ export default class DiscoverPage extends BasePage {
     private readonly fieldToggleError = () => this.page.getByTestId('fieldToggle-error.message');
     private readonly histogramChartIsRendered = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-render-complete="true"]');
     private readonly histogramEmbeddedError = () => this.page.locator('xpath=//div[@data-test-subj="unifiedHistogramChart"]//div[@data-test-subj="embeddable-lens-failure"]');
-    private readonly logsCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
+    private readonly chartCanvas = () => this.page.locator('xpath=//canvas[contains(@class, "echCanvasRenderer")]');
     private readonly logsDataGridRow = () => this.page.locator('xpath=//div[@data-test-subj="dataGridRowCell"][@aria-rowindex="1"][@data-gridcell-column-id="actions"][1]');
     private readonly flyoutLogMessage = () => this.page.getByTestId('logExplorerFlyoutLogMessage');
     private readonly flyoutService = () => this.page.getByTestId('logExplorerFlyoutService');
@@ -31,8 +31,8 @@ export default class DiscoverPage extends BasePage {
     private readonly switchToClassicButton = () => this.page.getByRole('button', { name: 'Switch to Classic' });
     private readonly queryInEsqlButton = () => this.page.getByRole('button', { name: 'Query in ES|QL' });
     private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
-    private readonly resultChartCanvas = () => this.page.getByTestId('echChart').locator('canvas');
-    private readonly resultValue = (value: string) => this.page.getByText(value).filter({ visible: true }).first();
+    private readonly dataGridRowCellValue = (value: string) =>
+        this.page.locator(`xpath=(//*[@data-test-subj="dataGridRowCell"][contains(., "${value}")])[1]`);
 
     public async clickDataView() {
         await this.dataViewSwitch().click();
@@ -85,7 +85,7 @@ export default class DiscoverPage extends BasePage {
     }
 
     public async assertVisibilityCanvas() {
-        await expect(this.logsCanvas()).toBeVisible();
+        await expect(this.chartCanvas()).toBeVisible();
     }
 
     public async filterLogsByError() {
@@ -100,6 +100,10 @@ export default class DiscoverPage extends BasePage {
 
     public async assertVisibilityDataGridRow() {
         await expect(this.logsDataGridRow()).toBeVisible();
+    }
+
+    public async assertVisibilityDataGridRowCellValue(value: string) {
+        await expect(this.dataGridRowCellValue(value), `"${value}" query result`).toBeVisible();
     }
 
     public async assertVisibilityFlyoutLogMessage() {
@@ -152,13 +156,5 @@ export default class DiscoverPage extends BasePage {
         await this.page.keyboard.insertText(query);
         await expect(this.querySubmitButton(), 'Query submit button').toBeEnabled();
         await this.querySubmitButton().click();
-    }
-
-    public async assertVisibilityResultValue(value: string, timeout?: number) {
-        await expect(this.resultValue(value), `"${value}" query result`).toBeVisible({ timeout });
-    }
-
-    public async assertVisibilityResultChart(timeout?: number) {
-        await expect(this.resultChartCanvas(), 'Query result chart').toBeVisible({ timeout });
     }
 }

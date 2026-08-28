@@ -53,7 +53,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
     await Promise.race([
       expect(page.locator('xpath=//span[text()="[Metrics Kubernetes] Cluster Overview"]')).toBeVisible(),
       dashboardPage.assertNoDashboard().then(() => {
-        throw new Error('Test is failed because no dashboard found');
+        throw new Error('No dashboard found');
         })
       ]);
     log.info('Clicking on the "Cluster Overview" dashboard');
@@ -74,19 +74,19 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
         dashboardPage.assertVisibilityVisualization(topMemoryIntensivePods)
           ]),
       dashboardPage.assertEmbeddedError(coresUsedVsTotal).then(() => {
-        throw new Error('Test is failed due to an error when loading visualization');
+        throw new Error('Error when loading visualization');
         }),
       dashboardPage.assertEmbeddedError(topMemoryIntensivePods).then(() => {
-        throw new Error('Test is failed due to an error when loading visualization');
+        throw new Error('Error when loading visualization');
         }),
       dashboardPage.assertNoData(coresUsedVsTotal).then(() => {
-        throw new Error(`Test is failed because no data found for visualization ${coresUsedVsTotal}`);
+        throw new Error(`No data found for visualization ${coresUsedVsTotal}`);
         }),
       dashboardPage.assertNoData(topMemoryIntensivePods).then(() => {
-        throw new Error(`Test is failed because no data found for visualization ${topMemoryIntensivePods}`);
+        throw new Error(`No data found for visualization ${topMemoryIntensivePods}`);
         }),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed due to an error when loading data');
+        throw new Error('Error when loading data');
         })
       ]);
   }, 'Setting the search interval and asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations');
@@ -113,10 +113,10 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       dashboardPage.assertAlreadyClosedError(title).then(() => {
-        throw new Error(`Test is failed due to an embedded error when loading visualization: 'Already closed, can't increment ref count'`);
+        throw new Error(`Embedded error when loading visualization: 'Already closed, can't increment ref count'`);
         }),
       dashboardPage.assertNoData(title).then(() => {
-        throw new Error('Test is failed due to not available data');
+        throw new Error('Not available data');
       })
     ])
   }, 'Setting search interval and ensuring visualizations are loaded');
@@ -137,7 +137,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
     await Promise.race([
       inventoryPage.assertWaffleMap(),
       inventoryPage.assertNoData().then(() => {
-        throw new Error('Test is failed because there is no data to display in the waffle map');
+        throw new Error('There is no data to display in the waffle map');
         })
       ]);
     await inventoryPage.clickDismiss();
@@ -163,10 +163,10 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
         inventoryPage.assertVisibilityVisualization(memoryUsage)
         ]),
         inventoryPage.assertBoundaryFatalHeader().then(() => {
-          throw new Error('Test is failed due to an error when loading data');
+          throw new Error('Error when loading data');
           }),
         inventoryPage.assertVisualizationNoData(cpuUsage).then(() => {
-          throw new Error('Test is failed due to an error when loading data');
+          throw new Error('Error when loading data');
           })
     ]);
   }, 'Setting search interval, asserting "Host CPU Usage" & "Host Memory Usage" visualizations visibility');
@@ -183,7 +183,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
     await Promise.race([
       inventoryPage.assertWaffleMap(),
       inventoryPage.assertNoData().then(() => {
-        throw new Error('Test is failed because there is no data to display in the waffle map');
+        throw new Error('There is no data to display in the waffle map');
         })
       ]);
     log.info('Sorting by metric value and clicking on a pod name');
@@ -206,7 +206,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
         inventoryPage.assertVisibilityPodVisualization(podMemoryUsage)
         ]),
       inventoryPage.assertNoData().then(() => {
-        throw new Error('Test is failed because there is no data to display in the pod visualization');
+        throw new Error('There is no data to display in the pod visualization');
         })
     ]);
   }, 'Setting search interval, asserting "Pod CPU Usage" & "Pod Memory Usage" visualization visibility');

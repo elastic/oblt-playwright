@@ -1,7 +1,7 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { expect } from "@playwright/test";
 import { checkKibanaAvailability } from 'oblt-playwright/helpers/test-utils';
-import { fetchClusterData, getDocCount, ensureDataViews, DataView } from 'oblt-playwright/helpers/api-client';
+import { fetchClusterData, ensureDataViews, DataView } from 'oblt-playwright/helpers/api-client';
 import { checkIndexExists, checkIndexTemplateExists, createIndexTemplate, createIndex } from 'oblt-playwright/helpers/setup';
 import { ABSOLUTE_TIME_RANGE, END_DATE, START_DATE, TIME_UNIT, TIME_VALUE } from 'oblt-playwright/env';
 

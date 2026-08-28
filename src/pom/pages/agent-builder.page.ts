@@ -19,7 +19,7 @@ export default class AgentBuilderPage extends BasePage {
     private readonly agentDescriptionInput = () => this.page.getByRole('textbox', { name: 'Agent display description' });
     private readonly instructionsInput = () => this.page.getByRole('textbox', { name: 'Custom Instructions' });
     private readonly pageControlsSaveButton = () => this.pageControls().getByRole('button', { name: 'Save', exact: true });
-    private readonly settingsSaveButton = () => this.page.getByRole('button', { name: 'Save' });
+    private readonly settingsSaveButton = () => this.page.getByTestId('editDetailsSaveButton');
     private readonly editSettingsButton = () => this.page.getByRole('button', { name: 'Edit agent settings' });
     private readonly chatTab = () => this.pageControls().getByRole('button', { name: 'Chat', exact: true });
     private readonly overviewTab = () => this.page.getByRole('link', { name: 'Overview' });

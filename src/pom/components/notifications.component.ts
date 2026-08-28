@@ -18,4 +18,10 @@ export default class Notifications extends BasePage {
     public async assertErrorIncrementCount() {
         await expect(this.errorIncrementCount(), `Error loading data in index logs-*. already closed, can't increment ref count.`).toBeVisible();
         }
+        
+    private readonly errorAgentDetailsUpdate = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Unable to update agent details"]');
+
+    public async assertErrorAgentDetailsUpdate() {
+        await expect(this.errorAgentDetailsUpdate(), 'Unable to update agent details').toBeVisible();
+    }
 }

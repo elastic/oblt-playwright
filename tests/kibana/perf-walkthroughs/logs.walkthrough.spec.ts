@@ -49,16 +49,16 @@ test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, n
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       }),
       notifications.assertErrorIncrementCount().then(() => {
-        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+        throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
+        throw new Error('Chart failed to load');
       }),
       discoverPage.assertDiscoverNoResults().then(() => {
-        throw new Error('Test is failed: Discover shows no results');
+        throw new Error('Discover shows no results');
       }),
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
@@ -79,16 +79,16 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       }),
       notifications.assertErrorIncrementCount().then(() => {
-        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+        throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
+        throw new Error('Chart failed to load');
       }),
       discoverPage.assertDiscoverNoResults().then(() => {
-        throw new Error('Test is failed: Discover shows no results');
+        throw new Error('Discover shows no results');
       }),
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
@@ -105,16 +105,16 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       }),
       notifications.assertErrorIncrementCount().then(() => {
-        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+        throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
+        throw new Error('Chart failed to load');
       }),
       discoverPage.assertDiscoverNoResults().then(() => {
-        throw new Error('Test is failed: Discover shows no results');
+        throw new Error('Discover shows no results');
       }),
     ]);
   }, 'Navigating to the "Field Statistics" tab and asserting doc count');
@@ -135,16 +135,16 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
         headerBar.assertLoadingIndicator()
       ]),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       }),
       notifications.assertErrorIncrementCount().then(() => {
-        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+        throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
+        throw new Error('Chart failed to load');
       }),
       discoverPage.assertDiscoverNoResults().then(() => {
-        throw new Error('Test is failed: Discover shows no results');
+        throw new Error('Discover shows no results');
       }),
     ]);
   }, 'Selecting "*logs" data view, setting search interval and asserting canvas visibility');
@@ -161,19 +161,19 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
         headerBar.assertLoadingIndicator()
       ]),
       discoverPage.assertPatternsNotLoaded().then(() => {
-        throw new Error('Test is failed: Error loading categories');
+        throw new Error('Error loading categories');
       }),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       }),
       notifications.assertErrorIncrementCount().then(() => {
-        throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+        throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
       }),
       discoverPage.assertHistogramEmbeddedError().then(() => {
-        throw new Error('Test is failed: Chart failed to load');
+        throw new Error('Chart failed to load');
       }),
       discoverPage.assertDiscoverNoResults().then(() => {
-        throw new Error('Test is failed: Discover shows no results');
+        throw new Error('Discover shows no results');
       }),
     ]);
     log.info('Clicking on the filter pattern button');

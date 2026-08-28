@@ -47,17 +47,17 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await Promise.race([
       servicesPage.selectServiceOpbeansGo(),
       servicesPage.assertServicesNotFound().then(() => {
-        throw new Error('Test is failed because services not found');
+        throw new Error('Services not found');
       }),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
     log.info('Asserting visibility of the "Transactions" tab');
     await Promise.race([
       servicesPage.assertVisibilityTransactionsTab(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
   }, 'Setting search interval, then selecting "opbeans-go" and asserting transaction tab visibility');
@@ -74,7 +74,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
     await Promise.race([
       servicesPage.assertVisibilityVisualization(errorRate),
       servicesPage.assertTransactionErrorsNotFound().then(() => {
-        throw new Error('Test is failed because transaction errors not found');
+        throw new Error('Transaction errors not found');
       })
     ]);
   }, 'Navigating to the "Transactions" tab, clicking on the most impactful transaction and asserting visualization visibility');
@@ -123,7 +123,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
   }, 'Setting search interval and waiting for top traces table to load');
@@ -145,7 +145,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
     await Promise.race([
       tracesPage.assertRelatedError(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
     log.info('Clicking on the related error and asserting visibility of the error distribution chart');
@@ -174,7 +174,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
     await Promise.race([
       headerBar.assertLoadingIndicator(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
     log.info('Clicking on the dependency and asserting visibility of dependencies table');
@@ -186,10 +186,10 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
     await Promise.race([
       dependenciesPage.assertVisibilityTable(),
       dependenciesPage.assertOperationsNotFound().then(() => {
-        throw new Error('Test is failed because dependency operations not found');
+        throw new Error('Dependency operations not found');
       }),
       dependenciesPage.assertUnableToLoadPage().then(() => {
-        throw new Error('Test is failed: "Unable to load page" message encountered');
+        throw new Error('"Unable to load page" message encountered');
       })
     ]);
   }, 'Setting search interval, selecting the dependency, navigating to the "Operations" tab and asserting table visibility');
@@ -203,12 +203,12 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
     await Promise.race([
       dependenciesPage.assertVisibilityTimelineTransaction(),
       notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       }),
       dependenciesPage.assertUnableToLoadPage().then(() => {
-        throw new Error('Test is failed: "Unable to load page" message encountered');
+        throw new Error('"Unable to load page" message encountered');
       }),
-      new Promise((_, reject) => setTimeout(() => reject(new Error('Test is failed: Trace sample not loaded within 2 minutes')), 120000))
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Trace sample not loaded within 2 minutes')), 120000))
     ]);
   }, 'Clicking on the most impactful operation and asserting timeline visibility');
 
