@@ -260,19 +260,19 @@ for (const scenario of scenarios) {
                 headerBar.assertLoadingIndicator(),
               ]),
               hostsPage.assertVisualizationNoData(cpuUsageKPI).then(() => {
-                throw new Error('Test is failed because no visualization data available');
+                throw new Error('No visualization data available');
               }),
               hostsPage.assertVisualizationNoData(normalizedLoadKPI).then(() => {
-                throw new Error('Test is failed because no visualization data available');
+                throw new Error('No visualization data available');
               }),
               hostsPage.assertVisualizationNoData(memoryUsageKPI).then(() => {
-                throw new Error('Test is failed because no visualization data available');
+                throw new Error('No visualization data available');
               }),
               hostsPage.assertVisualizationNoData(diskUsageKPI).then(() => {
-                throw new Error('Test is failed because no visualization data available');
+                throw new Error('No visualization data available');
               }),
               notifications.assertErrorFetchingResource().then(() => {
-                throw new Error('Test is failed because Hosts data failed to load');
+                throw new Error('Hosts data failed to load');
               })
             ]);
           };

@@ -46,7 +46,7 @@ test('Data Set Quality', async ({ datePicker, headerBar, datasetsPage, notificat
       headerBar.assertLoadingIndicator()
       ]),
     notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
     }, 'Navigating to the "Data Set Quality" page and asserting visibility of elements');
@@ -68,7 +68,7 @@ test('Data Set Quality', async ({ datePicker, headerBar, datasetsPage, notificat
       headerBar.assertLoadingIndicator()
     ]),
     notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Test is failed: Error while fetching resource');
+        throw new Error('Error while fetching resource');
       })
     ]);
     }, 'Setting custom search interval and asserting visibility of visual elements');

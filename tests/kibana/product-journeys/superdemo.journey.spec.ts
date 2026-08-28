@@ -2,7 +2,6 @@ import { test } from 'oblt-playwright/fixtures/journey-fixtures';
 import { deleteAgentBuilderAgent } from 'oblt-playwright/helpers/api-client';
 import type { AgentDefinition } from 'oblt-playwright/pom/pages/agent-builder.page';
 
-const RESULT_TIMEOUT = 10_000;
 const ASSISTANT_RESPONSE_TIMEOUT = 25_000;
 
 // A unique ID keeps a leftover agent from a failed run out of the way of the
@@ -51,7 +50,12 @@ test.describe('Agent Builder', () => {
       await agentBuilderPage.updateInstructions(
         'When prompted with the phrase "hello world", simply reply "hi" and nothing else.',
       );
-      await notifications.assertToast('Agent details updated');
+      await Promise.race([
+        notifications.assertToast('Agent details updated'),
+        notifications.assertErrorAgentDetailsUpdate().then(() => {
+          throw new Error('Unable to update agent details');
+        }),
+      ]);
     });
 
     await test.step('Delete the agent', async () => {
@@ -64,15 +68,26 @@ test.describe('Agent Builder', () => {
 });
 
 test.describe('PromQL', () => {
-  test('Runs a PromQL query in Discover', async ({ discoverPage, sideNav }) => {
+  test('Runs a PromQL query in Discover', async ({ discoverPage, headerBar, notifications, sideNav }) => {
     await sideNav.clickDiscover();
     await discoverPage.switchToEsqlMode();
     await discoverPage.runEsqlQuery(
       'PROMQL index=metrics-* start=?_tstart end=?_tend step=5m sum by (region) (rate(metrics.http_requests_total[5m]))',
     );
-
-    await discoverPage.assertVisibilityResultValue('trading-na', RESULT_TIMEOUT);
-    await discoverPage.assertVisibilityResultValue('trading-emea', RESULT_TIMEOUT);
-    await discoverPage.assertVisibilityResultChart(RESULT_TIMEOUT);
+    await headerBar.assertVisibleLoadingIndicator();
+    await Promise.race([
+      Promise.all([ 
+        headerBar.assertLoadingIndicator(),
+        discoverPage.assertVisibilityDataGridRowCellValue('trading-na'),
+        discoverPage.assertVisibilityDataGridRowCellValue('trading-emea'),
+        discoverPage.assertVisibilityCanvas(),
+      ]),
+      notifications.assertErrorFetchingResource().then(() => {
+        throw new Error('Error while fetching resource');
+      }),
+      discoverPage.assertDiscoverNoResults().then(() => {
+        throw new Error('Discover shows no results');
+      }),
+    ]);
   });
 });

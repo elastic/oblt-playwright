@@ -57,10 +57,10 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
         headerBar.assertLoadingIndicator()
       ]),
       dashboardPage.assertAlreadyClosedError(title).then(() => {
-        throw new Error(`Test is failed due to an embedded error when loading visualization: 'Already closed, can't increment ref count'`);
+        throw new Error(`Embedded error when loading visualization: 'Already closed, can't increment ref count'`);
         }),
       dashboardPage.assertNoData(title).then(() => {
-        throw new Error('Test is failed due to not available data');
+        throw new Error('Not available data');
       })
     ])
   }, 'Setting search interval and ensuring visualizations are loaded');

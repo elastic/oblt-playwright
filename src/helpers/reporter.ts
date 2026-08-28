@@ -55,7 +55,7 @@ function formatErrorMessage(value: string): string {
     .split(/\r?\n/)
     .map((line) => line.trim().replace(/^-\s*/, ''))
     .filter(Boolean)
-    .join(' > ');
+    .join(' ');
 }
 
 // Strips the origin (scheme + host + optional port) and Kibana's build-hash

@@ -59,6 +59,7 @@ export default defineConfig({
     {
       name: 'journey',
       testMatch: '**\/*.journey.spec.ts',
+      teardown: 'upload-report',
       use: {
         ...devices['Desktop Chrome'],
         viewport: {width: 1920, height: 1200},
@@ -70,6 +71,10 @@ export default defineConfig({
         // },
       },
       dependencies: ['auth'],
+    },
+    {
+      name: 'upload-report',
+      testMatch: 'upload-report.teardown.ts',
     },
     {
       name: 'api',

@@ -177,16 +177,16 @@ for (const scenario of scenarios) {
               await Promise.race([
                 headerBar.assertLoadingIndicator(),
                 notifications.assertErrorFetchingResource().then(() => {
-                  throw new Error('Test is failed: Error while fetching resource');
+                  throw new Error('Error while fetching resource');
                 }),
                 notifications.assertErrorIncrementCount().then(() => {
-                  throw new Error(`Test is failed: Error loading data in index logs-*. already closed, can't increment ref count`);
+                  throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
                 }),
                 discoverPage.assertHistogramEmbeddedError().then(() => {
-                  throw new Error('Test is failed: Chart failed to load');
+                  throw new Error('Chart failed to load');
                 }),
                 discoverPage.assertDiscoverNoResults().then(() => {
-                  throw new Error('Test is failed: Discover shows no results');
+                  throw new Error('Discover shows no results');
                 }),
               ]);
             };
