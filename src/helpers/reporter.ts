@@ -139,7 +139,7 @@ export async function writeJsonReport(
   perfMetrics?: object,
   options?: ReportOptions,
 ) {
-  let files: string[] = [];
+  const files: string[] = [];
 
   const fileSuffix = options?.fileNameSuffix ?? '';
   const titleSuffix = options?.titleSuffix ?? '';
@@ -159,6 +159,7 @@ export async function writeJsonReport(
       doc_count: docsCount,
       period: buildPeriodLabel(),
     }),
+    project: testInfo.project.name,
     status: testInfo.status,
     duration: testInfo.duration,
     ...(errorMessages.length > 0 && {
@@ -202,6 +203,7 @@ export async function writeNetworkTraceReport(
     title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
     period: buildPeriodLabel(),
+    project: testInfo.project.name,
     status: testInfo.status,
     duration: testInfo.duration,
     ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map((error) => stripAnsi(error.message)).join('\n') } }),

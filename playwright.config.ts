@@ -74,7 +74,7 @@ export default defineConfig({
     },
     {
       name: 'upload-report',
-      testMatch: 'upload-report.teardown.ts',
+      testMatch: 'upload-report.ts',
     },
     {
       name: 'api',
