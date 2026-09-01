@@ -77,6 +77,7 @@ export const oblt_playwright = {
         properties: {
           title: { type: 'text', fields: { keyword: { type: 'keyword', ignore_above: 256 } } },
           startTime: { type: 'date' },
+          trigger: { type: 'keyword' },
           doc_count: {
             properties: {
               apm: { type: 'long' },
