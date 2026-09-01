@@ -7,6 +7,7 @@ import {
   TIME_UNIT,
   TIME_VALUE,
   REPORT_DIR,
+  TRIGGER,
 } from '../env';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -155,6 +156,7 @@ export async function writeJsonReport(
   const reportData = {
     title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
+    ...(TRIGGER && { trigger: TRIGGER }),
     ...(docsCount && {
       doc_count: docsCount,
       period: buildPeriodLabel(),

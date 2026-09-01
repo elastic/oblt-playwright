@@ -15,6 +15,7 @@ export const REPORT_CLUSTER_API_KEY = `${process.env.REPORT_CLUSTER_API_KEY}`?.r
 export const REPORT_FILE = `${process.env.REPORT_FILE}`;
 export const CI = process.env.CI || 'false';
 export const REPORT_DIR = process.env.REPORT_DIR || './playwright-report';
+export const TRIGGER = process.env.TRIGGER;
 
 /*
 A set of variables used in cross-cluster search test.
