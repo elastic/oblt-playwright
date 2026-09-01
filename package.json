@@ -33,7 +33,7 @@
     "typescript-eslint": "^8.67.0"
   },
   "dependencies": {
-    "console-table-printer": "^2.14.6",
+    "console-table-printer": "^2.16.1",
     "winston": "^3.18.3"
   }
 }
