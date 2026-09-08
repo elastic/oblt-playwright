@@ -22,7 +22,7 @@ export default class AgentBuilderPage extends BasePage {
     private readonly settingsSaveButton = () => this.page.getByTestId('editDetailsSaveButton');
     private readonly editSettingsButton = () => this.page.getByRole('button', { name: 'Edit agent settings' });
     private readonly chatTab = () => this.pageControls().getByRole('button', { name: 'Chat', exact: true });
-    private readonly overviewTab = () => this.page.getByRole('link', { name: 'Overview' });
+    private readonly overviewTab = () => this.page.locator('xpath=//div[@data-test-subj="agentBuilderWrapper"]//a[contains(text(),"Overview")]');
     private readonly agentsList = () => this.page.getByRole('main', { name: 'Agent Builder agents list' });
     private readonly agentSearchInput = () => this.agentsList().getByRole('searchbox');
     private readonly agentsTable = () => this.agentsList().getByRole('table');
