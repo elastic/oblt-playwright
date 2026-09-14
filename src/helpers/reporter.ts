@@ -8,9 +8,11 @@ import {
   TIME_VALUE,
   REPORT_DIR,
   TRIGGER,
+  SOURCE_BASE_URL,
 } from '../env';
 import * as fs from 'fs';
 import * as path from 'path';
+import { findFailingStep } from './journey-steps';
 import { Table } from 'console-table-printer';
 import { Logger } from "winston";
 import { NetworkTraceCapture } from './network-trace';
@@ -57,6 +59,64 @@ function formatErrorMessage(value: string): string {
     .map((line) => line.trim().replace(/^-\s*/, ''))
     .filter(Boolean)
     .join(' ');
+}
+
+// Frame forms written by `stringifyStackFrames`: `at <fn> (<path>:<line>:<col>)`
+// and `at <path>:<line>:<col>`, either optionally prefixed with `async `. The
+// journey spec frame is normally an awaited one, so it carries that prefix.
+const STACK_FRAME = /^\s*at\s+(?:async\s+)?(?:[^(]*\()?(\/[^\s)]+):(\d+):\d+\)?$/;
+
+// One link per stack frame, innermost first. Playwright has already stripped its
+// own frames, so only dependencies need filtering out.
+function repoLinks(stack: string | undefined, repoRoot: string) {
+  const links: { file: string; location: string; permalink: string }[] = [];
+
+  for (const raw of (stack ?? '').split('\n')) {
+    const match = STACK_FRAME.exec(raw);
+    if (!match) {
+      continue;
+    }
+
+    const file = path.relative(repoRoot, match[1]);
+    if (!file.startsWith('..') && !file.startsWith('node_modules/')) {
+      links.push({
+        file,
+        location: `${file}:${match[2]}`,
+        permalink: `${SOURCE_BASE_URL}/${file}#L${match[2]}`,
+      });
+    }
+  }
+
+  return links;
+}
+
+// Picks two frames out of the stack: the innermost one, where the error was
+// raised, and the first one belonging to the journey spec, which is the call that
+// led there. They are the same frame when the spec threw directly.
+//
+// Only the first error is read. It is the failure that ended the test, so its
+// frames fall inside the step that `errors.step` names. Later entries are hook
+// failures, such as a cleanup error in `afterEach`, whose frames belong to a
+// different phase. A test-timeout error carries no frames, so a timed-out test
+// reports the step name without a link rather than a link to the wrong place.
+function buildFailureLinks(testInfo: TestInfo) {
+  // `config.rootDir` is the configured `testDir` (`<repo>/tests`), so its parent
+  // is the repository root.
+  const repoRoot = path.resolve(testInfo.config.rootDir, '..');
+  const links = repoLinks(testInfo.errors[0]?.stack, repoRoot);
+  const thrown = links[0];
+  if (!thrown) {
+    return {};
+  }
+
+  const specFile = path.relative(repoRoot, testInfo.file);
+  const spec = links.find((link) => link.file === specFile) ?? thrown;
+
+  return {
+    step_location: spec.location,
+    step_permalink: spec.permalink,
+    ...(spec !== thrown && { throw_location: thrown.location, throw_permalink: thrown.permalink }),
+  };
 }
 
 // Strips the origin (scheme + host + optional port) and Kibana's build-hash
@@ -153,6 +213,7 @@ export async function writeJsonReport(
   const outputPath = path.join(outputDirectory, fileName);
 
   const errorMessages = testInfo.errors.map((error) => stripAnsi(error.message));
+  const failingStep = findFailingStep(testInfo);
   const reportData = {
     title: `${testInfo.title}${titleSuffix}`,
     startTime: testStartTime,
@@ -167,6 +228,8 @@ export async function writeJsonReport(
     ...(errorMessages.length > 0 && {
       errors: {
         message: formatErrorMessage(errorMessages.join('\n')),
+        ...(failingStep && { step: failingStep }),
+        ...buildFailureLinks(testInfo),
       },
     }),
     ...(clusterData && {

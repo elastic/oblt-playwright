@@ -1,5 +1,5 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { selectDefaultSpace, perfStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
 import { checkApmData, fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 
@@ -39,7 +39,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info('Navigating to the "Services" section');
     await page.goto('/app/apm/services');
     log.info(`${getDatePickerLogMessage()} and selecting the "opbeans-go" service`);
@@ -65,7 +65,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info('Navigating to the "Transactions" tab and asserting visibility of the "Throughput" visualization');
     await servicesPage.openTransactionsTab();
     await servicesPage.assertVisibilityVisualization(throughput);
@@ -82,7 +82,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step03', stepData, page, async () => {
+  await perfStep('step03', stepData, page, async () => {
     log.info('Clicking on the "Failed transaction correlations" tab');
     await servicesPage.openFailedTransactionCorrelationsTab();
     log.info('Asserting visibility of the "Correlation" button');
@@ -101,7 +101,7 @@ test('APM - Services', async ({ datePicker, discoverPage, notifications, page, s
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step04', stepData, page, async () => {
+  await perfStep('step04', stepData, page, async () => {
     log.info('Clicking on the "Investigate" button and navigating to Discover');
     await servicesPage.clickInvestigate();
     await servicesPage.clickTraceLogsButton();
@@ -115,7 +115,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info('Navigating to the "Traces" section');
     await page.goto('/app/apm/traces');
     log.info(`${getDatePickerLogMessage()} and waiting for the top traces table to be loaded`);
@@ -131,7 +131,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   log.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info('Opening the "Explorer" tab and filtering data by http.response.status_code : 502');
     await tracesPage.openExplorerTab();
     await tracesPage.filterBy('service.name : "opbeans-go" and http.response.status_code : 502');
@@ -140,7 +140,7 @@ test.skip('APM - Traces', async ({ datePicker, headerBar, notifications, page, s
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step03', stepData, page, async () => {
+  await perfStep('step03', stepData, page, async () => {
     log.info('Clicking on the "View related error" in the timeline and asserting related errors');
     await Promise.race([
       tracesPage.assertRelatedError(),
@@ -159,7 +159,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info('Navigating to the "Dependencies" section and asserting visibility of dependencies table');
     await page.goto('/app/apm/dependencies');
     await dependenciesPage.assertVisibilityTable();
@@ -168,7 +168,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
   log.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info(`${getDatePickerLogMessage()} and asserting visibility of dependencies table`);
     await datePicker.setInterval();
     await Promise.race([
@@ -197,7 +197,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
   log.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
-  await testStep('step03', stepData, page, async () => {
+  await perfStep('step03', stepData, page, async () => {
     log.info('Clicking on the most impactful operation and asserting visibility of the timeline');
     await dependenciesPage.clickTableRow();
     await Promise.race([
@@ -215,7 +215,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step04', stepData, page, async () => {
+  await perfStep('step04', stepData, page, async () => {
     log.info('Clicking on the transaction in the timeline and asserting visibility of the tab panel');
     await dependenciesPage.clickTimelineTransaction();
     await dependenciesPage.assertVisibilityTabPanel();
@@ -224,7 +224,7 @@ test.skip('APM - Dependencies', async ({ datePicker, dependenciesPage, discoverP
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step05', stepData, page, async () => {
+  await perfStep('step05', stepData, page, async () => {
     log.info('Clicking on the "Investigate" button and navigating to Trace logs');
     await dependenciesPage.clickInvestigateButton();
     await dependenciesPage.clickTraceLogsButton();

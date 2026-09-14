@@ -1,7 +1,7 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { expect } from "@playwright/test";
 import { STORAGE_STATE } from "../playwright.config";
-import { testStep, waitForOneOf } from 'oblt-playwright/helpers/test-utils';
+import { perfStep, waitForOneOf } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport } from 'oblt-playwright/helpers/reporter';
 import { KIBANA_HOST, KIBANA_USERNAME, KIBANA_PASSWORD } from 'oblt-playwright/env';
@@ -31,7 +31,7 @@ test("Authentication", async ({ page, log }, testInfo) => {
   const isLocalWorkflow = buildFlavor === "default" && isLocalKibanaHost;
 
   if (isServerlessWorkflow) {
-    index = await testStep('step01', stepData, page, async () => {
+    index = await perfStep('step01', stepData, page, async () => {
       log.info("Navigating to Kibana host");
       await page.goto(KIBANA_HOST);
 
@@ -69,7 +69,7 @@ test("Authentication", async ({ page, log }, testInfo) => {
       throw new Error("Authentication is failed");
     }
   } else if (isLocalWorkflow) {
-    index = await testStep('step01', stepData, page, async () => {
+    index = await perfStep('step01', stepData, page, async () => {
       log.info("Navigating to Kibana host");
       await page.goto(KIBANA_HOST);
 
@@ -108,7 +108,7 @@ test("Authentication", async ({ page, log }, testInfo) => {
       throw new Error("Authentication is failed.");
     }
   } else if (buildFlavor === "default") {
-    index = await testStep('step01', stepData, page, async () => {
+    index = await perfStep('step01', stepData, page, async () => {
       log.info("Navigating to Kibana host");
       await page.goto(KIBANA_HOST);
       

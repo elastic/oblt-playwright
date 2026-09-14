@@ -1,5 +1,5 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { selectDefaultSpace, testStep } from 'oblt-playwright/helpers/test-utils';
+import { selectDefaultSpace, perfStep } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 
@@ -34,7 +34,7 @@ test('Data Set Quality', async ({ datePicker, headerBar, datasetsPage, notificat
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info ('Navigating to the "Data Set Quality" page');
     await page.goto('/app/management/data/data_quality');
     log.info('Checking quality statistics...');
@@ -55,7 +55,7 @@ test('Data Set Quality', async ({ datePicker, headerBar, datasetsPage, notificat
   log.info('Waiting for 15s before proceeding to the next step...');
   await page.waitForTimeout(15000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info ('Setting search interval');
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();

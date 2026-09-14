@@ -62,8 +62,12 @@ Keep this source structure:
 - an independent source scenario in an independent test
 - dependent source phases in one test
 
-When named `test.step` blocks make the trace clearer, use named `test.step`
-blocks.
+Wrap each phase in `journeyStep` from `oblt-playwright/helpers/journey-steps`,
+not `test.step`. It records which step failed, so the JSON report and the Slack
+alert name the failing phase instead of showing only `file:line`.
+
+Name a phase, not an individual action. Call it inside the test body: a
+`journeyStep` in `beforeAll` is reported against every test in the suite.
 
 Do not:
 

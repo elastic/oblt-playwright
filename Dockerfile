@@ -8,5 +8,10 @@ RUN ./node_modules/.bin/playwright install --with-deps chromium
 COPY src/ ./src/
 COPY tests/ ./tests/
 
+# Failure reports link to the source on GitHub. Journeys run from this image
+# outside GitHub Actions, where GITHUB_SHA is unset, so the commit is baked in.
+ARG GIT_COMMIT=main
+ENV GIT_COMMIT=${GIT_COMMIT}
+
 ENTRYPOINT ["npx","playwright"]
 CMD ["--help"]

@@ -50,7 +50,16 @@ export async function selectDefaultSpace(
   }
 }
 
-export async function testStep(
+/**
+ * Times a step and records its duration into a caller-owned `stepData` array,
+ * which becomes the report's `steps` field. Used by the walkthrough, benchmark
+ * and auth suites, whose step titles are positional (`step01`...) to match the
+ * `oblt_playwright` index mapping.
+ *
+ * Product journeys use `journeyStep` from `./journey-steps` instead: it wraps
+ * `test.step` and names the failing phase in the report rather than timing it.
+ */
+export async function perfStep(
   title: string,
   stepData: object[],
   page: Page,

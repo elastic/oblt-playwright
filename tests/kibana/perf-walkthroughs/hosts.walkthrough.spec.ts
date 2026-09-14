@@ -1,5 +1,5 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { selectDefaultSpace, perfStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount, getHostData } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 
@@ -45,7 +45,7 @@ test('Hosts - Landing page - All elements', async ({ datePicker, headerBar, host
     let stepData: object[] = [];
     (testInfo as any).stepData = stepData;
 
-    await testStep('step01', stepData, page, async () => {
+    await perfStep('step01', stepData, page, async () => {
         log.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
         await hostsPage.setHostsLimit500();
@@ -88,7 +88,7 @@ test('Hosts - Landing page - Logs', async ({ datePicker, headerBar, hostsPage, p
     let stepData: object[] = [];
     (testInfo as any).stepData = stepData;
 
-    await testStep('step01', stepData, page, async () => {
+    await perfStep('step01', stepData, page, async () => {
         let noLogsData = false;
         log.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
@@ -117,7 +117,7 @@ test('Hosts - Landing page - Alerts', async ({ datePicker, headerBar, hostsPage,
     let stepData: object[] = [];
     (testInfo as any).stepData = stepData;
 
-    await testStep('step01', stepData, page, async () => {
+    await perfStep('step01', stepData, page, async () => {
         let noAlertsData = false;
         log.info('Navigating to the "Hosts" section');
         await page.goto('/app/metrics/hosts');
