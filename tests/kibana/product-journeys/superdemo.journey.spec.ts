@@ -1,5 +1,6 @@
 import { test } from 'oblt-playwright/fixtures/journey-fixtures';
 import { deleteAgentBuilderAgent } from 'oblt-playwright/helpers/api-client';
+import { journeyStep } from 'oblt-playwright/helpers/journey-steps';
 import type { AgentDefinition } from 'oblt-playwright/pom/pages/agent-builder.page';
 
 const ASSISTANT_RESPONSE_TIMEOUT = 25_000;
@@ -29,7 +30,7 @@ test.describe('Agent Builder', () => {
     notifications,
     sideNav,
   }) => {
-    await test.step('Create a new agent', async () => {
+    await journeyStep('Create a new agent', async () => {
       await sideNav.clickAgents();
       await agentBuilderPage.openManageAgents();
       await agentBuilderPage.createAgent(agent);
@@ -37,7 +38,7 @@ test.describe('Agent Builder', () => {
       await agentBuilderPage.assertAgentListed(agent.displayName);
     });
 
-    await test.step('Test the new agent', async () => {
+    await journeyStep('Test the new agent', async () => {
       await agentBuilderPage.openAgent(agent.displayName);
       await agentBuilderPage.openChatTab();
       await agentBuilderPage.sendPrompt('hello world');
@@ -45,7 +46,7 @@ test.describe('Agent Builder', () => {
       await agentBuilderPage.assertResponseCompleted();
     });
 
-    await test.step('Update the new agent', async () => {
+    await journeyStep('Update the new agent', async () => {
       await agentBuilderPage.openOverviewTab();
       await agentBuilderPage.updateInstructions(
         'When prompted with the phrase "hello world", simply reply "hi" and nothing else.',
@@ -58,7 +59,7 @@ test.describe('Agent Builder', () => {
       ]);
     });
 
-    await test.step('Delete the agent', async () => {
+    await journeyStep('Delete the agent', async () => {
       await agentBuilderPage.openManageAgents();
       await agentBuilderPage.filterAgents(agent.displayName);
       await agentBuilderPage.deleteAgent(agent.displayName);
@@ -69,25 +70,27 @@ test.describe('Agent Builder', () => {
 
 test.describe('PromQL', () => {
   test('Runs a PromQL query in Discover', async ({ discoverPage, headerBar, notifications, sideNav }) => {
-    await sideNav.clickDiscover();
-    await discoverPage.switchToEsqlMode();
-    await discoverPage.runEsqlQuery(
-      'PROMQL index=metrics-* start=?_tstart end=?_tend step=5m sum by (region) (rate(metrics.http_requests_total[5m]))',
-    );
-    await headerBar.assertVisibleLoadingIndicator();
-    await Promise.race([
-      Promise.all([ 
-        headerBar.assertLoadingIndicator(),
-        discoverPage.assertVisibilityDataGridRowCellValue('trading-na'),
-        discoverPage.assertVisibilityDataGridRowCellValue('trading-emea'),
-        discoverPage.assertVisibilityCanvas(),
-      ]),
-      notifications.assertErrorFetchingResource().then(() => {
-        throw new Error('Error while fetching resource');
-      }),
-      discoverPage.assertDiscoverNoResults().then(() => {
-        throw new Error('Discover shows no results');
-      }),
-    ]);
+    await journeyStep('Run a PromQL query', async () => {
+      await sideNav.clickDiscover();
+      await discoverPage.switchToEsqlMode();
+      await discoverPage.runEsqlQuery(
+        'PROMQL index=metrics-* start=?_tstart end=?_tend step=5m sum by (region) (rate(metrics.http_requests_total[5m]))',
+      );
+      await headerBar.assertVisibleLoadingIndicator();
+      await Promise.race([
+        Promise.all([
+          headerBar.assertLoadingIndicator(),
+          discoverPage.assertVisibilityDataGridRowCellValue('trading-na'),
+          discoverPage.assertVisibilityDataGridRowCellValue('trading-emea'),
+          discoverPage.assertVisibilityCanvas(),
+        ]),
+        notifications.assertErrorFetchingResource().then(() => {
+          throw new Error('Error while fetching resource');
+        }),
+        discoverPage.assertDiscoverNoResults().then(() => {
+          throw new Error('Discover shows no results');
+        }),
+      ]);
+    });
   });
 });

@@ -18,6 +18,18 @@ export const REPORT_DIR = process.env.REPORT_DIR || './playwright-report';
 export const TRIGGER = process.env.TRIGGER;
 
 /*
+Base URL for the source permalinks in failure reports. Links point at the commit
+that ran, so a line number stays correct after the file changes. Journeys run
+from the Docker image rather than GitHub Actions, so their commit is baked in as
+GIT_COMMIT at image build time; GITHUB_SHA covers the walkthrough suites, which
+do run in Actions.
+*/
+const sourceServer = process.env.GITHUB_SERVER_URL || 'https://github.com';
+const sourceRepository = process.env.GITHUB_REPOSITORY || 'elastic/oblt-playwright';
+const sourceRef = process.env.GITHUB_SHA || process.env.GIT_COMMIT || 'main';
+export const SOURCE_BASE_URL = `${sourceServer}/${sourceRepository}/blob/${sourceRef}`;
+
+/*
 A set of variables used in cross-cluster search test.
 */
 export const REMOTE_CLUSTERS = `${process.env.REMOTE_CLUSTERS}`;

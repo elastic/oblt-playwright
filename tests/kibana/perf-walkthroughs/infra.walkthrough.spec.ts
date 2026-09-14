@@ -1,6 +1,6 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { expect, Page } from "@playwright/test";
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { selectDefaultSpace, perfStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount, getPodData } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 import { importDashboards } from 'oblt-playwright/helpers/setup';
@@ -43,7 +43,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info('Navigating to Dashboards');
     await sideNav.clickDashboards();
     await dashboardPage.assertVisibilityHeading();
@@ -63,7 +63,7 @@ test.skip('Infrastructure - Cluster Overview dashboard', async ({ dashboardPage,
   log.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info(getDatePickerLogMessage());
     await datePicker.setInterval();
     log.info('Asserting visibility of the "Cores used vs total cores" and "Top Memory intensive pods per Node" visualizations');
@@ -97,7 +97,7 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
   (testInfo as any).stepData = stepData;
   const title = "K8S Aggregations";
   
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     await page.goto('/app/dashboards');
     await dashboardPage.assertVisibilityHeading();
     await dashboardPage.assertVisibilityTable();
@@ -106,7 +106,7 @@ test('K8S Aggregations dashboard', async ({ page, dashboardPage, datePicker, hea
     await page.getByRole('link', { name: '[Playwright Test] K8S Aggregations' }).click();
   }, 'Searching for the "K8S Aggregations" dashboard and navigating to it');
   
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info(`${getDatePickerLogMessage()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
@@ -130,7 +130,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info('Navigating to Infrastructure inventory');
     await page.goto('/app/metrics/inventory');
     log.info('Asserting visibility of the waffle map');
@@ -152,7 +152,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
   log.info('Waiting for 20s before proceeding to the next step...');
   await page.waitForTimeout(20000);
   
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info(getDatePickerLogMessage());
     await datePicker.setInterval();
     await page.mouse.wheel(0, 900);
@@ -174,7 +174,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
   log.info('Waiting for 20s before proceeding to the next step...');
   await page.waitForTimeout(20000);
 
-  await testStep('step03', stepData, page, async () => {
+  await perfStep('step03', stepData, page, async () => {
     await inventoryPage.clickReturnButton();
     await inventoryPage.closeInfraAssetDetailsFlyout();
     log.info('Switching to Pods view');
@@ -196,7 +196,7 @@ test('Infrastructure - Inventory', async ({ datePicker, inventoryPage, page, log
   log.info('Waiting for 10s before proceeding to the next step...');
   await page.waitForTimeout(10000);
 
-  await testStep('step04', stepData, page, async () => {
+  await perfStep('step04', stepData, page, async () => {
     log.info(getDatePickerLogMessage());
     await datePicker.setInterval();
     log.info('Asserting visibility of the "Pod CPU Usage" and "Pod Memory Usage" visualizations');

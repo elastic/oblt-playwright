@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
-import { testStep, resolveKibanaTimeRangeRison } from '../../src/helpers/test-utils';
+import { perfStep, resolveKibanaTimeRangeRison } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, getHostData } from '../../src/helpers/api-client';
 import { writeJsonReport, writeNetworkTraceReport, printResults } from '../../src/helpers/reporter';
 
@@ -289,7 +289,7 @@ for (const scenario of scenarios) {
           // vs warm reveals how much of the observed cost is one-time
           // bootstrap versus per-render work.
           for (const iteration of ITERATIONS) {
-            await testStep(iteration.step, stepData, page, async () => {
+            await perfStep(iteration.step, stepData, page, async () => {
               log.info(`Iteration "${iteration.label}": taking perf baseline and starting network trace`);
               await perfMetrics.takeBaseline();
               await networkTraceCollector.start();

@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { selectDefaultSpace, perfStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 import { importDashboards } from 'oblt-playwright/helpers/setup';
@@ -39,7 +39,7 @@ test.afterAll('Print test results', async ({}) => {
 
 async function testBody(title: string, page: Page, dashboardPage: DashboardPage, datePicker: DatePicker, headerBar: HeaderBar, log: Logger) {
   let stepData: object[] = [];
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     await dashboardPage.assertVisibilityHeading();
     await dashboardPage.assertVisibilityTable();
     log.info('Searching for the dashboard: ' + title);
@@ -47,7 +47,7 @@ async function testBody(title: string, page: Page, dashboardPage: DashboardPage,
     await page.getByRole('link', { name: title }).click();
   }, 'Searching for the dashboard');
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info(`${getDatePickerLogMessage()} and asserting the visualization: ` + title);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();

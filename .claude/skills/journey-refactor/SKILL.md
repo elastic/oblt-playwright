@@ -93,8 +93,10 @@ Keep this source structure:
 - each independent scenario in an independent test
 - dependent phases in one test
 
-When named `test.step` blocks make the trace clearer, use named `test.step`
-blocks. Change only the repository integration points that occur in the source.
+Wrap each phase in `journeyStep` from `oblt-playwright/helpers/journey-steps`,
+not `test.step`. Name a phase, not an individual action.
+
+Change only the repository integration points that occur in the source.
 
 Do not add:
 

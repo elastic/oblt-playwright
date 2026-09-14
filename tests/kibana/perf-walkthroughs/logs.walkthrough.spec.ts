@@ -1,5 +1,5 @@
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { selectDefaultSpace, testStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
+import { selectDefaultSpace, perfStep, getDatePickerLogMessage } from 'oblt-playwright/helpers/test-utils';
 import { fetchClusterData, getDocCount } from 'oblt-playwright/helpers/api-client';
 import { writeJsonReport, printResults } from 'oblt-playwright/helpers/reporter';
 
@@ -38,7 +38,7 @@ test.skip('Discover - All logs', async ({ datePicker, discoverPage, headerBar, n
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
@@ -68,7 +68,7 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
@@ -96,7 +96,7 @@ test('Discover - Field Statistics', async ({ datePicker, discoverPage, headerBar
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info('Navigating to the "Field statistics" tab and asserting visibility of the document count');
     await discoverPage.clickFieldStatsTab();
     await Promise.race([
@@ -124,7 +124,7 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
   let stepData: object[] = [];
   (testInfo as any).stepData = stepData;
 
-  await testStep('step01', stepData, page, async () => {
+  await perfStep('step01', stepData, page, async () => {
     log.info(`${getDatePickerLogMessage()}, asserting visibility of the chart, canvas, and data grid row`);
     await datePicker.setInterval();
     await headerBar.assertVisibleLoadingIndicator();
@@ -152,7 +152,7 @@ test('Discover - Patterns', async ({ datePicker, discoverPage, headerBar, notifi
   log.info('Waiting for 30s before proceeding to the next step...');
   await page.waitForTimeout(30000);
 
-  await testStep('step02', stepData, page, async () => {
+  await perfStep('step02', stepData, page, async () => {
     log.info('Navigating to the "Patterns" tab and asserting visibility of the patterns row toggle');
     await discoverPage.clickPatternsTab();
     await Promise.race([

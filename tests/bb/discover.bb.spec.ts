@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
 import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
-import { testStep, buildKibanaUrl } from '../../src/helpers/test-utils';
+import { perfStep, buildKibanaUrl } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, listDataViews } from '../../src/helpers/api-client';
 import { writeJsonReport, writeNetworkTraceReport, printResults } from '../../src/helpers/reporter';
 
@@ -144,7 +144,7 @@ for (const scenario of scenarios) {
         });
 
         try {
-          await testStep('step01', stepData, page, async () => {
+          await perfStep('step01', stepData, page, async () => {
             let appState: string;
             const { appPath, appState: urlAppState } = getUrlEmbeddedAppState(KIBANA_APP_PATH);
             if (DATA_VIEW_TITLE) {
