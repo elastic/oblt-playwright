@@ -72,6 +72,21 @@ const performanceMetricsProperties = {
   },
 };
 
+// `errors` was previously left to dynamic mapping, which gave `errors.message`
+// a `keyword` subfield at the default `ignore_above: 256`. Long messages were
+// silently dropped from it and vanished from every terms aggregation.
+// `details` gets no `keyword` subfield on purpose - it is only ever full-text
+// searched, so there is nothing to ignore.
+const errorProperties = {
+  message: { type: 'text', fields: { keyword: { type: 'keyword', ignore_above: 256 } } },
+  details: { type: 'text' },
+  step: { type: 'keyword' },
+  step_location: { type: 'keyword' },
+  step_permalink: { type: 'keyword' },
+  throw_location: { type: 'keyword' },
+  throw_permalink: { type: 'keyword' },
+};
+
 export const oblt_playwright = {
       mappings: {
         properties: {
@@ -89,7 +104,7 @@ export const oblt_playwright = {
           project: { type: 'keyword' },
           status: { type: 'keyword' },
           duration: { type: 'float' },
-          errors: { type: 'object' },
+          errors: { properties: errorProperties },
           cluster_name: { type: 'keyword' },
           build_flavor: { type: 'keyword' },
           steps: {
@@ -164,7 +179,7 @@ export const oblt_playwright_network_traces = {
           project: { type: 'keyword' },
           status: { type: 'keyword' },
           duration: { type: 'float' },
-          errors: { type: 'object' },
+          errors: { properties: errorProperties },
           cluster_name: { type: 'keyword' },
           build_flavor: { type: 'keyword' },
           networkTraceId: { type: 'keyword' },

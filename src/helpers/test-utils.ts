@@ -14,6 +14,49 @@ import {
 
 type WaitForRes = [locatorIndex: number, locator: Locator];
 
+const MAX_ERROR_LENGTH = 250;
+
+export function stripAnsi(value: string | undefined): string {
+  if (!value) {
+    return '';
+  }
+
+  return value.replace(/\u001b\[[0-9;]*m|\u001b/g, '');
+}
+
+function collapseLines(value: string): string {
+  return value
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^-\s*/, ''))
+    .filter(Boolean)
+    .join(' ');
+}
+
+// Condenses a Playwright error into something short enough to survive
+// `ignore_above` on `errors.message.keyword`, and readable once it gets there.
+//
+// An assertion failure puts the `expect()` description, when one was given, above
+// a line holding just `expect(locator).toBeVisible() failed`; without a
+// description that line carries the `Error: ` prefix instead. Everything below
+// it - locator, expected value, timeout, call log - is bulk. `expect.poll` and
+// `toPass` spell the call log `Call Log:`, hence the case-insensitive split.
+//
+// Anything that is not an assertion failure - a hand-thrown error, a test
+// timeout - falls through unchanged, `Error: ` prefix included, so those keep
+// grouping in Lens exactly as they do today.
+export function summarizeError(raw: string | undefined): string {
+  const text = stripAnsi(raw).split(/^call log:/im)[0];
+  const matcher = /^(?:Error:\s*)?(expect\(.*\) failed)\r?$/m.exec(text);
+
+  const summary = matcher
+    ? [collapseLines(text.slice(0, matcher.index)).replace(/^Error:\s*/, ''), matcher[1]]
+        .filter(Boolean)
+        .join(': ')
+    : collapseLines(text);
+
+  return summary.length > MAX_ERROR_LENGTH ? `${summary.slice(0, MAX_ERROR_LENGTH)}…` : summary;
+}
+
 export async function waitForOneOf(locators: Locator[]): Promise<WaitForRes> {
   const res = await Promise.race([
     ...locators.map(async (locator, index): Promise<WaitForRes> => {
@@ -86,7 +129,7 @@ export async function perfStep(
     });
 
     return result;
-  } catch (error) {
+  } catch (error: any) {
     const end: string = new Date().toISOString();
 
     stepData.push({
@@ -94,7 +137,7 @@ export async function perfStep(
         start,
         end,
         status: 'failed',
-        error: error.message.replace(/\u001b\[[0-9;]*m|\u001b/g, '')
+        error: summarizeError(error.message)
       }
     });
 

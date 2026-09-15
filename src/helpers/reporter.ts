@@ -13,6 +13,7 @@ import {
 import * as fs from 'fs';
 import * as path from 'path';
 import { findFailingStep } from './journey-steps';
+import { stripAnsi, summarizeError } from './test-utils';
 import { Table } from 'console-table-printer';
 import { Logger } from "winston";
 import { NetworkTraceCapture } from './network-trace';
@@ -43,22 +44,6 @@ function buildPeriodLabel() {
   return ABSOLUTE_TIME_RANGE
     ? `From ${START_DATE} to ${END_DATE}`
     : `Last ${TIME_VALUE} ${TIME_UNIT}`;
-}
-
-function stripAnsi(value: string | undefined): string {
-  if (!value) {
-    return '';
-  }
-
-  return value.replace(/\u001b\[[0-9;]*m|\u001b/g, '');
-}
-
-function formatErrorMessage(value: string): string {
-  return value
-    .split(/\r?\n/)
-    .map((line) => line.trim().replace(/^-\s*/, ''))
-    .filter(Boolean)
-    .join(' ');
 }
 
 // Frame forms written by `stringifyStackFrames`: `at <fn> (<path>:<line>:<col>)`
@@ -150,6 +135,21 @@ function sanitizePerfMetrics(metrics: object): object {
   };
 }
 
+// Cap on the full error text kept alongside the summary. Long enough for a
+// call log, short enough that a runaway error can't bloat the document.
+const MAX_ERROR_DETAILS_LENGTH = 4000;
+
+// The unabridged error text, for reading in Discover when the summary isn't
+// enough. Call logs quote the URLs Playwright navigated to, so origins are
+// stripped here for the same reason they are in `sanitizePerfMetrics`.
+function errorDetails(errors: { message?: string }[]): string {
+  return errors
+    .map((error) => stripAnsi(error.message))
+    .join('\n\n')
+    .replace(/https?:\/\/[^\s"')\]]+/g, (url) => stripUrlOrigin(url))
+    .slice(0, MAX_ERROR_DETAILS_LENGTH);
+}
+
 // Cap on rows rendered into the console-friendly slowest-requests table.
 // The JSON report keeps a wider list (see `slowRequestCount` at the collector
 // call site) for offline drill-down; the console view stays compact so it
@@ -212,7 +212,11 @@ export async function writeJsonReport(
   log.info(`Saving report file to ${outputDirectory}`);
   const outputPath = path.join(outputDirectory, fileName);
 
-  const errorMessages = testInfo.errors.map((error) => stripAnsi(error.message));
+  // Only the first error is summarized, for the reason `buildFailureLinks`
+  // explains: it is the failure that ended the test. On a timed-out test
+  // Playwright also records the assertion the timeout interrupted, in a racy
+  // order, so anything that reads more than `errors[0]` is non-deterministic.
+  const [firstError] = testInfo.errors;
   const failingStep = findFailingStep(testInfo);
   const reportData = {
     title: `${testInfo.title}${titleSuffix}`,
@@ -225,9 +229,10 @@ export async function writeJsonReport(
     project: testInfo.project.name,
     status: testInfo.status,
     duration: testInfo.duration,
-    ...(errorMessages.length > 0 && {
+    ...(firstError && {
       errors: {
-        message: formatErrorMessage(errorMessages.join('\n')),
+        message: summarizeError(firstError.message),
+        details: errorDetails(testInfo.errors),
         ...(failingStep && { step: failingStep }),
         ...buildFailureLinks(testInfo),
       },
@@ -271,7 +276,12 @@ export async function writeNetworkTraceReport(
     project: testInfo.project.name,
     status: testInfo.status,
     duration: testInfo.duration,
-    ...(testInfo.errors.length > 0 && { errors: { message: testInfo.errors.map((error) => stripAnsi(error.message)).join('\n') } }),
+    ...(testInfo.errors.length > 0 && {
+      errors: {
+        message: summarizeError(testInfo.errors[0].message),
+        details: errorDetails(testInfo.errors),
+      },
+    }),
     cluster_name: clusterData.cluster_name,
     build_flavor: clusterData.version.build_flavor,
     networkTraceId: networkTrace.traceId,
