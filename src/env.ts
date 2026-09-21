@@ -17,6 +17,23 @@ export const CI = process.env.CI || 'false';
 export const REPORT_DIR = process.env.REPORT_DIR || './playwright-report';
 export const TRIGGER = process.env.TRIGGER;
 
+
+function deriveReportClusterKibana(): string | undefined {
+  const kibana = REPORT_CLUSTER_ES.replace(/^(https?:\/\/[^./]+)\.es\./, '$1.kb.');
+  return kibana === REPORT_CLUSTER_ES ? undefined : kibana;
+}
+export const REPORT_CLUSTER_KIBANA = deriveReportClusterKibana();
+
+function deriveClusterName(): string | undefined {
+  try {
+    const [label] = new URL(KIBANA_HOST).hostname.split('.');
+    return label.replace(/-[0-9a-f]{6}$/, '') || undefined;
+  } catch {
+    return undefined;
+  }
+}
+export const CLUSTER_NAME = deriveClusterName();
+
 /*
 Base URL for the source permalinks in failure reports. Links point at the commit
 that ran, so a line number stays correct after the file changes. Journeys run

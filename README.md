@@ -100,6 +100,8 @@ Benchmark scenario runners extend the main JSON report with performance metrics 
 
 Product journeys generate a test-level JSON report containing the result status, duration, and errors. They do not collect walkthrough step timings or benchmark performance metrics.
 
+Journey reports also carry `cluster_name`, derived from the `KIBANA_HOST` hostname, so an alert can name the cluster that failed. When a journey fails, the screenshot is uploaded to the reporting cluster's Kibana and the report gets a `screenshot_url` pointing at it.
+
 ## 💻 Local usage
 
 ### 🛠️ Installation

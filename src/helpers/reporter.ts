@@ -38,6 +38,7 @@ function buildReportFileBase(testStartTime: string, testTitle: string): string {
 export type ReportOptions = {
   fileNameSuffix?: string;
   titleSuffix?: string;
+  screenshotUrl?: string;
 };
 
 function buildPeriodLabel() {
@@ -241,6 +242,7 @@ export async function writeJsonReport(
       cluster_name: clusterData.cluster_name,
       build_flavor: clusterData.version?.build_flavor,
     }),
+    ...(options?.screenshotUrl && { screenshot_url: options.screenshotUrl }),
     steps: stepData ? stepData : null,
     ...(cacheStats && { cacheStats }),
     ...(perfMetrics && { performanceMetrics: sanitizePerfMetrics(perfMetrics) }),

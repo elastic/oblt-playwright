@@ -106,6 +106,7 @@ export const oblt_playwright = {
           duration: { type: 'float' },
           errors: { properties: errorProperties },
           cluster_name: { type: 'keyword' },
+          screenshot_url: { type: 'keyword' },
           build_flavor: { type: 'keyword' },
           steps: {
             properties: {
