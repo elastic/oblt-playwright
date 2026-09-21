@@ -58,6 +58,7 @@ KIBANA_USERNAME_SERVERLESS =
 KIBANA_USERNAME_STATEFUL = 
 REPORT_CLUSTER_ES = 
 REPORT_CLUSTER_API_KEY = 
+REPORT_CLUSTER_KIBANA = 
 ```
 
 #### GitHub Actions Variables:
@@ -99,6 +100,8 @@ A custom reporter generates JSON files and sends them to a remote Elasticsearch 
 Benchmark scenario runners extend the main JSON report with performance metrics for each measured navigation. When a runner collects traces, it also writes an additional `*.network-trace.json` file containing the request summary and slowest request breakdown for the same measured navigation.
 
 Product journeys generate a test-level JSON report containing the result status, duration, and errors. They do not collect walkthrough step timings or benchmark performance metrics.
+
+Journey reports also carry `cluster_name`, derived from the `KIBANA_HOST` hostname, so an alert can name the cluster that failed. When a journey fails, the screenshot is uploaded to the reporting cluster's Kibana and the report gets a `screenshot_url` pointing at it — a public link that needs no credentials and expires after 90 days. This needs `REPORT_CLUSTER_KIBANA` to be set and the API key to hold the `filesManagement` Kibana privilege; without either, the run is unaffected and the field is simply absent.
 
 ## 💻 Local usage
 

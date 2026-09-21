@@ -12,10 +12,21 @@ export const END_DATE = process.env.END_DATE;
 export const ABSOLUTE_TIME_RANGE = process.env.ABSOLUTE_TIME_RANGE === 'true';
 export const REPORT_CLUSTER_ES = `${process.env.REPORT_CLUSTER_ES}`?.replace(/\/$/, '');
 export const REPORT_CLUSTER_API_KEY = `${process.env.REPORT_CLUSTER_API_KEY}`?.replace(/^ApiKey\s+/i, '') ?? '';
+export const REPORT_CLUSTER_KIBANA = process.env.REPORT_CLUSTER_KIBANA?.replace(/\/$/, '');
 export const REPORT_FILE = `${process.env.REPORT_FILE}`;
 export const CI = process.env.CI || 'false';
 export const REPORT_DIR = process.env.REPORT_DIR || './playwright-report';
 export const TRIGGER = process.env.TRIGGER;
+
+function deriveClusterName(): string | undefined {
+  try {
+    const [label] = new URL(KIBANA_HOST).hostname.split('.');
+    return label.replace(/-[0-9a-f]{6}$/, '') || undefined;
+  } catch {
+    return undefined;
+  }
+}
+export const CLUSTER_NAME = deriveClusterName();
 
 /*
 Base URL for the source permalinks in failure reports. Links point at the commit
