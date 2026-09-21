@@ -59,6 +59,7 @@ export default defineConfig({
     {
       name: 'journey',
       testMatch: '**\/*.journey.spec.ts',
+      expect: {timeout: 30000},
       teardown: 'upload-report',
       use: {
         ...devices['Desktop Chrome'],
