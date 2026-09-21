@@ -6,7 +6,7 @@ Failure screenshots are hosted in the reporting cluster's Kibana through the
 Files plugin.
 */
 const FILE_KIND = 'defaultImage';
-const SHARE_VALIDITY_DAYS = 90;
+const SHARE_VALIDITY_DAYS = 14;
 
 // One deadline for the whole upload. Without it an unresponsive reporting
 // cluster stalls fixture teardown and the JSON report is never written.
