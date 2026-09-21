@@ -17,12 +17,7 @@ export const CI = process.env.CI || 'false';
 export const REPORT_DIR = process.env.REPORT_DIR || './playwright-report';
 export const TRIGGER = process.env.TRIGGER;
 
-/*
-The reporting cluster's Kibana, where failure screenshots are hosted. Elastic
-Cloud gives Kibana and Elasticsearch the same hostname apart from the second
-label, so it is derived rather than configured separately. Anything that is not
-a Cloud URL yields undefined, which disables the upload.
-*/
+
 function deriveReportClusterKibana(): string | undefined {
   const kibana = REPORT_CLUSTER_ES.replace(/^(https?:\/\/[^./]+)\.es\./, '$1.kb.');
   return kibana === REPORT_CLUSTER_ES ? undefined : kibana;
