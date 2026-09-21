@@ -19,17 +19,24 @@ async function kibanaRequest<T>(
   signal: AbortSignal,
 ): Promise<T> {
   const isBlob = Buffer.isBuffer(body);
-  const response = await fetch(`${REPORT_CLUSTER_KIBANA}${path}`, {
-    method,
-    signal,
-    headers: {
-      Authorization: `ApiKey ${REPORT_CLUSTER_API_KEY}`,
-      'kbn-xsrf': 'true',
-      'x-elastic-internal-origin': 'oblt-playwright',
-      'Content-Type': isBlob ? 'image/png' : 'application/json',
-    },
-    body: isBlob ? new Uint8Array(body) : JSON.stringify(body),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${REPORT_CLUSTER_KIBANA}${path}`, {
+      method,
+      signal,
+      headers: {
+        Authorization: `ApiKey ${REPORT_CLUSTER_API_KEY}`,
+        'kbn-xsrf': 'true',
+        'x-elastic-internal-origin': 'oblt-playwright',
+        'Content-Type': isBlob ? 'image/png' : 'application/json',
+      },
+      body: isBlob ? new Uint8Array(body) : JSON.stringify(body),
+    });
+  } catch (error) {
+    // Names the call that failed; a bare timeout does not say which of the
+    // three it was. The host is left out, as it is everywhere else in reports.
+    throw new Error(`${method} ${path} failed: ${String(error)}`, { cause: error });
+  }
   if (!response.ok) {
     throw new Error(`${method} ${path} returned ${response.status}: ${await response.text()}`);
   }
