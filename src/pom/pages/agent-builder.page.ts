@@ -36,7 +36,7 @@ export default class AgentBuilderPage extends BasePage {
     private readonly conversationInput = () => this.page.getByTestId('agentBuilderConversationInputEditor');
     private readonly submitPromptButton = () => this.page.getByRole('button', { name: 'Submit', exact: true });
     private readonly assistantResponse = () => this.page.getByLabel('Assistant response').last();
-    private readonly responseCopyButton = () => this.page.getByTestId('roundResponseCopyButton').last();
+    private readonly responseCopyButton = () => this.page.getByTestId('responseCopyButton').last();
 
     public async openManageAgents() {
         this.log.info('Opening the agent list');
