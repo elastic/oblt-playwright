@@ -80,8 +80,7 @@ test.describe('PromQL', () => {
       await Promise.race([
         Promise.all([
           headerBar.assertLoadingIndicator(),
-          discoverPage.assertVisibilityDataGridRowCellValue('trading-na'),
-          discoverPage.assertVisibilityDataGridRowCellValue('trading-emea'),
+          discoverPage.assertVisibilityTotalDocumentsProcessed(),
           discoverPage.assertVisibilityCanvas(),
         ]),
         notifications.assertErrorFetchingResource().then(() => {
@@ -91,6 +90,8 @@ test.describe('PromQL', () => {
           throw new Error('Discover shows no results');
         }),
       ]);
+      await discoverPage.assertVisibilityDataGridRowCellValue('trading-na');
+      await discoverPage.assertVisibilityDataGridRowCellValue('trading-emea');
     });
   });
 });
