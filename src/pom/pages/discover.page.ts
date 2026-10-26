@@ -31,6 +31,7 @@ export default class DiscoverPage extends BasePage {
     private readonly switchToClassicButton = () => this.page.getByRole('button', { name: 'Switch to Classic' });
     private readonly queryInEsqlButton = () => this.page.getByRole('button', { name: 'Query in ES|QL' });
     private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
+    private readonly totalDocumentsProcessed = () => this.page.getByTestId('ESQLEditor-queryStats-totalDocumentsProcessed');
     private readonly dataGridRowCellValue = (value: string) =>
         this.page.locator(`xpath=(//*[@data-test-subj="dataGridRowCell"][contains(., "${value}")])[1]`);
 
@@ -104,6 +105,10 @@ export default class DiscoverPage extends BasePage {
 
     public async assertVisibilityDataGridRowCellValue(value: string) {
         await expect(this.dataGridRowCellValue(value), `"${value}" query result`).toBeVisible();
+    }
+
+    public async assertVisibilityTotalDocumentsProcessed() {
+        await expect(this.totalDocumentsProcessed(), 'Total documents processed').toBeVisible();
     }
 
     public async assertVisibilityFlyoutLogMessage() {
