@@ -40,6 +40,9 @@ export default defineConfig({
     {
       name: 'auth',
       testMatch: 'auth.ts',
+      // A failed login skips every project that depends on it, so retry it in
+      // place. The Job's backoffLimit is 0, and a new pod would redo the whole run.
+      retries: 2,
       use: {
         viewport: {width: 1920, height: 1200},
       },
