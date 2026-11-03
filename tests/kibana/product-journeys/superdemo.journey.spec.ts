@@ -76,12 +76,12 @@ test.describe('PromQL', () => {
       await discoverPage.runEsqlQuery(
         'PROMQL index=metrics-* start=?_tstart end=?_tend step=5m sum by (region) (rate(metrics.http_requests_total[5m]))',
       );
-      await headerBar.assertVisibleLoadingIndicator();
+      // Discover keeps showing the previous query's results until the PromQL result
+      // arrives, so only the PromQL cell values are a reliable signal that it finished.
       await Promise.race([
         Promise.all([
-          headerBar.assertLoadingIndicator(),
-          discoverPage.assertVisibilityTotalDocumentsProcessed(),
-          discoverPage.assertVisibilityCanvas(),
+          discoverPage.assertVisibilityDataGridRowCellValue('trading-na'),
+          discoverPage.assertVisibilityDataGridRowCellValue('trading-emea'),
         ]),
         notifications.assertErrorFetchingResource().then(() => {
           throw new Error('Error while fetching resource');
@@ -90,8 +90,9 @@ test.describe('PromQL', () => {
           throw new Error('Discover shows no results');
         }),
       ]);
-      await discoverPage.assertVisibilityDataGridRowCellValue('trading-na');
-      await discoverPage.assertVisibilityDataGridRowCellValue('trading-emea');
+      await headerBar.assertLoadingIndicator();
+      await discoverPage.assertVisibilityTotalDocumentsProcessed();
+      await discoverPage.assertVisibilityCanvas();
     });
   });
 });
