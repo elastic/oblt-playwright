@@ -152,6 +152,9 @@ export default class DiscoverPage extends BasePage {
             await this.queryInEsqlButton().click();
         }
         await expect(this.esqlEditor(), 'ES|QL editor').toBeVisible();
+        // The wrapper renders before Monaco mounts. Text typed in that window is lost
+        // and the editor then initializes with the default query.
+        await expect(this.esqlEditor().locator('.monaco-editor'), 'Monaco editor').toBeVisible();
     }
 
     public async runEsqlQuery(query: string) {
