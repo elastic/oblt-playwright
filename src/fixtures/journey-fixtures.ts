@@ -2,7 +2,7 @@ import { Page, TestInfo } from '@playwright/test';
 import { Logger } from 'winston';
 import { CLUSTER_NAME } from '../env';
 import { writeJsonReport } from '../helpers/reporter';
-import { uploadFailureScreenshot } from '../helpers/screenshot';
+import { SCREENSHOT_FILE, uploadFile } from '../helpers/kibana-files';
 import { test as base } from './page-fixtures';
 
 // Screenshots are taken here rather than through Playwright's `screenshot`
@@ -28,7 +28,7 @@ async function captureFailureScreenshot(
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-');
 
-  return uploadFailureScreenshot(log, png, fileName);
+  return uploadFile(log, png, `${fileName}.png`, SCREENSHOT_FILE);
 }
 
 export const test = base.extend<{ reportTestResult: void }>({
@@ -39,14 +39,18 @@ export const test = base.extend<{ reportTestResult: void }>({
 
       await use();
 
-      const screenshotUrl =
-        testInfo.status === testInfo.expectedStatus
-          ? undefined
-          : await captureFailureScreenshot(log, page, testInfo, testStartTime);
+      const didFail = testInfo.status !== testInfo.expectedStatus;
+      const screenshotUrl = didFail
+        ? await captureFailureScreenshot(log, page, testInfo, testStartTime)
+        : undefined;
+
+      // Playwright writes the trace when the context closes, after this
+      // fixture. The upload-report teardown finds it in this directory.
+      const traceDir = didFail ? testInfo.outputDir : undefined;
 
       await writeJsonReport(
         log, { cluster_name: CLUSTER_NAME }, testInfo, testStartTime,
-        undefined, undefined, undefined, undefined, { screenshotUrl },
+        undefined, undefined, undefined, undefined, { screenshotUrl, traceDir },
       );
     },
     { auto: true },

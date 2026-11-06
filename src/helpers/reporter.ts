@@ -18,7 +18,7 @@ import { Table } from 'console-table-printer';
 import { Logger } from "winston";
 import { NetworkTraceCapture } from './network-trace';
 
-const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
+export const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
 
 function ensureOutputDirectory() {
   if (!fs.existsSync(outputDirectory)) {
@@ -39,6 +39,7 @@ export type ReportOptions = {
   fileNameSuffix?: string;
   titleSuffix?: string;
   screenshotUrl?: string;
+  traceDir?: string;
 };
 
 function buildPeriodLabel() {
@@ -229,6 +230,7 @@ export async function writeJsonReport(
     }),
     project: testInfo.project.name,
     status: testInfo.status,
+    retry: testInfo.retry,
     duration: testInfo.duration,
     ...(firstError && {
       errors: {
@@ -243,6 +245,7 @@ export async function writeJsonReport(
       build_flavor: clusterData.version?.build_flavor,
     }),
     ...(options?.screenshotUrl && { screenshot_url: options.screenshotUrl }),
+    ...(options?.traceDir && { trace_dir: options.traceDir }),
     steps: stepData ? stepData : null,
     ...(cacheStats && { cacheStats }),
     ...(perfMetrics && { performanceMetrics: sanitizePerfMetrics(perfMetrics) }),
