@@ -2,10 +2,16 @@ import { Logger } from 'winston';
 import { REPORT_CLUSTER_API_KEY, REPORT_CLUSTER_KIBANA } from '../env';
 
 /*
-Failure screenshots are hosted in the reporting cluster's Kibana through the
-Files plugin.
+Failure screenshots and traces are hosted in the reporting cluster's Kibana
+through the Files plugin. Screenshots get a public share link. Traces contain
+session data, so they are not shared and can only be downloaded with a Kibana
+login.
 */
-const FILE_KIND = 'defaultImage';
+export const SCREENSHOT_FILE = { kind: 'defaultImage', mimeType: 'image/png', share: true };
+export const TRACE_FILE = { kind: 'observabilityFilesCases', mimeType: 'application/zip', share: false };
+
+export type FileOptions = { kind: string; mimeType: string; share: boolean };
+
 const SHARE_VALIDITY_DAYS = 14;
 
 // One deadline for the whole upload. Without it an unresponsive reporting
@@ -17,6 +23,7 @@ async function kibanaRequest<T>(
   path: string,
   body: object | Buffer,
   signal: AbortSignal,
+  contentType = 'application/json',
 ): Promise<T> {
   const isBlob = Buffer.isBuffer(body);
   let response: Response;
@@ -28,7 +35,7 @@ async function kibanaRequest<T>(
         Authorization: `ApiKey ${REPORT_CLUSTER_API_KEY}`,
         'kbn-xsrf': 'true',
         'x-elastic-internal-origin': 'oblt-playwright',
-        'Content-Type': isBlob ? 'image/png' : 'application/json',
+        'Content-Type': isBlob ? contentType : 'application/json',
       },
       body: isBlob ? new Uint8Array(body) : JSON.stringify(body),
     });
@@ -43,10 +50,13 @@ async function kibanaRequest<T>(
   return (await response.json()) as T;
 }
 
-export async function uploadFailureScreenshot(
+// Returns the URL of the uploaded file, or undefined if the upload failed.
+// `fileName` includes the extension.
+export async function uploadFile(
   log: Logger,
-  png: Buffer,
+  content: Buffer,
   fileName: string,
+  { kind, mimeType, share }: FileOptions,
 ): Promise<string | undefined> {
   if (!REPORT_CLUSTER_KIBANA) {
     return undefined;
@@ -57,23 +67,27 @@ export async function uploadFailureScreenshot(
   try {
     const created = await kibanaRequest<{ file: { id: string } }>(
       'POST',
-      `/api/files/files/${FILE_KIND}`,
-      { name: fileName, mimeType: 'image/png' },
+      `/api/files/files/${kind}`,
+      { name: fileName.replace(/\.[^.]+$/, ''), mimeType },
       signal,
     );
 
-    await kibanaRequest('PUT', `/api/files/files/${FILE_KIND}/${created.file.id}/blob`, png, signal);
+    await kibanaRequest('PUT', `/api/files/files/${kind}/${created.file.id}/blob`, content, signal, mimeType);
 
-    const share = await kibanaRequest<{ token: string }>(
+    if (!share) {
+      return `${REPORT_CLUSTER_KIBANA}/api/files/files/${kind}/${created.file.id}/blob/${fileName}`;
+    }
+
+    const shared = await kibanaRequest<{ token: string }>(
       'POST',
-      `/api/files/shares/${FILE_KIND}/${created.file.id}`,
+      `/api/files/shares/${kind}/${created.file.id}`,
       { validUntil: Date.now() + SHARE_VALIDITY_DAYS * 24 * 60 * 60 * 1000 },
       signal,
     );
 
-    return `${REPORT_CLUSTER_KIBANA}/api/files/public/blob/${fileName}.png?token=${share.token}`;
+    return `${REPORT_CLUSTER_KIBANA}/api/files/public/blob/${fileName}?token=${shared.token}`;
   } catch (error) {
-    log.warn(`Could not upload the failure screenshot: ${String(error)}`);
+    log.warn(`Could not upload ${fileName}: ${String(error)}`);
     return undefined;
   }
 }

@@ -64,8 +64,12 @@ export default defineConfig({
       testMatch: '**\/*.journey.spec.ts',
       expect: {timeout: 30000},
       teardown: 'upload-report',
+      // The pod doesn't set CI, so the global setting would give no retries.
+      // A journey that passes on a retry is reported as unstable.
+      retries: 2,
       use: {
         ...devices['Desktop Chrome'],
+        trace: 'retain-on-failure',
         viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
         // httpCredentials: {
