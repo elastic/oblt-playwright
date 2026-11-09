@@ -3,7 +3,7 @@ import { BasePage } from "../base.page";
 
 export default class HeaderBar extends BasePage {
 
-    private readonly loadingIndicator = () => this.page.locator('xpath=//*[@data-test-subj="globalLoadingIndicator"]');
+    private readonly loadingIndicator = () => this.page.getByTestId('globalLoadingIndicator');
 
     public async assertLoadingIndicator() {
         await expect(this.loadingIndicator(), 'Loading indicator').toBeHidden();

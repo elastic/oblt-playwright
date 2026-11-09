@@ -1,6 +1,18 @@
-import { expect } from "@playwright/test";
+import { expect, Response } from "@playwright/test";
 import { waitForOneOf } from "../../helpers/test-utils";
 import { BasePage } from "../base.page";
+
+/**
+ * A search request carrying this query. Matching on the query text ties the
+ * response to the submit that sent it, so results rendered for an earlier query
+ * can't stand in for it. The query is compared in its JSON-escaped form.
+ */
+const isSearchForQuery = (query: string) => (response: Response) => {
+    const request = response.request();
+    return request.method() === 'POST'
+        && new URL(response.url()).pathname.startsWith('/internal/search/')
+        && (request.postData() ?? '').includes(JSON.stringify(query).slice(1, -1));
+};
 
 export default class DiscoverPage extends BasePage {
 
@@ -28,12 +40,14 @@ export default class DiscoverPage extends BasePage {
     private readonly patternsNotLoaded = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//span[contains(text(), "Error loading categories")]');
     private readonly discoverNoResults = () => this.page.getByTestId('discoverNoResults');
     private readonly esqlEditor = () => this.page.getByTestId('ESQLEditor');
-    private readonly switchToClassicButton = () => this.page.getByRole('button', { name: 'Switch to Classic' });
-    private readonly queryInEsqlButton = () => this.page.getByRole('button', { name: 'Query in ES|QL' });
+    private readonly classicQueryInput = () => this.page.getByTestId('queryInput');
+    private readonly selectEsqlModeButton = () => this.page.getByTestId('select-text-based-language-btn');
     private readonly querySubmitButton = () => this.page.getByTestId('querySubmitButton');
+    private readonly dataGridUpdating = () => this.page.getByTestId('discoverDataGridUpdating');
+    private readonly totalHits = () => this.page.getByTestId('discoverQueryTotalHits');
     private readonly totalDocumentsProcessed = () => this.page.getByTestId('ESQLEditor-queryStats-totalDocumentsProcessed');
     private readonly dataGridRowCellValue = (value: string) =>
-        this.page.locator(`xpath=(//*[@data-test-subj="dataGridRowCell"][contains(., "${value}")])[1]`);
+        this.page.getByTestId('dataGridRowCell').filter({ hasText: value });
 
     public async clickDataView() {
         await this.dataViewSwitch().click();
@@ -103,8 +117,20 @@ export default class DiscoverPage extends BasePage {
         await expect(this.logsDataGridRow()).toBeVisible();
     }
 
+    /** The value usually repeats across rows, so this asserts that at least one cell has it. */
     public async assertVisibilityDataGridRowCellValue(value: string) {
-        await expect(this.dataGridRowCellValue(value), `"${value}" query result`).toBeVisible();
+        await expect(this.dataGridRowCellValue(value), `"${value}" query result`).not.toHaveCount(0);
+    }
+
+    /**
+     * Kibana's own page objects treat a search as finished when the grid has no
+     * update indicator, the query bar shows Submit again (it shows Cancel while a
+     * fetch runs) and the hit count is no longer loading.
+     */
+    public async assertSearchSettled() {
+        await expect(this.dataGridUpdating(), 'Data grid update indicator').toBeHidden();
+        await expect(this.querySubmitButton(), 'Query submit button').toBeVisible();
+        await expect(this.totalHits(), 'Hit count').not.toHaveAttribute('data-fetch-status', 'loading');
     }
 
     public async assertVisibilityTotalDocumentsProcessed() {
@@ -144,25 +170,34 @@ export default class DiscoverPage extends BasePage {
      */
     public async switchToEsqlMode() {
         await expect(
-            this.switchToClassicButton().or(this.queryInEsqlButton()),
-            'Query mode toggle'
+            this.esqlEditor().or(this.classicQueryInput()),
+            'Query editor'
         ).toBeVisible();
-        if (await this.queryInEsqlButton().isVisible()) {
+        if (!(await this.esqlEditor().isVisible())) {
             this.log.info('Switching Discover to ES|QL mode');
-            await this.queryInEsqlButton().click();
+            await this.selectEsqlModeButton().click();
         }
         await expect(this.esqlEditor(), 'ES|QL editor').toBeVisible();
         // The wrapper renders before Monaco mounts. Text typed in that window is lost
-        // and the editor then initializes with the default query.
+        // and the editor then initializes with the default query. Monaco renders no role
+        // or test-subj for the mounted editor, so its own class is the signal here, as in
+        // Kibana's page objects.
         await expect(this.esqlEditor().locator('.monaco-editor'), 'Monaco editor').toBeVisible();
     }
 
+    /**
+     * Resolves once the search request for this query has come back. If the typed
+     * text was lost and another query ran, the request never matches and this fails.
+     */
     public async runEsqlQuery(query: string) {
         this.log.info(`Running the ES|QL query: ${query}`);
         await this.esqlEditor().click();
         await this.page.keyboard.press('ControlOrMeta+A');
         await this.page.keyboard.insertText(query);
         await expect(this.querySubmitButton(), 'Query submit button').toBeEnabled();
-        await this.querySubmitButton().click();
+        await Promise.all([
+            this.page.waitForResponse(isSearchForQuery(query)),
+            this.querySubmitButton().click(),
+        ]);
     }
 }

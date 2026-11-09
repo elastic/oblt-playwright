@@ -3,9 +3,10 @@ import { BasePage } from "../base.page";
 
 export default class Notifications extends BasePage {
 
-    private readonly errorFetchingResource = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Error while fetching resource"]');
+    private readonly toastList = () => this.page.getByTestId('globalToastList');
+    private readonly errorFetchingResource = () => this.toastList().getByText('Error while fetching resource', { exact: true });
     private readonly errorIncrementCount = () => this.page.locator(`xpath=//p[@data-test-subj="errorToastMessage"]//*[contains(text(),"already closed, can't increment ref count")]`);
-    private readonly toast = (text: string) => this.page.getByText(text);
+    private readonly toast = (text: string) => this.toastList().getByText(text);
 
     public async assertToast(text: string) {
         await expect(this.toast(text), `"${text}" toast`).toBeVisible();
@@ -19,7 +20,7 @@ export default class Notifications extends BasePage {
         await expect(this.errorIncrementCount(), `Error loading data in index logs-*. already closed, can't increment ref count.`).toBeVisible();
         }
         
-    private readonly errorAgentDetailsUpdate = () => this.page.locator('xpath=//div[@data-test-subj="globalToastList"]//*[text()="Unable to update agent details"]');
+    private readonly errorAgentDetailsUpdate = () => this.toastList().getByText('Unable to update agent details', { exact: true });
 
     public async assertErrorAgentDetailsUpdate() {
         await expect(this.errorAgentDetailsUpdate(), 'Unable to update agent details').toBeVisible();
