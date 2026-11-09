@@ -35,7 +35,7 @@ test.describe('Agent Builder', () => {
       await agentBuilderPage.openManageAgents();
       await agentBuilderPage.createAgent(agent);
       await agentBuilderPage.filterAgents(agent.displayName);
-      await agentBuilderPage.assertAgentListed(agent.displayName);
+      await agentBuilderPage.assertAgentListed(agent.id);
     });
 
     await journeyStep('Test the new agent', async () => {
@@ -62,8 +62,8 @@ test.describe('Agent Builder', () => {
     await journeyStep('Delete the agent', async () => {
       await agentBuilderPage.openManageAgents();
       await agentBuilderPage.filterAgents(agent.displayName);
-      await agentBuilderPage.deleteAgent(agent.displayName);
-      await agentBuilderPage.assertAgentDeleted(agent.displayName);
+      await agentBuilderPage.deleteAgent(agent.id);
+      await agentBuilderPage.assertAgentDeleted(agent.id);
     });
   });
 });
@@ -90,6 +90,7 @@ test.describe('PromQL', () => {
           throw new Error('Discover shows no results');
         }),
       ]);
+      await discoverPage.assertSearchSettled();
       await headerBar.assertLoadingIndicator();
       await discoverPage.assertVisibilityTotalDocumentsProcessed();
       await discoverPage.assertVisibilityCanvas();

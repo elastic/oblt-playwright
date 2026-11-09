@@ -9,8 +9,8 @@ export default class SideNav extends BasePage {
 
     public readonly sideNav = () => this.page.locator('xpath=//nav[@data-test-subj="projectLayoutSideNav"]');
     private readonly moreMenuTrigger = () => this.page.getByTestId('kbnChromeNav-moreMenuTrigger');
-    private readonly discover = () => this.page.locator('xpath=//a[@id="discover"]');
     private readonly mainNav = () => this.page.getByRole('navigation', { name: 'Main' });
+    private readonly discover = () => this.mainNav().getByRole('link', { name: 'Discover', exact: true });
     private readonly agents = () => this.page.getByRole('link', { name: 'Agents', exact: true });
     private readonly dashboards = () => this.mainNav().getByRole('link', { name: 'Dashboards', exact: true });
     private readonly alerts = () => this.page.locator('xpath=//span[contains(text(),"Alerts")]');
