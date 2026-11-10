@@ -70,6 +70,9 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         trace: 'retain-on-failure',
+        // Fails a click or fill within seconds with the locator in the error,
+        // instead of at the test timeout with no locator. Also bounds waitForResponse.
+        actionTimeout: 30000,
         viewport: {width: 1920, height: 1200},
         storageState: STORAGE_STATE,
         // httpCredentials: {
