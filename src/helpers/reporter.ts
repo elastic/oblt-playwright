@@ -17,6 +17,7 @@ import { stripAnsi, summarizeError } from './test-utils';
 import { Table } from 'console-table-printer';
 import { Logger } from "winston";
 import { NetworkTraceCapture } from './network-trace';
+import type { LocatorFailure } from './locator-failure';
 
 export const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
 
@@ -40,6 +41,7 @@ export type ReportOptions = {
   titleSuffix?: string;
   screenshotUrl?: string;
   traceDir?: string;
+  locatorFailure?: LocatorFailure;
 };
 
 function buildPeriodLabel() {
@@ -238,6 +240,12 @@ export async function writeJsonReport(
         details: errorDetails(testInfo.errors),
         ...(failingStep && { step: failingStep }),
         ...buildFailureLinks(testInfo),
+        ...(options?.locatorFailure && {
+          locator: options.locatorFailure.locator,
+          kind: options.locatorFailure.kind,
+          candidates: options.locatorFailure.candidates,
+          url: stripUrlOrigin(options.locatorFailure.url),
+        }),
       },
     }),
     ...(clusterData && {

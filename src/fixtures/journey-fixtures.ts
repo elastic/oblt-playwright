@@ -1,6 +1,7 @@
 import { Page, TestInfo } from '@playwright/test';
 import { Logger } from 'winston';
 import { CLUSTER_NAME } from '../env';
+import { classifyLocatorFailure } from '../helpers/locator-failure';
 import { writeJsonReport } from '../helpers/reporter';
 import { SCREENSHOT_FILE, uploadFile } from '../helpers/kibana-files';
 import { test as base } from './page-fixtures';
@@ -48,9 +49,13 @@ export const test = base.extend<{ reportTestResult: void }>({
       // fixture. The upload-report teardown finds it in this directory.
       const traceDir = didFail ? testInfo.outputDir : undefined;
 
+      const locatorFailure = didFail
+        ? await classifyLocatorFailure(log, page, testInfo.errors[0]?.message)
+        : undefined;
+
       await writeJsonReport(
         log, { cluster_name: CLUSTER_NAME }, testInfo, testStartTime,
-        undefined, undefined, undefined, undefined, { screenshotUrl, traceDir },
+        undefined, undefined, undefined, undefined, { screenshotUrl, traceDir, locatorFailure },
       );
     },
     { auto: true },
