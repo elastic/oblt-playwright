@@ -41,6 +41,10 @@ export const test = base.extend<{ reportTestResult: void }>({
       await use();
 
       const didFail = testInfo.status !== testInfo.expectedStatus;
+      const locatorFailure = didFail
+        ? await classifyLocatorFailure(log, page, testInfo.errors[0]?.message)
+        : undefined;
+
       const screenshotUrl = didFail
         ? await captureFailureScreenshot(log, page, testInfo, testStartTime)
         : undefined;
@@ -48,10 +52,6 @@ export const test = base.extend<{ reportTestResult: void }>({
       // Playwright writes the trace when the context closes, after this
       // fixture. The upload-report teardown finds it in this directory.
       const traceDir = didFail ? testInfo.outputDir : undefined;
-
-      const locatorFailure = didFail
-        ? await classifyLocatorFailure(log, page, testInfo.errors[0]?.message)
-        : undefined;
 
       await writeJsonReport(
         log, { cluster_name: CLUSTER_NAME }, testInfo, testStartTime,

@@ -5,6 +5,11 @@ import { stripAnsi } from './test-utils';
 // Tells a locator that stopped matching (Kibana changed its UI) apart from a
 // product failure, using the page as it was when the test failed.
 //
+// `locator` means the element is missing and the page has a similar test id, or
+// an element with the same role (the candidates), or the locator matched several
+// elements. Leaving `/app/`, an error toast, a Kibana error screen, or an element
+// that exists but is hidden or disabled means `product`.
+//
 // Only the two locator styles the journey policy allows are understood:
 // `getByTestId('x')` and `getByRole('r', { name: 'y' })`, chained or not.
 // Each segment is checked inside the one before it; only the candidates
@@ -39,7 +44,7 @@ function extractLocator(message: string): string | undefined {
   const text = stripAnsi(message);
   const match =
     /^Locator: (.+)$/m.exec(text) ??
-    /waiting for (\S.*)$/m.exec(text) ??
+    /waiting for ((?:getBy|locator\().+)$/m.exec(text) ??
     /strict mode violation: (.+?) resolved to/.exec(text);
   return match?.[1].trim();
 }
@@ -94,7 +99,6 @@ const tokens = (value: string) =>
 function rank(wanted: string, values: string[], minShared: number): string[] {
   const wantedTokens = new Set(tokens(wanted));
   return [...new Set(values)]
-    .filter((value) => value !== wanted)
     .map((value) => ({ value, shared: tokens(value).filter((t) => wantedTokens.has(t)).length }))
     .filter(({ shared }) => shared >= minShared)
     .sort((a, b) => b.shared - a.shared)
@@ -147,16 +151,19 @@ async function inspect(
   const errorToast = page
     .getByTestId('globalToastList')
     .locator('.euiToast--danger, [data-euiicon-type="error"]');
-  if (leftApp || (await errorToast.count()) > 0) {
+  // Kibana's "application not found" page and its error boundaries.
+  const errorScreen = page.getByTestId(
+    /^(appNotFoundPageContent|errorBoundaryFatalHeader|errorBoundaryRecoverableHeader|sectionErrorBoundaryPromptHeader)$/,
+  );
+  if (leftApp || (await errorToast.or(errorScreen).count()) > 0) {
     return { kind: 'product', candidates: [] };
   }
 
   for (let i = 1; i <= segments.length; i++) {
     if ((await toLocator(page, segments.slice(0, i)).count()) === 0) {
       const similar = await candidates(page, segments[i - 1]);
-      // No element has this role at all: the role itself is the question, not the name.
-      const noRole = segments[i - 1].type === 'role' && similar.length === 0;
-      return { kind: noRole ? 'unknown' : 'locator', candidates: similar };
+      // No similar test id, or no element with this role, on the page: no evidence of a rename.
+      return { kind: similar.length === 0 ? 'unknown' : 'locator', candidates: similar };
     }
   }
 
@@ -176,6 +183,10 @@ export async function classifyLocatorFailure(
   const locator = errorMessage && extractLocator(errorMessage);
   if (!locator) {
     return undefined;
+  }
+
+  if (stripAnsi(errorMessage).includes('strict mode violation')) {
+    return { locator, kind: 'locator', candidates: [], url: page.url() };
   }
 
   const segments = parseSegments(locator);

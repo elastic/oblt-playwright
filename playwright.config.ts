@@ -103,6 +103,11 @@ export default defineConfig({
       dependencies: [],
     },
     {
+      // Runs against static pages; needs no cluster.
+      name: 'unit',
+      testMatch: '**/*.unit.spec.ts',
+    },
+    {
       name: 'bb',
       testDir: process.env.PLAYWRIGHT_TEST_DIR,
       testMatch: '**\/*.bb.spec.ts',
