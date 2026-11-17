@@ -7,6 +7,7 @@
     "./env": "./src/env.ts",
     "./helpers/api-client": "./src/helpers/api-client.ts",
     "./helpers/journey-steps": "./src/helpers/journey-steps.ts",
+    "./helpers/locator-failure": "./src/helpers/locator-failure.ts",
     "./helpers/reporter": "./src/helpers/reporter.ts",
     "./helpers/setup": "./src/helpers/setup.ts",
     "./helpers/test-utils": "./src/helpers/test-utils.ts",
@@ -18,7 +19,8 @@
   },
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test:unit": "playwright test --project unit"
   },
   "keywords": [],
   "author": "Andrei Bialenik",

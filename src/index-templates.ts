@@ -85,6 +85,10 @@ const errorProperties = {
   step_permalink: { type: 'keyword' },
   throw_location: { type: 'keyword' },
   throw_permalink: { type: 'keyword' },
+  locator: { type: 'keyword', ignore_above: 8191 },
+  kind: { type: 'keyword' },
+  candidates: { type: 'keyword', ignore_above: 8191 },
+  url: { type: 'keyword', ignore_above: 8191 },
 };
 
 export const oblt_playwright = {

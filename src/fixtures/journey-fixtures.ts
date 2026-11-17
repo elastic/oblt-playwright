@@ -1,6 +1,7 @@
 import { Page, TestInfo } from '@playwright/test';
 import { Logger } from 'winston';
 import { CLUSTER_NAME } from '../env';
+import { classifyLocatorFailure } from '../helpers/locator-failure';
 import { writeJsonReport } from '../helpers/reporter';
 import { SCREENSHOT_FILE, uploadFile } from '../helpers/kibana-files';
 import { test as base } from './page-fixtures';
@@ -40,6 +41,10 @@ export const test = base.extend<{ reportTestResult: void }>({
       await use();
 
       const didFail = testInfo.status !== testInfo.expectedStatus;
+      const locatorFailure = didFail
+        ? await classifyLocatorFailure(log, page, testInfo.errors[0]?.message)
+        : undefined;
+
       const screenshotUrl = didFail
         ? await captureFailureScreenshot(log, page, testInfo, testStartTime)
         : undefined;
@@ -50,7 +55,7 @@ export const test = base.extend<{ reportTestResult: void }>({
 
       await writeJsonReport(
         log, { cluster_name: CLUSTER_NAME }, testInfo, testStartTime,
-        undefined, undefined, undefined, undefined, { screenshotUrl, traceDir },
+        undefined, undefined, undefined, undefined, { screenshotUrl, traceDir, locatorFailure },
       );
     },
     { auto: true },
