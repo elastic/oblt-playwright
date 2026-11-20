@@ -78,6 +78,12 @@ test.describe('Preflight checks', () => {
     });
 
     test("Reporting cluster check", async ({ log }) => {
+        // The env.ts constants stringify unset variables to "undefined", so read process.env directly.
+        test.skip(
+            !process.env.REPORT_CLUSTER_ES || !process.env.REPORT_CLUSTER_API_KEY,
+            "REPORT_CLUSTER_ES and REPORT_CLUSTER_API_KEY are not both set, so no reports are uploaded"
+        );
+
         const indices: string[] = [
             'oblt-playwright',
             'oblt-playwright-network-traces',
