@@ -14,7 +14,9 @@ export const REPORT_CLUSTER_ES = `${process.env.REPORT_CLUSTER_ES}`?.replace(/\/
 export const REPORT_CLUSTER_API_KEY = `${process.env.REPORT_CLUSTER_API_KEY}`?.replace(/^ApiKey\s+/i, '') ?? '';
 export const REPORT_FILE = `${process.env.REPORT_FILE}`;
 export const CI = process.env.CI || 'false';
-export const REPORT_DIR = process.env.REPORT_DIR || './playwright-report';
+// An explicit REPORT_DIR wins over the GitHub Actions default, because other runners set it while also running with CI=true.
+export const OUTPUT_DIRECTORY =
+  process.env.REPORT_DIR || (CI === 'true' ? '/home/runner/work/oblt-playwright/' : './playwright-report');
 export const TRIGGER = process.env.TRIGGER;
 
 
