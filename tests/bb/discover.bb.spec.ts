@@ -62,7 +62,9 @@ function hasDesiredDiscoverState(url: string, expectedDataViewId?: string): bool
     return true;
   }
 
-  return decoded.includes(`index:'${expectedDataViewId}'`) || decoded.includes(`index:${expectedDataViewId}`);
+  // Kibana rewrites the legacy `index:'<id>'` into `dataSource:(dataViewId:'<id>',...)`,
+  // so match the id itself rather than a specific serialization.
+  return decoded.includes(expectedDataViewId);
 }
 
 const scenarios = loadScenarios();
