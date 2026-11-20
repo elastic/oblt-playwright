@@ -1,12 +1,11 @@
 import { TestInfo } from '@playwright/test';
 import {
   ABSOLUTE_TIME_RANGE,
-  CI,
   END_DATE,
   START_DATE,
   TIME_UNIT,
   TIME_VALUE,
-  REPORT_DIR,
+  OUTPUT_DIRECTORY,
   TRIGGER,
   SOURCE_BASE_URL,
 } from '../env';
@@ -19,7 +18,7 @@ import { Logger } from "winston";
 import { NetworkTraceCapture } from './network-trace';
 import type { LocatorFailure } from './locator-failure';
 
-export const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
+export const outputDirectory = OUTPUT_DIRECTORY;
 
 function ensureOutputDirectory() {
   if (!fs.existsSync(outputDirectory)) {

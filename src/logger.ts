@@ -1,8 +1,5 @@
 import winston from 'winston';
-import {
-  CI,
-  REPORT_DIR,
-} from './env';
+import { OUTPUT_DIRECTORY } from './env';
 
 const customLevels = {
   levels: {
@@ -19,8 +16,6 @@ const customLevels = {
   }
 };
 
-const outputDirectory = CI === 'true' ? '/home/runner/work/oblt-playwright/' : REPORT_DIR;
-
 const logger = winston.createLogger({
   levels: customLevels.levels,
   format: winston.format.combine(
@@ -29,7 +24,7 @@ const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.File({
-      filename: `${outputDirectory}/execution.json.log`,
+      filename: `${OUTPUT_DIRECTORY}/execution.json.log`,
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.json()
