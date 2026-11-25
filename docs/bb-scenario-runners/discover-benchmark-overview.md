@@ -11,10 +11,9 @@ It captures **both cold-cache and warmed steady-state** performance so the two c
 For each Discover scenario, the test confirms that:
 
 - The page opens with the intended scenario state (data view or `_a` target, plus time range).
-- Core elements are rendered:
-  - the histogram chart
-  - the first row of the documents grid
-  - the search has finished (no pending update, hit count loaded)
+- The result is rendered:
+  - data view scenarios: the first row of the documents grid, the finished search (no pending update, hit count loaded) and the histogram chart
+  - ES|QL scenarios: the ES|QL query stats line. Results such as `STATS COUNT(*)` or `TS metrics-*` have no documents grid, hit count or chart canvas to wait for.
 - No known error state is shown (failed fetch, histogram error, no results).
 
 ## How measurement is conducted
@@ -26,7 +25,7 @@ Each iteration:
 - Takes a fresh performance baseline.
 - Starts a new network trace.
 - Navigates to `about:blank` and then to the scenario URL via `page.goto`. Discover keeps its state in the URL hash, and a navigation that changes only the hash does not reload the page, so leaving the app first is what makes each iteration a full page load.
-- Waits for the loading indicator to hide, then for the first grid row, the finished search and the histogram chart.
+- Waits for the loading indicator to hide, then for the result checks listed above.
 - Checks that the final URL still holds the scenario's time range and data view.
 - Collects performance and network data, and emits its own JSON + network-trace report file.
 
