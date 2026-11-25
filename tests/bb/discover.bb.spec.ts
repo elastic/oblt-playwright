@@ -170,14 +170,13 @@ for (const scenario of scenarios) {
             await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
           };
 
-          // The page counts as rendered once the first grid row is visible, the
-          // search has finished and the histogram is drawn; the loading
-          // indicator alone can hide before any of that. Same order as the
-          // PromQL journey in superdemo.journey.spec.ts. The histogram check is
-          // the canvas: Kibana does not set `data-render-complete` on it.
+          // The page counts as rendered once the result is shown and the loading
+          // indicator is gone; the indicator alone can hide before the result.
           const waitForDiscoverRendered = async () => {
             await Promise.race([
-              discoverPage.assertVisibilityDataGridRow(),
+              DATA_VIEW_TITLE
+                ? discoverPage.assertVisibilityDataGridRow()
+                : discoverPage.assertVisibilityTotalDocumentsProcessed(),
               notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Error while fetching resource');
               }),
@@ -191,9 +190,13 @@ for (const scenario of scenarios) {
                 throw new Error('Discover shows no results');
               }),
             ]);
-            await discoverPage.assertSearchSettled();
-            await headerBar.assertLoadingIndicator();
-            await discoverPage.assertVisibilityCanvas();
+            if (DATA_VIEW_TITLE) {
+              await discoverPage.assertSearchSettled();
+              await headerBar.assertLoadingIndicator();
+              await discoverPage.assertVisibilityCanvas();
+            } else {
+              await headerBar.assertLoadingIndicator();
+            }
           };
 
           // MEASURED iterations. `cold` is the first load of the target URL
