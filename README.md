@@ -206,10 +206,10 @@ Benchmark runners read scenario parameters from `BB_SCENARIOS_FILE`. Each scenar
 BB_SCENARIOS_FILE=./scenarios.json npx playwright test tests/bb/hosts.bb.spec.ts --project bb --headed
 ```
 
-The Hosts benchmark runner performs a setup navigation to discover Kibana's canonical URL state, then runs three measured navigations for each scenario: `cold`, `warm1`, and `warm2`. Each measured pass produces its own JSON report and network trace report, making cold-cache and warmed steady-state results directly comparable.
+The Hosts benchmark runner performs a setup navigation to discover Kibana's canonical URL state, then runs three measured navigations for each scenario: `cold`, `warm1`, and `warm2`. Each measured pass produces its own JSON report and network trace report, making cold-cache and warmed steady-state results directly comparable. The Discover runner (`tests/bb/discover.bb.spec.ts`) takes the same three measurements, without the setup navigation.
 
 ## 📚 Additional Resources
 
 - [Test suites and required datasets](https://github.com/elastic/oblt-playwright/blob/main/docs/perf-walkthroughs/data-mapping.md)
 - Step definitions: [APM](https://github.com/elastic/oblt-playwright/blob/main/docs/perf-walkthroughs/walkthrough-apm.md) | [Dataset Quality](https://github.com/elastic/oblt-playwright/blob/main/docs/perf-walkthroughs/walkthrough-datasets.md) | [Hosts](https://github.com/elastic/oblt-playwright/blob/main/docs/perf-walkthroughs/walkthrough-hosts.md) | [Infrastructure](https://github.com/elastic/oblt-playwright/blob/main/docs/perf-walkthroughs/walkthrough-infra.md) | [Logs](https://github.com/elastic/oblt-playwright/blob/main/docs/perf-walkthroughs/walkthrough-logs.md)
-- Benchmark scenario runners: [Hosts overview](https://github.com/elastic/oblt-playwright/blob/main/docs/bb-scenario-runners/hosts-benchmark-overview.md)
+- Benchmark scenario runners: [Hosts overview](https://github.com/elastic/oblt-playwright/blob/main/docs/bb-scenario-runners/hosts-benchmark-overview.md) | [Discover overview](https://github.com/elastic/oblt-playwright/blob/main/docs/bb-scenario-runners/discover-benchmark-overview.md)

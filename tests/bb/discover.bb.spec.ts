@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
-import { perfStep, buildKibanaUrl } from '../../src/helpers/test-utils';
+import { createNetworkTraceCollector } from '../../src/helpers/network-trace';
+import { perfStep, buildKibanaUrl, resolveKibanaTimeRangeRison } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, listDataViews } from '../../src/helpers/api-client';
-import { writeJsonReport, writeNetworkTraceReport, printResults } from '../../src/helpers/reporter';
+import { printResults } from '../../src/helpers/reporter';
+import { ITERATIONS, IterationResult, writeIterationReports } from '../../src/helpers/bb-iterations';
 
 interface Scenario {
   name: string;
@@ -47,7 +48,7 @@ function getUrlEmbeddedAppState(targetUrl: string): { appPath: string; appState?
   return { appPath: u };
 }
 
-function hasDesiredDiscoverState(url: string, expectedDataViewId?: string): boolean {
+function hasDesiredDiscoverState(url: string, from: string, to: string, expectedDataViewId?: string): boolean {
   let decoded: string;
   try {
     decoded = decodeURIComponent(url);
@@ -56,6 +57,14 @@ function hasDesiredDiscoverState(url: string, expectedDataViewId?: string): bool
   }
 
   if (!decoded.includes('_a=')) {
+    return false;
+  }
+
+  // Kibana writes relative bounds like `now-1d` unquoted in rison, while
+  // `resolveKibanaTimeRangeRison` quotes any configured date, so compare
+  // without quotes.
+  const unquoted = decoded.replace(/'/g, '');
+  if (!unquoted.includes(`time:(from:${from.replace(/'/g, '')},to:${to.replace(/'/g, '')})`)) {
     return false;
   }
   if (!expectedDataViewId) {
@@ -101,17 +110,11 @@ for (const scenario of scenarios) {
     });
 
     test.afterEach('Log test results', async ({ log }, testInfo) => {
-      const perfData = (testInfo as any).perfData;
-      const networkTrace = (testInfo as any).networkTrace as NetworkTraceCapture | null | undefined;
-      const stepData = (testInfo as any).stepData;
-      const reportFiles = await writeJsonReport(
+      reports.push(...await writeIterationReports(
         log, clusterData, testInfo, testStartTime, doc_count,
-        stepData, undefined, perfData
-      );
-      if (networkTrace) {
-        await writeNetworkTraceReport(log, clusterData, testInfo, testStartTime, networkTrace, perfData ?? undefined);
-      }
-      reports.push(...reportFiles.filter(item => typeof item === 'string'));
+        (testInfo as any).stepData,
+        (testInfo as any).iterations as IterationResult[] | undefined,
+      ));
     });
 
     test.afterAll('Print test results', async ({}) => {
@@ -126,19 +129,17 @@ for (const scenario of scenarios) {
       ? `Navigating directly to ${KIBANA_APP_PATH} via data view id: ${dataViewId}`
       : `Navigating directly to ${KIBANA_APP_PATH} via url-embedded _a target`;
 
-    const stepDescription = DATA_VIEW_TITLE
-      ? `Opening ${KIBANA_APP_PATH} with ${DATA_VIEW_TITLE} data view id using warm-up + measured pass and collecting full navigation metrics`
-      : `Opening ${KIBANA_APP_PATH} with url-embedded _a target using warm-up + measured pass and collecting full navigation metrics`;
+    const stepDescription = (label: string) => DATA_VIEW_TITLE
+      ? `Discover ${label} measurement: open ${KIBANA_APP_PATH} with ${DATA_VIEW_TITLE} data view id and collect perf + network trace`
+      : `Discover ${label} measurement: open ${KIBANA_APP_PATH} with url-embedded _a target and collect perf + network trace`;
 
     test(testName,
       async ({ discoverPage, headerBar, notifications, perfMetrics, page, log }, testInfo) => {
         let stepData: object[] = [];
-        let perfData: object | null = null;
-        let networkTrace: NetworkTraceCapture | null = null;
+        const iterations: IterationResult[] = [];
         let traceCollectionStarted = false;
         (testInfo as any).stepData = stepData;
-        (testInfo as any).perfData = perfData;
-        (testInfo as any).networkTrace = networkTrace;
+        (testInfo as any).iterations = iterations;
 
         const networkTraceCollector = await createNetworkTraceCollector(page, log, {
           maxNetworkRequests: 2000,
@@ -146,91 +147,100 @@ for (const scenario of scenarios) {
         });
 
         try {
-          await perfStep('step01', stepData, page, async () => {
-            let appState: string;
-            const { appPath, appState: urlAppState } = getUrlEmbeddedAppState(KIBANA_APP_PATH);
-            if (DATA_VIEW_TITLE) {
-              if (!dataViewId) {
-                throw new Error(`Data view id was not resolved for data_view "${DATA_VIEW_TITLE}"`);
-              }
-              appState = `(index:'${dataViewId}')`;
-            } else if (urlAppState) {
-              appState = normalizeTarget(urlAppState);
-            } else {
-              throw new Error('Neither DATA_VIEW_TITLE nor a url-embedded _a target are configured');
+          let appState: string;
+          const { appPath, appState: urlAppState } = getUrlEmbeddedAppState(KIBANA_APP_PATH);
+          if (DATA_VIEW_TITLE) {
+            if (!dataViewId) {
+              throw new Error(`Data view id was not resolved for data_view "${DATA_VIEW_TITLE}"`);
             }
+            appState = `(index:'${dataViewId}')`;
+          } else if (urlAppState) {
+            appState = normalizeTarget(urlAppState);
+          } else {
+            throw new Error('Neither DATA_VIEW_TITLE nor a url-embedded _a target are configured');
+          }
 
-            const kibanaUrl = buildKibanaUrl(appPath, appState);
-            log.info(logNavigate);
-            const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
+          const { from, to } = resolveKibanaTimeRangeRison();
+          const kibanaUrl = buildKibanaUrl(appPath, appState);
+          const loadingIndicator = page.locator('[data-test-subj="globalLoadingIndicator"]');
 
-            const navigateAndConfirmDiscoverState = async () => {
-              await page.goto(kibanaUrl);
-              await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
-              await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
+          const navigateToDiscover = async () => {
+            await page.goto(kibanaUrl);
+            await loadingIndicator.waitFor({ state: 'visible', timeout: 2000 }).catch(() => {});
+            await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
+          };
+
+          // The page counts as rendered once the histogram is drawn, the first
+          // grid row is visible and the search has finished; the loading
+          // indicator alone can hide before any of that.
+          const waitForDiscoverRendered = async () => {
+            await Promise.race([
+              (async () => {
+                await Promise.all([
+                  discoverPage.assertChartIsRendered(),
+                  discoverPage.assertVisibilityDataGridRow(),
+                ]);
+                await discoverPage.assertSearchSettled();
+                await headerBar.assertLoadingIndicator();
+              })(),
+              notifications.assertErrorFetchingResource().then(() => {
+                throw new Error('Error while fetching resource');
+              }),
+              notifications.assertErrorIncrementCount().then(() => {
+                throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
+              }),
+              discoverPage.assertHistogramEmbeddedError().then(() => {
+                throw new Error('Chart failed to load');
+              }),
+              discoverPage.assertDiscoverNoResults().then(() => {
+                throw new Error('Discover shows no results');
+              }),
+            ]);
+          };
+
+          // MEASURED iterations. `cold` is the first load of the target URL
+          // in this browser session, so it includes one-time costs. `warm1`
+          // and `warm2` are full page loads of the same URL on a warmed
+          // session, so cold vs warm shows how much of the cost is one-time.
+          for (const iteration of ITERATIONS) {
+            await perfStep(iteration.step, stepData, page, async () => {
+              log.info(`Iteration "${iteration.label}": taking perf baseline and starting network trace`);
+              await perfMetrics.takeBaseline();
+              await networkTraceCollector.start();
+              traceCollectionStarted = true;
+
+              log.info(`Iteration "${iteration.label}": ${logNavigate}`);
+              await navigateToDiscover();
+
+              log.info(`Iteration "${iteration.label}": asserting Discover has rendered`);
+              await waitForDiscoverRendered();
 
               const finalUrl = page.url();
-              if (!hasDesiredDiscoverState(finalUrl, dataViewId)) {
+              if (!hasDesiredDiscoverState(finalUrl, from, to, dataViewId)) {
                 throw new Error(`Discover URL did not contain expected app state. Final URL: ${finalUrl}`);
               }
-            };
 
-            const waitForDiscoverLoadSettled = async () => {
-              await Promise.race([
-                headerBar.assertLoadingIndicator(),
-                notifications.assertErrorFetchingResource().then(() => {
-                  throw new Error('Error while fetching resource');
-                }),
-                notifications.assertErrorIncrementCount().then(() => {
-                  throw new Error(`Error loading data in index logs-*. already closed, can't increment ref count`);
-                }),
-                discoverPage.assertHistogramEmbeddedError().then(() => {
-                  throw new Error('Chart failed to load');
-                }),
-                discoverPage.assertDiscoverNoResults().then(() => {
-                  throw new Error('Discover shows no results');
-                }),
-              ]);
-            };
+              log.info(`Iteration "${iteration.label}": settled, collecting full performance metrics`);
+              const collectedPerfMetrics = await perfMetrics.collect();
+              const networkTrace = await networkTraceCollector.collect();
+              traceCollectionStarted = false;
 
-            // Warm-up pass (not measured): this loads one-time Discover assets
-            // and cold internal endpoints before we start timing, so the
-            // measured pass is more stable and comparable across runs.
-            log.info('Warm-up navigation to Discover target URL (NOT measured)');
-            await navigateAndConfirmDiscoverState();
-            log.info('Asserting Discover loading completion after warm-up pass');
-            await waitForDiscoverLoadSettled();
-
-            await perfMetrics.takeBaseline();
-            await networkTraceCollector.start();
-            traceCollectionStarted = true;
-
-            log.info('Measured navigation to Discover target URL');
-            await navigateAndConfirmDiscoverState();
-            log.info('Asserting Discover loading completion after measured pass');
-            await waitForDiscoverLoadSettled();
-
-            log.info('Step 1 settled, collecting full performance metrics');
-            const collectedPerfMetrics = await perfMetrics.collect();
-            networkTrace = await networkTraceCollector.collect();
-            traceCollectionStarted = false;
-
-            perfData = {
-              ...collectedPerfMetrics,
-              networkTraceId: networkTrace.traceId,
-              networkSummary: networkTrace.summary,
-              slowestRequests: networkTrace.slowestRequests,
-              slowestApiRequests: networkTrace.slowestApiRequests,
-              slowestStaticRequests: networkTrace.slowestStaticRequests,
-            };
-            (testInfo as any).perfData = perfData;
-            (testInfo as any).networkTrace = networkTrace;
-          }, stepDescription);
+              const perfData = {
+                iteration: iteration.label,
+                ...collectedPerfMetrics,
+                networkTraceId: networkTrace.traceId,
+                networkSummary: networkTrace.summary,
+                slowestRequests: networkTrace.slowestRequests,
+                slowestApiRequests: networkTrace.slowestApiRequests,
+                slowestStaticRequests: networkTrace.slowestStaticRequests,
+              };
+              iterations.push({ label: iteration.label, perfData, networkTrace });
+            }, stepDescription(iteration.label));
+          }
         } finally {
-          if (traceCollectionStarted && !networkTrace) {
+          if (traceCollectionStarted) {
             try {
-              networkTrace = await networkTraceCollector.collect();
-              (testInfo as any).networkTrace = networkTrace;
+              await networkTraceCollector.collect();
             } catch (error: any) {
               log.warn(`Network trace collection could not be completed: ${error.message}`);
             }
