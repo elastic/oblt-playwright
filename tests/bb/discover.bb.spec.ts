@@ -170,19 +170,14 @@ for (const scenario of scenarios) {
             await loadingIndicator.waitFor({ state: 'hidden', timeout: 180000 });
           };
 
-          // The page counts as rendered once the histogram is drawn, the first
-          // grid row is visible and the search has finished; the loading
-          // indicator alone can hide before any of that.
+          // The page counts as rendered once the first grid row is visible, the
+          // search has finished and the histogram is drawn; the loading
+          // indicator alone can hide before any of that. Same order as the
+          // PromQL journey in superdemo.journey.spec.ts. The histogram check is
+          // the canvas: Kibana does not set `data-render-complete` on it.
           const waitForDiscoverRendered = async () => {
             await Promise.race([
-              (async () => {
-                await Promise.all([
-                  discoverPage.assertChartIsRendered(),
-                  discoverPage.assertVisibilityDataGridRow(),
-                ]);
-                await discoverPage.assertSearchSettled();
-                await headerBar.assertLoadingIndicator();
-              })(),
+              discoverPage.assertVisibilityDataGridRow(),
               notifications.assertErrorFetchingResource().then(() => {
                 throw new Error('Error while fetching resource');
               }),
@@ -196,6 +191,9 @@ for (const scenario of scenarios) {
                 throw new Error('Discover shows no results');
               }),
             ]);
+            await discoverPage.assertSearchSettled();
+            await headerBar.assertLoadingIndicator();
+            await discoverPage.assertVisibilityCanvas();
           };
 
           // MEASURED iterations. `cold` is the first load of the target URL
@@ -203,6 +201,11 @@ for (const scenario of scenarios) {
           // and `warm2` are full page loads of the same URL on a warmed
           // session, so cold vs warm shows how much of the cost is one-time.
           for (const iteration of ITERATIONS) {
+            // Discover keeps its state in the URL hash, and a navigation to a
+            // URL that differs from the current one only by the hash does not
+            // reload the page. Leaving the app first makes the measured
+            // `goto` a real load.
+            await page.goto('about:blank');
             await perfStep(iteration.step, stepData, page, async () => {
               log.info(`Iteration "${iteration.label}": taking perf baseline and starting network trace`);
               await perfMetrics.takeBaseline();

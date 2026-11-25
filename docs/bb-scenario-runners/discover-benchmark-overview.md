@@ -25,8 +25,8 @@ Each iteration:
 
 - Takes a fresh performance baseline.
 - Starts a new network trace.
-- Navigates to the scenario URL via `page.goto` (a full page load — no bfcache).
-- Waits for the loading indicator to hide, then for the histogram, the first grid row and the finished search.
+- Navigates to `about:blank` and then to the scenario URL via `page.goto`. Discover keeps its state in the URL hash, and a navigation that changes only the hash does not reload the page, so leaving the app first is what makes each iteration a full page load.
+- Waits for the loading indicator to hide, then for the first grid row, the finished search and the histogram chart.
 - Checks that the final URL still holds the scenario's time range and data view.
 - Collects performance and network data, and emits its own JSON + network-trace report file.
 
