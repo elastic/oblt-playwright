@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 import { test } from 'oblt-playwright/fixtures/page-fixtures';
-import { createNetworkTraceCollector, NetworkTraceCapture } from '../../src/helpers/network-trace';
+import { createNetworkTraceCollector } from '../../src/helpers/network-trace';
 import { perfStep, resolveKibanaTimeRangeRison } from '../../src/helpers/test-utils';
 import { fetchClusterData, getDocCount, getHostData } from '../../src/helpers/api-client';
-import { writeJsonReport, writeNetworkTraceReport, printResults } from '../../src/helpers/reporter';
+import { printResults } from '../../src/helpers/reporter';
+import { ITERATIONS, IterationResult, writeIterationReports } from '../../src/helpers/bb-iterations';
 
 interface Scenario {
   name: string;
@@ -64,26 +65,9 @@ function hasDesiredHostsState(url: string, hostLimit: number, from: string, to: 
 const HOSTS_APP_PATH = '/app/metrics/hosts';
 const scenarios = loadScenarios();
 
-// Each scenario runs the measured navigation three times to expose both
-// cold-cache cost (first hit) and warmed steady-state cost (subsequent hits).
+// Each scenario runs the measured navigation three times (see ITERATIONS).
 // The bootstrap navigation is shared across all three and is NOT counted as
 // an iteration; it only exists to read Hosts' canonical URL shape.
-type IterationDescriptor = {
-  label: 'cold' | 'warm1' | 'warm2';
-  step: 'step01' | 'step02' | 'step03';
-};
-const ITERATIONS: IterationDescriptor[] = [
-  { label: 'cold', step: 'step01' },
-  { label: 'warm1', step: 'step02' },
-  { label: 'warm2', step: 'step03' },
-];
-
-type IterationResult = {
-  label: IterationDescriptor['label'];
-  perfData: object;
-  networkTrace: NetworkTraceCapture;
-};
-
 for (const scenario of scenarios) {
   test.describe(`Hosts - ${scenario.name}`, () => {
     let clusterData: any;
@@ -101,39 +85,11 @@ for (const scenario of scenarios) {
     });
 
     test.afterEach('Log test results', async ({ log }, testInfo) => {
-      const stepData = (testInfo as any).stepData;
-      const iterations = (testInfo as any).iterations as IterationResult[] | undefined;
-
-      if (Array.isArray(iterations) && iterations.length > 0) {
-        // Per-iteration reports: one JSON + one network-trace file per
-        // iteration, suffixed and title-tagged so cold/warm1/warm2 are
-        // distinguishable both on disk and in the printed console output.
-        for (const iteration of iterations) {
-          const fileNameSuffix = `_${iteration.label}`;
-          const titleSuffix = ` [${iteration.label}]`;
-          const reportFiles = await writeJsonReport(
-            log, clusterData, testInfo, testStartTime, doc_count,
-            stepData, undefined, iteration.perfData,
-            { fileNameSuffix, titleSuffix },
-          );
-          if (iteration.networkTrace) {
-            await writeNetworkTraceReport(
-              log, clusterData, testInfo, testStartTime, iteration.networkTrace,
-              iteration.perfData,
-              { fileNameSuffix, titleSuffix },
-            );
-          }
-          reports.push(...reportFiles.filter(item => typeof item === 'string'));
-        }
-      } else {
-        // Fallback path for partial runs (e.g. test failed before any
-        // iteration completed): still emit a report with whatever stepData
-        // was captured so the failure is recorded.
-        const reportFiles = await writeJsonReport(
-          log, clusterData, testInfo, testStartTime, doc_count, stepData,
-        );
-        reports.push(...reportFiles.filter(item => typeof item === 'string'));
-      }
+      reports.push(...await writeIterationReports(
+        log, clusterData, testInfo, testStartTime, doc_count,
+        (testInfo as any).stepData,
+        (testInfo as any).iterations as IterationResult[] | undefined,
+      ));
     });
 
     test.afterAll('Print test results', async ({}) => {
